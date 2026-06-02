@@ -6,7 +6,7 @@ namespace ChessSharp.Pieces;
 public class Bishop : ChessPiece
 {
     public Bishop(PieceColor pieceColor)
-        : base(pieceColor, PieceType.Bishop, pieceColor == PieceColor.White ? "♗" : "♝")
+     : base(pieceColor, PieceType.Bishop, pieceColor == PieceColor.White ? "B" : "b")
     {
     }
 
