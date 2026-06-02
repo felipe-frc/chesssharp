@@ -1,0 +1,16 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.rsuser
+*.userosscache
+*.sln.docstates
+
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+.vscode/
+.idea/
