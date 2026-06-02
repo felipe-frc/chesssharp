@@ -28,6 +28,17 @@ public class ChessBoard
         return GetPieceAt(position) is null;
     }
 
+    public void MovePiece(BoardPosition origin, BoardPosition target)
+    {
+        var piece = GetPieceAt(origin);
+
+        if (piece is null)
+            throw new InvalidOperationException("Não existe peça na posição de origem.");
+
+        SetPieceAt(target, piece);
+        SetPieceAt(origin, null);
+    }
+
     public bool IsPathClear(BoardPosition currentPosition, BoardPosition targetPosition)
     {
         int rowStep = Math.Sign(targetPosition.Row - currentPosition.Row);
