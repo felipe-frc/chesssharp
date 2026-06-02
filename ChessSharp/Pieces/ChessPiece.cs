@@ -1,4 +1,5 @@
-﻿using ChessSharp.Enums;
+﻿using ChessSharp.Board;
+using ChessSharp.Enums;
 
 namespace ChessSharp.Pieces;
 
@@ -20,4 +21,10 @@ public abstract class ChessPiece
     {
         HasMoved = true;
     }
+
+    public abstract bool IsValidMove(
+        BoardPosition currentPosition,
+        BoardPosition targetPosition,
+        ChessBoard board
+    );
 }
