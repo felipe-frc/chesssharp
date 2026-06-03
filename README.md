@@ -6,11 +6,11 @@
 
 # ♟️ ChessSharp
 
-Jogo de xadrez desenvolvido em **C# com .NET**, executado no console, com foco em lógica de programação, orientação a objetos, validação de regras, testes automatizados, cobertura de testes, organização de código e evolução incremental por releases.
+Jogo de xadrez desenvolvido em **C# com .NET**, com versão em console e interface gráfica 2D em **WPF**, focado em lógica de programação, orientação a objetos, validação de regras, inteligência artificial simples, testes automatizados, cobertura de testes, organização de código e evolução incremental por releases.
 
-O projeto permite jogar uma partida de xadrez contra a máquina, utilizando comandos no formato padrão de coordenadas do tabuleiro, como `e2 e4`. O jogador pode escolher se deseja jogar com as peças brancas ou pretas, enquanto a máquina controla a cor oposta por meio de um bot com busca minimax simples.
+O projeto permite jogar uma partida de xadrez contra a máquina. Na versão console, o jogador utiliza comandos no formato padrão de coordenadas do tabuleiro, como `e2 e4`. Na versão desktop, o jogador movimenta as peças com o mouse em um tabuleiro visual 2D.
 
-A versão atual conta com renderização visual aprimorada no console, peças Unicode, escolha de cor do jogador, detecção de xeque e xeque-mate, regras especiais como **roque** e **promoção de peão**, bot com avaliação de tabuleiro e simulação de jogadas futuras, além de cobertura de testes integrada ao pipeline de CI.
+A versão atual conta com motor de regras mais completo, incluindo detecção de xeque e xeque-mate, roque, promoção de peão, en passant, empate por afogamento, bot com minimax simples, cobertura de testes integrada ao pipeline de CI e interface gráfica 2D com seleção de peças, movimentação por clique e destaque visual de movimentos legais.
 
 ---
 
@@ -19,13 +19,16 @@ A versão atual conta com renderização visual aprimorada no console, peças Un
 Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimentos em:
 
 - Desenvolvimento de aplicações em C# com .NET;
+- Desenvolvimento de interface gráfica desktop com WPF;
 - Programação orientada a objetos;
 - Modelagem de domínio com classes, enums e responsabilidades bem definidas;
 - Implementação de regras de movimentação das peças de xadrez;
 - Implementação de regras reais de xeque e xeque-mate;
-- Implementação de regras especiais como roque e promoção de peão;
+- Implementação de regras especiais como roque, promoção de peão e en passant;
+- Detecção de empate por afogamento;
 - Manipulação de matrizes para representação de tabuleiro;
 - Validação de entradas do usuário;
+- Movimentação por mouse na interface gráfica;
 - Criação de um bot para jogar contra o usuário;
 - Implementação de busca minimax simples;
 - Avaliação material do tabuleiro;
@@ -42,15 +45,17 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 
 ## ✅ Funcionalidades
 
-### ♟️ Tabuleiro
+### ♟️ Motor do Jogo
 
 - Representação de tabuleiro 8x8;
 - Conversão de posições no formato de xadrez, como `e2`, `a1` e `h8`;
-- Renderização do tabuleiro no console;
-- Casas alternadas com cores diferentes;
-- Peças representadas por símbolos Unicode reais de xadrez;
-- Exibição das coordenadas do tabuleiro;
-- Melhor espaçamento visual entre as casas.
+- Controle de turno entre peças brancas e pretas;
+- Validação de movimentos legais;
+- Validação de caminho livre para torre, bispo e rainha;
+- Captura de peças adversárias;
+- Bloqueio de captura de peças da mesma cor;
+- Bloqueio de captura direta do rei;
+- Bloqueio de movimentos que deixam o próprio rei em xeque.
 
 ### 🧩 Peças
 
@@ -62,17 +67,16 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
   - Rainha;
   - Rei.
 - Validação individual de movimentação por peça;
-- Validação de caminho livre para torre, bispo e rainha;
-- Captura de peças adversárias;
-- Bloqueio de captura de peças da mesma cor;
-- Bloqueio de captura direta do rei.
+- Regras específicas para cada tipo de peça;
+- Controle de peças que já se moveram, necessário para regras como roque.
 
-### 🎮 Jogabilidade
+### 🎮 Versão Console
 
-- Jogador pode escolher jogar com peças brancas ou pretas;
-- Máquina controla automaticamente a cor oposta;
-- Quando o jogador escolhe as brancas, ele inicia a partida;
-- Quando o jogador escolhe as pretas, a máquina faz o primeiro movimento;
+- Execução da partida pelo terminal;
+- Renderização do tabuleiro no console;
+- Casas alternadas com cores diferentes;
+- Peças representadas por símbolos Unicode;
+- Exibição das coordenadas do tabuleiro;
 - Entrada de movimentos no formato `origem destino`.
 
 Exemplo:
@@ -81,18 +85,38 @@ Exemplo:
 e2 e4
 ```
 
-- Validação de:
-  - Movimento inválido;
-  - Posição inexistente;
-  - Casa de origem vazia;
-  - Tentativa de mover peça adversária;
-  - Tentativa de capturar peça da mesma cor;
-  - Tentativa de capturar diretamente o rei;
-  - Turno incorreto;
-  - Movimento que deixa o próprio rei em xeque;
-  - Movimento que não resolve uma situação de xeque.
+- Escolha da cor do jogador:
+  - Brancas;
+  - Pretas.
+- Máquina controla automaticamente a cor oposta;
+- Encerramento manual da partida com o comando:
 
-### 👑 Xeque e Xeque-mate
+```txt
+sair
+```
+
+### 🖥️ Interface Gráfica 2D
+
+- Projeto desktop criado com WPF;
+- Tabuleiro visual 8x8;
+- Visual em tons de madeira;
+- Coordenadas exibidas ao redor do tabuleiro;
+- Peças renderizadas visualmente na interface;
+- Seleção de peças com o mouse;
+- Movimentação por clique na casa de destino;
+- Botões de:
+  - Nova partida;
+  - Sair.
+- Mensagens curtas de status da partida;
+- Integração da interface gráfica com o motor de regras existente;
+- Máquina joga automaticamente após o movimento do usuário;
+- Destaque visual da peça selecionada;
+- Destaque dos movimentos legais usando marcadores em formato de losango;
+- Exibição apenas de movimentos válidos para a peça selecionada;
+- Em situação de xeque, a interface mostra apenas movimentos que resolvem o xeque;
+- Bloqueio de tentativas de movimento fora das casas destacadas.
+
+### 👑 Xeque, Xeque-mate e Empate
 
 - Detecção de xeque;
 - Detecção de xeque-mate;
@@ -100,7 +124,8 @@ e2 e4
 - Identificação da posição do rei;
 - Simulação de movimentos para verificar a segurança do rei;
 - Impedimento de movimentos que deixam o próprio rei em xeque;
-- Encerramento correto da partida por xeque-mate.
+- Encerramento correto da partida por xeque-mate;
+- Detecção de empate por afogamento quando o jogador não está em xeque, mas não possui movimentos legais.
 
 ### 🏰 Regras Especiais
 
@@ -120,7 +145,10 @@ e2 e4
 - Bloqueio de roque quando há peças entre o rei e a torre;
 - Bloqueio de roque quando o rei está em xeque;
 - Bloqueio de roque quando o rei passa por casa atacada;
-- Bloqueio de roque quando o rei termina em casa atacada.
+- Bloqueio de roque quando o rei termina em casa atacada;
+- Captura en passant;
+- En passant disponível apenas imediatamente após o avanço duplo de um peão adversário;
+- Remoção correta do peão capturado por en passant.
 
 ### 🤖 Bot da Máquina
 
@@ -128,7 +156,7 @@ e2 e4
 - Busca movimentos legais disponíveis;
 - Avalia o material do tabuleiro;
 - Simula jogadas futuras usando minimax simples;
-- Usa profundidade padrão controlada para preservar desempenho no console;
+- Usa profundidade padrão controlada para preservar desempenho;
 - Utiliza poda alpha-beta para otimizar a busca;
 - Considera consequências futuras antes de escolher uma jogada;
 - Respeita xeque, xeque-mate e movimentos legais;
@@ -136,6 +164,7 @@ e2 e4
 - Não captura diretamente o rei;
 - Mantém suporte a roque;
 - Mantém suporte a promoção de peão;
+- Mantém suporte a en passant;
 - Promove peões automaticamente para rainha quando uma promoção estiver disponível.
 
 ### 🧪 Qualidade e Validação
@@ -147,31 +176,21 @@ e2 e4
 - Badge de cobertura exibido no README;
 - Relatório de cobertura disponibilizado como artefato no GitHub Actions.
 
-### 🏁 Fim de Jogo
-
-- Vitória das brancas por xeque-mate;
-- Vitória das pretas por xeque-mate;
-- Vitória do jogador caso a máquina não possua movimentos legais;
-- Encerramento manual da partida com o comando:
-
-```txt
-sair
-```
-
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-| Camada          | Tecnologia                 |
-| --------------- | -------------------------- |
-| Linguagem       | C#                         |
-| Plataforma      | .NET                       |
-| Interface       | Console                    |
-| Testes          | xUnit                      |
-| Cobertura       | Coverlet / ReportGenerator |
-| CI/CD           | GitHub Actions             |
-| Versionamento   | Git / GitHub               |
-| IDE recomendada | Visual Studio 2022         |
+| Camada            | Tecnologia                 |
+| ----------------- | -------------------------- |
+| Linguagem         | C#                         |
+| Plataforma        | .NET                       |
+| Interface Console | Console Application        |
+| Interface Desktop | WPF                        |
+| Testes            | xUnit                      |
+| Cobertura         | Coverlet / ReportGenerator |
+| CI/CD             | GitHub Actions             |
+| Versionamento     | Git / GitHub               |
+| IDE recomendada   | Visual Studio 2022         |
 
 ---
 
@@ -215,6 +234,13 @@ ChessSharp/
 │   │
 │   └── Program.cs
 │
+├── ChessSharp.Desktop/
+│   ├── App.xaml
+│   ├── App.xaml.cs
+│   ├── MainWindow.xaml
+│   ├── MainWindow.xaml.cs
+│   └── ChessSharp.Desktop.csproj
+│
 ├── ChessSharp.Tests/
 │   ├── AI/
 │   │   └── ChessBotTests.cs
@@ -225,6 +251,7 @@ ChessSharp/
 │   ├── Game/
 │   │   ├── CastlingTests.cs
 │   │   ├── ChessGameTests.cs
+│   │   ├── EnPassantTests.cs
 │   │   └── PawnPromotionTests.cs
 │   │
 │   └── Pieces/
@@ -283,7 +310,7 @@ dotnet restore
 
 ---
 
-### 3. Execute o projeto
+### 3. Execute a versão console
 
 ```bash
 dotnet run --project ChessSharp
@@ -291,16 +318,32 @@ dotnet run --project ChessSharp
 
 ---
 
+### 4. Execute a versão desktop 2D
+
+```bash
+dotnet run --project ChessSharp.Desktop
+```
+
+Caso esteja dentro da pasta `ChessSharp.Desktop`, execute:
+
+```bash
+dotnet run
+```
+
+---
+
 ## 🎮 Como Jogar
 
-Ao iniciar o jogo, o usuário escolhe se deseja jogar com as peças brancas ou pretas.
+### Versão Console
+
+Ao iniciar o jogo no console, o usuário escolhe se deseja jogar com as peças brancas ou pretas.
 
 ```txt
 1 - Brancas
 2 - Pretas
 ```
 
-Depois da escolha, o tabuleiro será exibido no console.
+Depois da escolha, o tabuleiro será exibido no terminal.
 
 O jogador deve digitar os movimentos usando o formato:
 
@@ -329,13 +372,26 @@ b - Bispo
 n - Cavalo
 ```
 
-Após o movimento do jogador, a máquina joga automaticamente com a cor oposta.
-
-Para sair da partida, digite:
+Para sair da partida no console, digite:
 
 ```txt
 sair
 ```
+
+---
+
+### Versão Desktop
+
+Na interface gráfica 2D:
+
+- Clique em uma peça branca;
+- As casas legais serão marcadas com losangos;
+- Clique em uma das casas marcadas para mover;
+- A máquina joga automaticamente após o seu movimento;
+- Use o botão **Nova partida** para reiniciar;
+- Use o botão **Sair** para fechar o jogo.
+
+Quando o rei estiver em xeque, a interface destacará apenas os movimentos que resolvem o xeque.
 
 ---
 
@@ -368,6 +424,9 @@ O projeto possui testes automatizados com xUnit cobrindo:
 - Bloqueio de roque inválido;
 - Bloqueio de roque quando o rei está em xeque;
 - Bloqueio de roque passando por casa atacada;
+- En passant;
+- Bloqueio de en passant fora da jogada imediatamente seguinte;
+- Empate por afogamento;
 - Validação de movimentos legais do bot;
 - Validação de promoção de peão pelo bot;
 - Validação para impedir o bot de capturar diretamente o rei;
@@ -490,20 +549,33 @@ O badge de cobertura fica disponível no topo do README:
 
 ### v2.0.0
 
-- Criar uma interface gráfica 2D;
-- Adicionar tabuleiro visual com aparência de madeira;
-- Adicionar peças em imagem;
-- Permitir movimentação com mouse;
-- Substituir comandos digitados por clique nas casas;
-- Melhorar a experiência visual da partida.
+- Criar projeto desktop com WPF;
+- Adicionar interface gráfica 2D;
+- Renderizar tabuleiro visual;
+- Renderizar peças na interface;
+- Permitir seleção de peças com mouse;
+- Permitir movimentação por clique;
+- Integrar o bot à interface desktop;
+- Adicionar botão de nova partida;
+- Adicionar botão de sair;
+- Melhorar mensagens da interface;
+- Destacar peça selecionada;
+- Destacar movimentos legais com marcadores em formato de losango;
+- Exibir apenas movimentos válidos em situação de xeque;
+- Manter compatibilidade com o motor de regras existente.
 
 ### v2.1.0
 
-- Destacar casas disponíveis ao selecionar uma peça;
-- Destacar casa de origem e destino;
-- Destacar capturas possíveis;
-- Melhorar feedback visual para movimentos inválidos;
-- Tornar a jogabilidade mais intuitiva.
+- Substituir peças Unicode por imagens PNG;
+- Melhorar o visual das peças;
+- Adicionar texturas ao tabuleiro;
+- Criar uma experiência visual mais próxima de jogos de xadrez modernos.
+
+### v2.2.0
+
+- Adicionar modal visual para promoção de peão;
+- Permitir escolher a peça promovida diretamente na interface gráfica;
+- Melhorar o fluxo visual de regras especiais.
 
 ### v3.0.0
 
@@ -515,6 +587,14 @@ O badge de cobertura fica disponível no topo do README:
 ---
 
 ## 📦 Releases
+
+### v2.0.0 - Interface gráfica 2D com WPF
+
+Versão focada na evolução visual do ChessSharp, adicionando uma interface gráfica desktop em WPF, tabuleiro 2D, movimentação por mouse, integração com o bot e marcadores visuais para movimentos legais.
+
+### v1.7.0 - En passant
+
+Versão focada na implementação da regra especial en passant, completando as principais regras especiais do xadrez junto com roque e promoção de peão.
 
 ### v1.6.0 - Cobertura de testes com badge
 
