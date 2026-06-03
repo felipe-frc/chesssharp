@@ -38,10 +38,15 @@ public class ChessGame
             return MoveResult.Invalid(exception.Message);
         }
 
-        if (origin == target)
+        return TryMove(new Move(origin, target));
+    }
+
+    public MoveResult TryMove(Move move)
+    {
+        if (move.Origin == move.Target)
             return MoveResult.Invalid("A posição de origem e destino não podem ser iguais.");
 
-        var piece = Board.GetPieceAt(origin);
+        var piece = Board.GetPieceAt(move.Origin);
 
         if (piece is null)
             return MoveResult.Invalid("Não existe peça na posição de origem.");
@@ -49,20 +54,20 @@ public class ChessGame
         if (piece.PieceColor != CurrentTurn)
             return MoveResult.Invalid($"Não é a vez das peças {GetTurnName(piece.PieceColor)}.");
 
-        var targetPiece = Board.GetPieceAt(target);
+        var targetPiece = Board.GetPieceAt(move.Target);
 
         if (targetPiece is not null && targetPiece.PieceColor == piece.PieceColor)
             return MoveResult.Invalid("Você não pode capturar uma peça da mesma cor.");
 
-        if (!piece.IsValidMove(origin, target, Board))
+        if (!piece.IsValidMove(move.Origin, move.Target, Board))
             return MoveResult.Invalid("Movimento inválido para essa peça.");
 
-        Board.MovePiece(origin, target);
+        Board.MovePiece(move.Origin, move.Target);
         piece.MarkAsMoved();
 
         string moveMessage = targetPiece is null
-            ? $"Movimento realizado: {origin} para {target}."
-            : $"Movimento realizado: {origin} capturou peça em {target}.";
+            ? $"Movimento realizado: {move.Origin} para {move.Target}."
+            : $"Movimento realizado: {move.Origin} capturou peça em {move.Target}.";
 
         ChangeTurn();
 
