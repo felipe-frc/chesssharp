@@ -8,7 +8,7 @@ var bot = new ChessBot(PieceColor.Black);
 
 string lastMessage = "ChessSharp iniciado. Você joga com as peças brancas. Digite um movimento no formato: e2 e4.";
 
-while (true)
+while (!game.IsFinished)
 {
     ConsoleRenderer.RenderBoard(game.Board);
 
@@ -24,7 +24,11 @@ while (true)
         string? input = Console.ReadLine();
 
         if (string.Equals(input, "sair", StringComparison.OrdinalIgnoreCase))
+        {
+            game.FinishByPlayerQuit();
+            lastMessage = ChessGame.GetStatusMessage(game.Status);
             break;
+        }
 
         var playerMoveResult = game.TryMove(input ?? string.Empty);
         lastMessage = playerMoveResult.Message;
@@ -38,6 +42,9 @@ while (true)
             continue;
         }
     }
+
+    if (game.IsFinished)
+        break;
 
     if (game.CurrentTurn == PieceColor.Black)
     {
@@ -53,7 +60,8 @@ while (true)
 
         if (botMove is null)
         {
-            lastMessage = "A máquina não possui movimentos válidos. Fim de jogo.";
+            game.FinishWithWhiteWin();
+            lastMessage = "A máquina não possui movimentos válidos. Você venceu.";
             break;
         }
 
@@ -69,4 +77,5 @@ ConsoleRenderer.RenderBoard(game.Board);
 
 Console.WriteLine();
 Console.WriteLine(lastMessage);
+Console.WriteLine(ChessGame.GetStatusMessage(game.Status));
 Console.WriteLine("Jogo encerrado.");

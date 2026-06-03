@@ -10,13 +10,20 @@ public class ChessGame
         Board = new ChessBoard();
         Board.SetupInitialPosition();
         CurrentTurn = PieceColor.White;
+        Status = GameStatus.InProgress;
     }
 
     public ChessBoard Board { get; }
     public PieceColor CurrentTurn { get; private set; }
+    public GameStatus Status { get; private set; }
+
+    public bool IsFinished => Status != GameStatus.InProgress;
 
     public MoveResult TryMove(string input)
     {
+        if (IsFinished)
+            return MoveResult.Invalid("A partida já foi encerrada.");
+
         if (string.IsNullOrWhiteSpace(input))
             return MoveResult.Invalid("Digite um movimento no formato: e2 e4.");
 
@@ -43,6 +50,9 @@ public class ChessGame
 
     public MoveResult TryMove(Move move)
     {
+        if (IsFinished)
+            return MoveResult.Invalid("A partida já foi encerrada.");
+
         if (move.Origin == move.Target)
             return MoveResult.Invalid("A posição de origem e destino não podem ser iguais.");
 
@@ -52,7 +62,7 @@ public class ChessGame
             return MoveResult.Invalid("Não existe peça na posição de origem.");
 
         if (piece.PieceColor != CurrentTurn)
-            return MoveResult.Invalid($"Não é a vez das peças {GetTurnName(piece.PieceColor)}.");
+            return MoveResult.Invalid($"Não é a vez das peças {GetTurnName(CurrentTurn)}.");
 
         var targetPiece = Board.GetPieceAt(move.Target);
 
@@ -67,11 +77,41 @@ public class ChessGame
 
         string moveMessage = targetPiece is null
             ? $"Movimento realizado: {move.Origin} para {move.Target}."
-            : $"Movimento realizado: {move.Origin} capturou peça em {move.Target}.";
+            : $"Movimento realizado: {move.Origin} capturou {targetPiece.PieceType} em {move.Target}.";
 
-        ChangeTurn();
+        UpdateGameStatus();
+
+        if (!IsFinished)
+            ChangeTurn();
 
         return MoveResult.Valid(moveMessage);
+    }
+
+    public void FinishByPlayerQuit()
+    {
+        Status = GameStatus.PlayerQuit;
+    }
+
+    public void FinishWithWhiteWin()
+    {
+        Status = GameStatus.WhiteWins;
+    }
+
+    private void UpdateGameStatus()
+    {
+        bool whiteKingExists = Board.HasKing(PieceColor.White);
+        bool blackKingExists = Board.HasKing(PieceColor.Black);
+
+        if (!whiteKingExists)
+        {
+            Status = GameStatus.BlackWins;
+            return;
+        }
+
+        if (!blackKingExists)
+        {
+            Status = GameStatus.WhiteWins;
+        }
     }
 
     private void ChangeTurn()
@@ -84,5 +124,18 @@ public class ChessGame
     public static string GetTurnName(PieceColor color)
     {
         return color == PieceColor.White ? "brancas" : "pretas";
+    }
+
+    public static string GetStatusMessage(GameStatus status)
+    {
+        return status switch
+        {
+            GameStatus.InProgress => "Partida em andamento.",
+            GameStatus.WhiteWins => "Fim de jogo. As peças brancas venceram.",
+            GameStatus.BlackWins => "Fim de jogo. As peças pretas venceram.",
+            GameStatus.Draw => "Fim de jogo. A partida terminou empatada.",
+            GameStatus.PlayerQuit => "Partida encerrada pelo jogador.",
+            _ => "Status desconhecido."
+        };
     }
 }

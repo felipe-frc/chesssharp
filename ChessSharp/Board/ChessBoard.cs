@@ -15,6 +15,26 @@ public class ChessBoard
         return _squares[position.Row, position.Column];
     }
 
+    public bool HasKing(PieceColor pieceColor)
+    {
+        for (int row = 0; row < 8; row++)
+        {
+            for (int column = 0; column < 8; column++)
+            {
+                var piece = _squares[row, column];
+
+                if (piece is not null &&
+                    piece.PieceColor == pieceColor &&
+                    piece.PieceType == PieceType.King)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public void SetPieceAt(BoardPosition position, ChessPiece? piece)
     {
         if (!position.IsValid())
