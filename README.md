@@ -1,3 +1,8 @@
+[![CI (.NET)](https://github.com/felipe-frc/chesssharp/actions/workflows/dotnet-ci.yml/badge.svg)](https://github.com/felipe-frc/chesssharp/actions/workflows/dotnet-ci.yml)
+![GitHub release](https://img.shields.io/github/v/release/felipe-frc/chesssharp)
+![GitHub repo size](https://img.shields.io/github/repo-size/felipe-frc/chesssharp)
+![GitHub license](https://img.shields.io/github/license/felipe-frc/chesssharp)
+
 # ♟️ ChessSharp
 
 Jogo de xadrez desenvolvido em **C# com .NET**, executado no console, com foco em lógica de programação, orientação a objetos, validação de regras, testes automatizados e organização de código.
