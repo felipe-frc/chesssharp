@@ -7,9 +7,9 @@
 
 Jogo de xadrez desenvolvido em **C# com .NET**, executado no console, com foco em lógica de programação, orientação a objetos, validação de regras, testes automatizados, organização de código e evolução incremental por releases.
 
-O projeto permite jogar uma partida de xadrez contra a máquina, utilizando comandos no formato padrão de coordenadas do tabuleiro, como `e2 e4`. O jogador pode escolher se deseja jogar com as peças brancas ou pretas, enquanto a máquina controla a cor oposta por meio de um bot simples que prioriza capturas de maior valor.
+O projeto permite jogar uma partida de xadrez contra a máquina, utilizando comandos no formato padrão de coordenadas do tabuleiro, como `e2 e4`. O jogador pode escolher se deseja jogar com as peças brancas ou pretas, enquanto a máquina controla a cor oposta por meio de um bot com busca minimax simples.
 
-A versão atual conta com renderização visual aprimorada no console, peças Unicode, escolha de cor do jogador, detecção de xeque e xeque-mate, além de regras especiais como **roque** e **promoção de peão**.
+A versão atual conta com renderização visual aprimorada no console, peças Unicode, escolha de cor do jogador, detecção de xeque e xeque-mate, regras especiais como **roque** e **promoção de peão**, além de um bot com avaliação de tabuleiro e simulação de jogadas futuras.
 
 ---
 
@@ -25,8 +25,11 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 - Implementação de regras especiais como roque e promoção de peão;
 - Manipulação de matrizes para representação de tabuleiro;
 - Validação de entradas do usuário;
-- Criação de um bot simples para jogar contra o usuário;
-- Separação entre regra de negócio, renderização e controle do jogo;
+- Criação de um bot para jogar contra o usuário;
+- Implementação de busca minimax simples;
+- Avaliação material do tabuleiro;
+- Simulação de jogadas futuras;
+- Separação entre regra de negócio, renderização, controle do jogo e inteligência da máquina;
 - Testes automatizados com xUnit;
 - Integração contínua com GitHub Actions;
 - Versionamento com Git e GitHub;
@@ -118,12 +121,18 @@ e2 e4
 
 ### 🤖 Bot da Máquina
 
-- Bot simples para jogar contra o usuário;
-- Busca movimentos válidos disponíveis;
-- Prioriza capturas de peças adversárias;
-- Escolhe a captura com maior valor de peça;
-- Caso não exista captura, realiza um movimento válido aleatório;
-- Respeita as regras de xeque e não escolhe movimentos ilegais que deixem o próprio rei em risco;
+- Bot para jogar contra o usuário;
+- Busca movimentos legais disponíveis;
+- Avalia o material do tabuleiro;
+- Simula jogadas futuras usando minimax simples;
+- Usa profundidade padrão controlada para preservar desempenho no console;
+- Utiliza poda alpha-beta para otimizar a busca;
+- Considera consequências futuras antes de escolher uma jogada;
+- Respeita xeque, xeque-mate e movimentos legais;
+- Não escolhe movimentos que deixam o próprio rei em xeque;
+- Não captura diretamente o rei;
+- Mantém suporte a roque;
+- Mantém suporte a promoção de peão;
 - Promove peões automaticamente para rainha quando uma promoção estiver disponível.
 
 ### 🏁 Fim de Jogo
@@ -160,6 +169,7 @@ ChessSharp/
 │
 ├── ChessSharp/
 │   ├── AI/
+│   │   ├── BoardEvaluator.cs
 │   │   └── ChessBot.cs
 │   │
 │   ├── Board/
@@ -193,6 +203,9 @@ ChessSharp/
 │   └── Program.cs
 │
 ├── ChessSharp.Tests/
+│   ├── AI/
+│   │   └── ChessBotTests.cs
+│   │
 │   ├── Board/
 │   │   └── BoardPositionTests.cs
 │   │
@@ -338,7 +351,11 @@ O projeto possui testes automatizados com xUnit cobrindo:
 - Roque grande;
 - Bloqueio de roque inválido;
 - Bloqueio de roque quando o rei está em xeque;
-- Bloqueio de roque passando por casa atacada.
+- Bloqueio de roque passando por casa atacada;
+- Validação de movimentos legais do bot;
+- Validação de promoção de peão pelo bot;
+- Validação para impedir o bot de capturar diretamente o rei;
+- Validação do bot com minimax simples.
 
 Para executar os testes:
 
@@ -410,23 +427,25 @@ O workflow executa:
 
 ### v1.5.0
 
-- Implementar en passant;
-- Adicionar testes automatizados para en passant;
-- Completar as principais regras especiais do xadrez.
-
-### v1.6.0
-
 - Evoluir o bot para minimax simples;
-- Implementar avaliação básica de tabuleiro;
+- Implementar avaliação material do tabuleiro;
+- Adicionar simulação de jogadas futuras;
+- Adicionar poda alpha-beta;
 - Melhorar a tomada de decisão da máquina;
 - Adicionar testes para a lógica de decisão do bot.
 
-### v1.7.0
+### v1.6.0
 
 - Adicionar coleta de cobertura de testes com Coverlet;
 - Gerar relatório de cobertura;
 - Adicionar badge de cobertura no README;
 - Reforçar a validação de qualidade do projeto.
+
+### v1.7.0
+
+- Implementar en passant;
+- Adicionar testes automatizados para en passant;
+- Completar as principais regras especiais do xadrez.
 
 ### v2.0.0
 
@@ -455,6 +474,10 @@ O workflow executa:
 ---
 
 ## 📦 Releases
+
+### v1.5.0 - Bot com minimax simples
+
+Versão focada na evolução da inteligência da máquina, adicionando avaliação de tabuleiro, simulação de jogadas futuras, busca minimax simples e poda alpha-beta.
 
 ### v1.4.0 - Roque e promoção de peão
 
