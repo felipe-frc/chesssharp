@@ -1,12 +1,108 @@
 ﻿<Window x:Class="ChessSharp.Desktop.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ChessSharp.Desktop"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="ChessSharp"
+        Width="1280"
+        Height="980"
+        MinWidth="980"
+        MinHeight="760"
+        WindowStartupLocation="CenterScreen"
+        Background="#1f1209">
 
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0"
+                    EndPoint="1,1">
+                <GradientStop Color="#2a1308"
+                        Offset="0"/>
+                <GradientStop Color="#5b2410"
+                        Offset="0.45"/>
+                <GradientStop Color="#140804"
+                        Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <Grid Margin="28">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,22">
+                <TextBlock Text="♟ ChessSharp"
+                           Foreground="#f7d58b"
+                           FontSize="42"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"/>
+
+                <TextBlock Text="Interface gráfica 2D"
+                           Foreground="#d4a85f"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"
+                           Margin="0,6,0,0"/>
+            </StackPanel>
+
+            <Viewbox Grid.Row="1"
+                     Stretch="Uniform"
+                     StretchDirection="DownOnly"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center">
+                <Border Background="#5a2b12"
+                        CornerRadius="18"
+                        Padding="18"
+                        BorderBrush="#8a4b22"
+                        BorderThickness="4">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="28"
+                                          ShadowDepth="8"
+                                          Opacity="0.55"/>
+                    </Border.Effect>
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="34"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="34"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="34"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="34"/>
+                        </Grid.ColumnDefinitions>
+
+                        <UniformGrid x:Name="TopFilesPanel"
+                                     Grid.Row="0"
+                                     Grid.Column="1"
+                                     Columns="8"/>
+
+                        <UniformGrid x:Name="LeftRanksPanel"
+                                     Grid.Row="1"
+                                     Grid.Column="0"
+                                     Rows="8"/>
+
+                        <Grid x:Name="BoardGrid"
+                              Grid.Row="1"
+                              Grid.Column="1"
+                              Width="720"
+                              Height="720"
+                              ClipToBounds="True"/>
+
+                        <UniformGrid x:Name="RightRanksPanel"
+                                     Grid.Row="1"
+                                     Grid.Column="2"
+                                     Rows="8"/>
+
+                        <UniformGrid x:Name="BottomFilesPanel"
+                                     Grid.Row="2"
+                                     Grid.Column="1"
+                                     Columns="8"/>
+                    </Grid>
+                </Border>
+            </Viewbox>
+        </Grid>
     </Grid>
 </Window>
