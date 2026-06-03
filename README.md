@@ -5,9 +5,11 @@
 
 # ♟️ ChessSharp
 
-Jogo de xadrez desenvolvido em **C# com .NET**, executado no console, com foco em lógica de programação, orientação a objetos, validação de regras, testes automatizados e organização de código.
+Jogo de xadrez desenvolvido em **C# com .NET**, executado no console, com foco em lógica de programação, orientação a objetos, validação de regras, testes automatizados, organização de código e evolução incremental por releases.
 
 O projeto permite jogar uma partida de xadrez simplificada contra a máquina, utilizando comandos no formato padrão de coordenadas do tabuleiro, como `e2 e4`. O jogador controla as peças brancas, enquanto a máquina controla as peças pretas por meio de um bot simples que prioriza capturas de maior valor.
+
+A versão atual também conta com uma renderização visual aprimorada no console, usando casas coloridas e símbolos Unicode para representar as peças reais do xadrez.
 
 ---
 
@@ -24,6 +26,7 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 - Criação de um bot simples para jogar contra o usuário;
 - Separação entre regra de negócio, renderização e controle do jogo;
 - Testes automatizados com xUnit;
+- Integração contínua com GitHub Actions;
 - Versionamento com Git e GitHub;
 - Organização de projeto para portfólio profissional.
 
@@ -36,8 +39,10 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 - Representação de tabuleiro 8x8;
 - Conversão de posições no formato de xadrez, como `e2`, `a1` e `h8`;
 - Renderização do tabuleiro no console;
-- Exibição das peças brancas em letras maiúsculas;
-- Exibição das peças pretas em letras minúsculas.
+- Casas alternadas com cores diferentes;
+- Peças representadas por símbolos Unicode reais de xadrez;
+- Exibição das coordenadas do tabuleiro;
+- Melhor espaçamento visual entre as casas.
 
 ### 🧩 Peças
 
@@ -102,6 +107,7 @@ sair
 | Plataforma      | .NET               |
 | Interface       | Console            |
 | Testes          | xUnit              |
+| CI/CD           | GitHub Actions     |
 | Versionamento   | Git / GitHub       |
 | IDE recomendada | Visual Studio 2022 |
 
@@ -158,6 +164,10 @@ ChessSharp/
 │       ├── PawnTests.cs
 │       ├── QueenTests.cs
 │       └── RookTests.cs
+│
+├── .github/
+│   └── workflows/
+│       └── dotnet-ci.yml
 │
 ├── ChessSharp.sln
 ├── README.md
@@ -259,6 +269,18 @@ dotnet test
 
 ---
 
+## 🔄 Integração Contínua
+
+O projeto utiliza **GitHub Actions** para executar automaticamente o fluxo de validação a cada alteração enviada para a branch `main`.
+
+O workflow executa:
+
+- Restauração das dependências;
+- Execução dos testes automatizados;
+- Validação da solução no ambiente do GitHub Actions.
+
+---
+
 ## 📌 Roadmap
 
 ### v1.0.0
@@ -269,27 +291,60 @@ dotnet test
 - Jogador contra máquina;
 - Bot simples com prioridade de captura;
 - Fim de jogo simplificado;
-- Testes automatizados principais.
+- Testes automatizados principais;
+- GitHub Actions configurado.
 
-### Melhorias futuras
+### v1.1.0
 
-- Implementar xeque;
-- Implementar xeque-mate real;
-- Implementar promoção de peão;
-- Implementar roque;
-- Implementar en passant;
-- Melhorar inteligência da máquina;
-- Adicionar histórico de movimentos;
-- Melhorar interface visual do console;
-- Criar versão gráfica futuramente.
+- Melhorias visuais no tabuleiro do console;
+- Casas alternadas com cores;
+- Peças Unicode representando peças reais de xadrez;
+- Melhor espaçamento visual entre as casas;
+- Ajuste de codificação UTF-8 no console;
+- Melhor contraste visual das peças no tabuleiro.
+
+### v1.2.0
+
+- Permitir que o jogador escolha jogar com peças brancas ou pretas;
+- Ajustar o fluxo da máquina conforme a cor escolhida;
+- Melhorar as mensagens iniciais da partida;
+- Ajustar a ordem de jogadas quando o usuário escolher jogar com peças pretas.
+
+### v2.0.0
+
+- Criar uma interface gráfica 2D;
+- Adicionar tabuleiro visual com aparência de madeira;
+- Adicionar peças em imagem;
+- Permitir movimentação com mouse;
+- Substituir comandos digitados por clique nas casas;
+- Melhorar a experiência visual da partida.
+
+### v2.1.0
+
+- Destacar casas disponíveis ao selecionar uma peça;
+- Destacar casa de origem e destino;
+- Destacar capturas possíveis;
+- Melhorar feedback visual para movimentos inválidos;
+- Tornar a jogabilidade mais intuitiva.
+
+### v3.0.0
+
+- Estudar uma versão 3D do tabuleiro;
+- Avaliar o uso de engine gráfica;
+- Adicionar modelos 3D de peças;
+- Implementar câmera, iluminação e movimentação visual das peças.
 
 ---
 
 ## 📦 Releases
 
+### v1.1.0 - Melhorias visuais no tabuleiro
+
+Versão focada na melhoria visual do ChessSharp no console, com casas coloridas, peças Unicode e melhor apresentação do tabuleiro.
+
 ### v1.0.0 - Versão inicial jogável no console
 
-Primeira versão jogável do ChessSharp, com tabuleiro, peças, movimentação, jogador contra máquina, bot simples e testes automatizados.
+Primeira versão jogável do ChessSharp, com tabuleiro, peças, movimentação, jogador contra máquina, bot simples, testes automatizados e integração contínua.
 
 ---
 
