@@ -7,112 +7,212 @@ namespace ChessSharp.AI;
 
 public class ChessBot
 {
-    private readonly Random _random = new();
+    private const int CheckmateScore = 100_000;
 
-    public ChessBot(PieceColor botColor)
+    public ChessBot(PieceColor botColor, int searchDepth = 2)
     {
+        if (searchDepth < 1)
+            throw new ArgumentOutOfRangeException(nameof(searchDepth), "A profundidade de busca deve ser maior que zero.");
+
         BotColor = botColor;
+        SearchDepth = searchDepth;
     }
 
     public PieceColor BotColor { get; }
+    public int SearchDepth { get; }
 
     public Move? ChooseMove(ChessBoard board)
     {
-        var validMoves = GetAllLegalMoves(board);
+        var legalMoves = ChessRules.GetLegalMoves(board, BotColor);
 
-        if (validMoves.Count == 0)
+        if (legalMoves.Count == 0)
             return null;
 
-        var captureMoves = validMoves
-            .Where(move => board.GetPieceAt(move.Target) is not null)
-            .OrderByDescending(move => GetPieceValue(board.GetPieceAt(move.Target)!))
-            .ToList();
+        Move? bestMove = null;
+        int bestScore = int.MinValue;
 
-        if (captureMoves.Count > 0)
-            return captureMoves[0];
-
-        int randomIndex = _random.Next(validMoves.Count);
-        return validMoves[randomIndex];
-    }
-
-    private List<Move> GetAllLegalMoves(ChessBoard board)
-    {
-        var moves = new List<Move>();
-
-        for (int row = 0; row < 8; row++)
+        foreach (var move in OrderMoves(board, legalMoves))
         {
-            for (int column = 0; column < 8; column++)
+            var simulatedBoard = board.Clone();
+            ApplyMove(simulatedBoard, move);
+
+            int score = Minimax(
+                simulatedBoard,
+                SearchDepth - 1,
+                ChessRules.GetOpponentColor(BotColor),
+                int.MinValue,
+                int.MaxValue
+            );
+
+            if (score > bestScore)
             {
-                var origin = new BoardPosition(row, column);
-                var piece = board.GetPieceAt(origin);
-
-                if (piece is null || piece.PieceColor != BotColor)
-                    continue;
-
-                AddLegalMovesForPiece(board, origin, piece, moves);
+                bestScore = score;
+                bestMove = move;
             }
         }
 
-        return moves;
+        return bestMove;
     }
 
-    private void AddLegalMovesForPiece(
+    private int Minimax(
         ChessBoard board,
-        BoardPosition origin,
-        ChessPiece piece,
-        List<Move> moves
+        int depth,
+        PieceColor currentTurn,
+        int alpha,
+        int beta
     )
     {
-        for (int targetRow = 0; targetRow < 8; targetRow++)
+        if (ChessRules.IsCheckmate(board, BotColor))
+            return -CheckmateScore - depth;
+
+        if (ChessRules.IsCheckmate(board, ChessRules.GetOpponentColor(BotColor)))
+            return CheckmateScore + depth;
+
+        if (depth == 0)
+            return BoardEvaluator.Evaluate(board, BotColor);
+
+        var legalMoves = ChessRules.GetLegalMoves(board, currentTurn);
+
+        if (legalMoves.Count == 0)
+            return BoardEvaluator.Evaluate(board, BotColor);
+
+        bool isMaximizing = currentTurn == BotColor;
+
+        if (isMaximizing)
         {
-            for (int targetColumn = 0; targetColumn < 8; targetColumn++)
+            int bestScore = int.MinValue;
+
+            foreach (var move in OrderMoves(board, legalMoves))
             {
-                var target = new BoardPosition(targetRow, targetColumn);
+                var simulatedBoard = board.Clone();
+                ApplyMove(simulatedBoard, move);
 
-                if (origin == target)
-                    continue;
+                int score = Minimax(
+                    simulatedBoard,
+                    depth - 1,
+                    ChessRules.GetOpponentColor(currentTurn),
+                    alpha,
+                    beta
+                );
 
-                var targetPiece = board.GetPieceAt(target);
+                bestScore = Math.Max(bestScore, score);
+                alpha = Math.Max(alpha, score);
 
-                if (targetPiece is not null && targetPiece.PieceColor == piece.PieceColor)
-                    continue;
-
-                if (targetPiece is not null && targetPiece.PieceType == PieceType.King)
-                    continue;
-
-                if (!piece.IsValidMove(origin, target, board))
-                    continue;
-
-                var move = CreateMove(piece, origin, target);
-
-                if (ChessRules.IsLegalMove(board, move, BotColor))
-                    moves.Add(move);
+                if (beta <= alpha)
+                    break;
             }
+
+            return bestScore;
+        }
+
+        int worstScore = int.MaxValue;
+
+        foreach (var move in OrderMoves(board, legalMoves))
+        {
+            var simulatedBoard = board.Clone();
+            ApplyMove(simulatedBoard, move);
+
+            int score = Minimax(
+                simulatedBoard,
+                depth - 1,
+                ChessRules.GetOpponentColor(currentTurn),
+                alpha,
+                beta
+            );
+
+            worstScore = Math.Min(worstScore, score);
+            beta = Math.Min(beta, score);
+
+            if (beta <= alpha)
+                break;
+        }
+
+        return worstScore;
+    }
+
+    private static IEnumerable<Move> OrderMoves(ChessBoard board, IEnumerable<Move> moves)
+    {
+        return moves
+            .OrderByDescending(move => GetMovePriority(board, move))
+            .ThenBy(move => move.ToString(), StringComparer.Ordinal);
+    }
+
+    private static int GetMovePriority(ChessBoard board, Move move)
+    {
+        var movingPiece = board.GetPieceAt(move.Origin);
+        var targetPiece = board.GetPieceAt(move.Target);
+
+        int priority = 0;
+
+        if (targetPiece is not null)
+            priority += BoardEvaluator.GetPieceValue(targetPiece) * 10;
+
+        if (movingPiece is not null && move.PromotionPieceType is not null)
+            priority += BoardEvaluator.GetPieceValue(CreatePromotedPiece(movingPiece.PieceColor, move.PromotionPieceType.Value));
+
+        return priority;
+    }
+
+    private static void ApplyMove(ChessBoard board, Move move)
+    {
+        var piece = board.GetPieceAt(move.Origin);
+
+        if (piece is null)
+            throw new InvalidOperationException("Não existe peça na posição de origem.");
+
+        if (ChessRules.IsCastlingMove(board, move, piece.PieceColor))
+        {
+            ApplyCastlingMove(board, move);
+            return;
+        }
+
+        board.MovePiece(move.Origin, move.Target);
+        piece.MarkAsMoved();
+
+        if (move.PromotionPieceType is not null)
+        {
+            var promotedPiece = CreatePromotedPiece(piece.PieceColor, move.PromotionPieceType.Value);
+            promotedPiece.MarkAsMoved();
+
+            board.SetPieceAt(move.Target, promotedPiece);
         }
     }
 
-    private static Move CreateMove(ChessPiece piece, BoardPosition origin, BoardPosition target)
+    private static void ApplyCastlingMove(ChessBoard board, Move move)
     {
-        bool isPromotion =
-            piece.PieceType == PieceType.Pawn &&
-            (piece.PieceColor == PieceColor.White ? target.Row == 0 : target.Row == 7);
+        var king = board.GetPieceAt(move.Origin);
 
-        return isPromotion
-            ? new Move(origin, target, PieceType.Queen)
-            : new Move(origin, target);
+        if (king is null)
+            throw new InvalidOperationException("Não existe rei na posição de origem do roque.");
+
+        bool isKingSideCastle = move.Target.Column == 6;
+        int row = move.Origin.Row;
+        int rookOriginColumn = isKingSideCastle ? 7 : 0;
+        int rookTargetColumn = isKingSideCastle ? 5 : 3;
+
+        var rookOrigin = new BoardPosition(row, rookOriginColumn);
+        var rookTarget = new BoardPosition(row, rookTargetColumn);
+        var rook = board.GetPieceAt(rookOrigin);
+
+        if (rook is null)
+            throw new InvalidOperationException("Não existe torre na posição de origem do roque.");
+
+        board.MovePiece(move.Origin, move.Target);
+        board.MovePiece(rookOrigin, rookTarget);
+
+        king.MarkAsMoved();
+        rook.MarkAsMoved();
     }
 
-    private static int GetPieceValue(ChessPiece piece)
+    private static ChessPiece CreatePromotedPiece(PieceColor pieceColor, PieceType pieceType)
     {
-        return piece.PieceType switch
+        return pieceType switch
         {
-            PieceType.Pawn => 1,
-            PieceType.Knight => 3,
-            PieceType.Bishop => 3,
-            PieceType.Rook => 5,
-            PieceType.Queen => 9,
-            PieceType.King => 100,
-            _ => 0
+            PieceType.Queen => new Queen(pieceColor),
+            PieceType.Rook => new Rook(pieceColor),
+            PieceType.Bishop => new Bishop(pieceColor),
+            PieceType.Knight => new Knight(pieceColor),
+            _ => throw new ArgumentException("Tipo de peça inválido para promoção.", nameof(pieceType))
         };
     }
 }
