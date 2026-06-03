@@ -7,10 +7,15 @@ using ChessSharp.UI;
 Console.OutputEncoding = Encoding.UTF8;
 Console.InputEncoding = Encoding.UTF8;
 
-var game = new ChessGame();
-var bot = new ChessBot(PieceColor.Black);
+var playerColor = PlayerColorSelector.AskPlayerColor();
+var botColor = playerColor == PieceColor.White ? PieceColor.Black : PieceColor.White;
 
-string lastMessage = "ChessSharp iniciado. Você joga com as peças brancas. Digite um movimento no formato: e2 e4.";
+var game = new ChessGame();
+var bot = new ChessBot(botColor);
+
+string lastMessage = playerColor == PieceColor.White
+    ? "ChessSharp iniciado. Você joga com as peças brancas. Digite um movimento no formato: e2 e4."
+    : "ChessSharp iniciado. Você joga com as peças pretas. A máquina fará o primeiro movimento.";
 
 while (!game.IsFinished)
 {
@@ -20,9 +25,9 @@ while (!game.IsFinished)
     Console.WriteLine(lastMessage);
     Console.WriteLine();
 
-    if (game.CurrentTurn == PieceColor.White)
+    if (game.CurrentTurn == playerColor)
     {
-        Console.WriteLine("Sua vez.");
+        Console.WriteLine($"Sua vez. Você está jogando com as peças {ChessGame.GetTurnName(playerColor)}.");
         Console.Write("Digite seu movimento ou 'sair': ");
 
         string? input = Console.ReadLine();
@@ -50,22 +55,30 @@ while (!game.IsFinished)
     if (game.IsFinished)
         break;
 
-    if (game.CurrentTurn == PieceColor.Black)
+    if (game.CurrentTurn == botColor)
     {
         ConsoleRenderer.RenderBoard(game.Board);
 
         Console.WriteLine();
         Console.WriteLine(lastMessage);
         Console.WriteLine();
-        Console.WriteLine("A máquina está pensando...");
+        Console.WriteLine($"A máquina está jogando com as peças {ChessGame.GetTurnName(botColor)}...");
         Thread.Sleep(700);
 
         var botMove = bot.ChooseMove(game.Board);
 
         if (botMove is null)
         {
-            game.FinishWithWhiteWin();
-            lastMessage = "A máquina não possui movimentos válidos. Você venceu.";
+            if (playerColor == PieceColor.White)
+            {
+                game.FinishWithWhiteWin();
+                lastMessage = "A máquina não possui movimentos válidos. Você venceu.";
+            }
+            else
+            {
+                lastMessage = "A máquina não possui movimentos válidos. Fim de jogo.";
+            }
+
             break;
         }
 
