@@ -9,28 +9,64 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
-  build-and-test:
-    name: Build and test
+  test:
+    name: Run .NET tests
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup .NET
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
 
-      - name: Show .NET version
+      - name: Show .NET info
         run: dotnet --info
 
-      - name: Restore dependencies
+      - name: Restore solution
         run: dotnet restore ChessSharp.sln
 
-      - name: Build solution
-        run: dotnet build ChessSharp.sln --configuration Release --no-restore
+      - name: Run tests with coverage
+        run: dotnet test ChessSharp.sln --configuration Release --collect:"XPlat Code Coverage" --results-directory TestResults --verbosity normal
 
-      - name: Run tests
-        run: dotnet test ChessSharp.sln --configuration Release --no-build --verbosity normal
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Generate coverage report and badge
+        run: |
+          reportgenerator \
+            -reports:"TestResults/**/coverage.cobertura.xml" \
+            -targetdir:"coveragereport" \
+            -reporttypes:"HtmlInline_AzurePipelines;Cobertura;Badges"
+
+          mkdir -p badges
+          cp coveragereport/badge_linecoverage.svg badges/coverage.svg
+
+      - name: Upload coverage report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coveragereport
+
+      - name: Commit coverage badge
+        if: github.event_name == 'push'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add badges/coverage.svg
+
+          if git diff --cached --quiet; then
+            echo "No coverage badge changes to commit."
+          else
+            git commit -m "docs: update coverage badge"
+            git push
+          fi

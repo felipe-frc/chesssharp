@@ -1,15 +1,16 @@
 [![CI (.NET)](https://github.com/felipe-frc/chesssharp/actions/workflows/dotnet-ci.yml/badge.svg)](https://github.com/felipe-frc/chesssharp/actions/workflows/dotnet-ci.yml)
+![Coverage](badges/coverage.svg)
 ![GitHub release](https://img.shields.io/github/v/release/felipe-frc/chesssharp)
 ![GitHub repo size](https://img.shields.io/github/repo-size/felipe-frc/chesssharp)
 ![GitHub license](https://img.shields.io/github/license/felipe-frc/chesssharp)
 
 # ♟️ ChessSharp
 
-Jogo de xadrez desenvolvido em **C# com .NET**, executado no console, com foco em lógica de programação, orientação a objetos, validação de regras, testes automatizados, organização de código e evolução incremental por releases.
+Jogo de xadrez desenvolvido em **C# com .NET**, executado no console, com foco em lógica de programação, orientação a objetos, validação de regras, testes automatizados, cobertura de testes, organização de código e evolução incremental por releases.
 
 O projeto permite jogar uma partida de xadrez contra a máquina, utilizando comandos no formato padrão de coordenadas do tabuleiro, como `e2 e4`. O jogador pode escolher se deseja jogar com as peças brancas ou pretas, enquanto a máquina controla a cor oposta por meio de um bot com busca minimax simples.
 
-A versão atual conta com renderização visual aprimorada no console, peças Unicode, escolha de cor do jogador, detecção de xeque e xeque-mate, regras especiais como **roque** e **promoção de peão**, além de um bot com avaliação de tabuleiro e simulação de jogadas futuras.
+A versão atual conta com renderização visual aprimorada no console, peças Unicode, escolha de cor do jogador, detecção de xeque e xeque-mate, regras especiais como **roque** e **promoção de peão**, bot com avaliação de tabuleiro e simulação de jogadas futuras, além de cobertura de testes integrada ao pipeline de CI.
 
 ---
 
@@ -31,6 +32,8 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 - Simulação de jogadas futuras;
 - Separação entre regra de negócio, renderização, controle do jogo e inteligência da máquina;
 - Testes automatizados com xUnit;
+- Coleta de cobertura de testes com Coverlet;
+- Geração de relatório de cobertura com ReportGenerator;
 - Integração contínua com GitHub Actions;
 - Versionamento com Git e GitHub;
 - Organização de projeto para portfólio profissional.
@@ -135,6 +138,15 @@ e2 e4
 - Mantém suporte a promoção de peão;
 - Promove peões automaticamente para rainha quando uma promoção estiver disponível.
 
+### 🧪 Qualidade e Validação
+
+- Testes automatizados com xUnit;
+- Pipeline de CI com GitHub Actions;
+- Coleta de cobertura com Coverlet;
+- Geração de relatório de cobertura com ReportGenerator;
+- Badge de cobertura exibido no README;
+- Relatório de cobertura disponibilizado como artefato no GitHub Actions.
+
 ### 🏁 Fim de Jogo
 
 - Vitória das brancas por xeque-mate;
@@ -150,15 +162,16 @@ sair
 
 ## 🛠️ Tecnologias Utilizadas
 
-| Camada          | Tecnologia         |
-| --------------- | ------------------ |
-| Linguagem       | C#                 |
-| Plataforma      | .NET               |
-| Interface       | Console            |
-| Testes          | xUnit              |
-| CI/CD           | GitHub Actions     |
-| Versionamento   | Git / GitHub       |
-| IDE recomendada | Visual Studio 2022 |
+| Camada          | Tecnologia                 |
+| --------------- | -------------------------- |
+| Linguagem       | C#                         |
+| Plataforma      | .NET                       |
+| Interface       | Console                    |
+| Testes          | xUnit                      |
+| Cobertura       | Coverlet / ReportGenerator |
+| CI/CD           | GitHub Actions             |
+| Versionamento   | Git / GitHub               |
+| IDE recomendada | Visual Studio 2022         |
 
 ---
 
@@ -225,6 +238,9 @@ ChessSharp/
 ├── .github/
 │   └── workflows/
 │       └── dotnet-ci.yml
+│
+├── badges/
+│   └── coverage.svg
 │
 ├── ChessSharp.sln
 ├── README.md
@@ -363,6 +379,8 @@ Para executar os testes:
 dotnet test
 ```
 
+A cobertura dos testes é coletada automaticamente pelo GitHub Actions utilizando **Coverlet** e **ReportGenerator**. O badge de cobertura é atualizado no README após a execução do workflow na branch `main`.
+
 ---
 
 ## 🔄 Integração Contínua
@@ -373,7 +391,29 @@ O workflow executa:
 
 - Restauração das dependências;
 - Execução dos testes automatizados;
+- Coleta da cobertura de testes;
+- Geração do relatório de cobertura;
+- Atualização automática do badge de cobertura;
+- Upload do relatório de cobertura como artefato do workflow;
 - Validação da solução no ambiente do GitHub Actions.
+
+---
+
+## 📊 Cobertura de Testes
+
+A cobertura de testes é gerada automaticamente durante o pipeline de CI.
+
+O processo utiliza:
+
+- **Coverlet** para coletar cobertura dos testes;
+- **ReportGenerator** para gerar relatório visual e badge SVG;
+- **GitHub Actions** para executar a coleta e publicar o badge atualizado no repositório.
+
+O badge de cobertura fica disponível no topo do README:
+
+```md
+![Coverage](badges/coverage.svg)
+```
 
 ---
 
@@ -437,8 +477,9 @@ O workflow executa:
 ### v1.6.0
 
 - Adicionar coleta de cobertura de testes com Coverlet;
-- Gerar relatório de cobertura;
+- Gerar relatório de cobertura com ReportGenerator;
 - Adicionar badge de cobertura no README;
+- Atualizar o workflow de CI para publicar relatório de cobertura;
 - Reforçar a validação de qualidade do projeto.
 
 ### v1.7.0
@@ -474,6 +515,10 @@ O workflow executa:
 ---
 
 ## 📦 Releases
+
+### v1.6.0 - Cobertura de testes com badge
+
+Versão focada na validação de qualidade do projeto, adicionando coleta de cobertura com Coverlet, relatório com ReportGenerator e badge de cobertura no README.
 
 ### v1.5.0 - Bot com minimax simples
 
