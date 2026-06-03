@@ -88,40 +88,55 @@ public class ChessGame
         if (move.PromotionPieceType is not null && !IsPawnPromotionMove(piece, move.Target))
             return MoveResult.Invalid("Promoção só é permitida quando um peão alcança a última fileira.");
 
-        if (!piece.IsValidMove(move.Origin, move.Target, Board))
-            return MoveResult.Invalid("Movimento inválido para essa peça.");
+        bool isEnPassant = ChessRules.IsEnPassantMove(Board, move, CurrentTurn);
+        var normalizedMove = isEnPassant
+            ? move with { IsEnPassant = true }
+            : move;
 
-        if (!ChessRules.IsLegalMove(Board, move, CurrentTurn))
+        if (!ChessRules.IsLegalMove(Board, normalizedMove, CurrentTurn))
             return MoveResult.Invalid("Movimento inválido. O rei ficaria em xeque.");
 
         string moveMessage;
 
-        if (ChessRules.IsCastlingMove(Board, move, CurrentTurn))
+        if (ChessRules.IsCastlingMove(Board, normalizedMove, CurrentTurn))
         {
-            ExecuteCastlingMove(move);
-            moveMessage = move.Target.Column == 6
+            ExecuteCastlingMove(normalizedMove);
+            moveMessage = normalizedMove.Target.Column == 6
                 ? "Roque pequeno realizado."
                 : "Roque grande realizado.";
         }
+        else if (isEnPassant)
+        {
+            var capturedPawnPosition = Board.LastMove!.Value.Target;
+
+            Board.SetPieceAt(capturedPawnPosition, null);
+            Board.MovePiece(normalizedMove.Origin, normalizedMove.Target);
+            piece.MarkAsMoved();
+
+            moveMessage = $"Movimento realizado: {normalizedMove.Origin} capturou peão en passant em {capturedPawnPosition}.";
+        }
         else
         {
-            Board.MovePiece(move.Origin, move.Target);
+            Board.MovePiece(normalizedMove.Origin, normalizedMove.Target);
             piece.MarkAsMoved();
 
             moveMessage = targetPiece is null
-                ? $"Movimento realizado: {move.Origin} para {move.Target}."
-                : $"Movimento realizado: {move.Origin} capturou {targetPiece.PieceType} em {move.Target}.";
+                ? $"Movimento realizado: {normalizedMove.Origin} para {normalizedMove.Target}."
+                : $"Movimento realizado: {normalizedMove.Origin} capturou {targetPiece.PieceType} em {normalizedMove.Target}.";
 
-            if (IsPawnPromotionMove(piece, move.Target))
+            if (IsPawnPromotionMove(piece, normalizedMove.Target))
             {
-                var promotionPieceType = move.PromotionPieceType ?? PieceType.Queen;
+                var promotionPieceType = normalizedMove.PromotionPieceType ?? PieceType.Queen;
                 var promotedPiece = CreatePromotedPiece(piece.PieceColor, promotionPieceType);
+                promotedPiece.MarkAsMoved();
 
-                Board.SetPieceAt(move.Target, promotedPiece);
+                Board.SetPieceAt(normalizedMove.Target, promotedPiece);
 
                 moveMessage += $" Peão promovido para {GetPieceName(promotionPieceType)}.";
             }
         }
+
+        Board.RegisterMove(normalizedMove);
 
         var opponentColor = CurrentTurn == PieceColor.White
             ? PieceColor.Black

@@ -1,4 +1,4 @@
-﻿using ChessSharp.Board;
+using ChessSharp.Board;
 using ChessSharp.Enums;
 
 namespace ChessSharp.Game;
@@ -6,14 +6,19 @@ namespace ChessSharp.Game;
 public readonly record struct Move(
     BoardPosition Origin,
     BoardPosition Target,
-    PieceType? PromotionPieceType = null
+    PieceType? PromotionPieceType = null,
+    bool IsEnPassant = false
 )
 {
     public override string ToString()
     {
-        return PromotionPieceType is null
+        var baseNotation = PromotionPieceType is null
             ? $"{Origin} {Target}"
             : $"{Origin} {Target} {GetPromotionNotation(PromotionPieceType.Value)}";
+
+        return IsEnPassant
+            ? $"{baseNotation} e.p."
+            : baseNotation;
     }
 
     private static string GetPromotionNotation(PieceType pieceType)

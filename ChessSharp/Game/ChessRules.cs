@@ -45,7 +45,7 @@ public static class ChessRules
                     for (int targetColumn = 0; targetColumn < 8; targetColumn++)
                     {
                         var target = new BoardPosition(targetRow, targetColumn);
-                        var move = CreateMove(piece, origin, target);
+                        var move = CreateMove(board, piece, origin, target);
 
                         if (IsLegalMove(board, move, pieceColor))
                             legalMoves.Add(move);
@@ -78,10 +78,19 @@ public static class ChessRules
         if (IsCastlingMove(board, move, currentTurn))
             return IsCastlingLegal(board, move, currentTurn);
 
-        if (!piece.IsValidMove(move.Origin, move.Target, board))
+        bool isEnPassant = IsEnPassantMove(board, move, currentTurn);
+
+        if (!isEnPassant && !piece.IsValidMove(move.Origin, move.Target, board))
             return false;
 
         var simulatedBoard = board.Clone();
+
+        if (isEnPassant)
+        {
+            var capturedPawnPosition = board.LastMove!.Value.Target;
+            simulatedBoard.SetPieceAt(capturedPawnPosition, null);
+        }
+
         simulatedBoard.MovePiece(move.Origin, move.Target);
 
         if (IsPawnPromotionMove(piece, move.Target))
@@ -108,6 +117,46 @@ public static class ChessRules
         int columnDifference = Math.Abs(move.Target.Column - move.Origin.Column);
 
         return rowDifference == 0 && columnDifference == 2;
+    }
+
+    public static bool IsEnPassantMove(ChessBoard board, Move move, PieceColor currentTurn)
+    {
+        var piece = board.GetPieceAt(move.Origin);
+
+        if (piece is null || piece.PieceColor != currentTurn || piece.PieceType != PieceType.Pawn)
+            return false;
+
+        if (!board.IsEmpty(move.Target))
+            return false;
+
+        int direction = currentTurn == PieceColor.White ? -1 : 1;
+        int rowDifference = move.Target.Row - move.Origin.Row;
+        int columnDifference = Math.Abs(move.Target.Column - move.Origin.Column);
+
+        if (rowDifference != direction || columnDifference != 1)
+            return false;
+
+        if (board.LastMove is null)
+            return false;
+
+        var lastMove = board.LastMove.Value;
+        var lastMovedPiece = board.GetPieceAt(lastMove.Target);
+
+        if (lastMovedPiece is null ||
+            lastMovedPiece.PieceColor != GetOpponentColor(currentTurn) ||
+            lastMovedPiece.PieceType != PieceType.Pawn)
+        {
+            return false;
+        }
+
+        bool lastMoveWasTwoSquarePawnMove =
+            Math.Abs(lastMove.Target.Row - lastMove.Origin.Row) == 2;
+
+        if (!lastMoveWasTwoSquarePawnMove)
+            return false;
+
+        return lastMove.Target.Row == move.Origin.Row &&
+               lastMove.Target.Column == move.Target.Column;
     }
 
     public static bool IsSquareUnderAttack(
@@ -230,14 +279,23 @@ public static class ChessRules
         return rowDifference <= 1 && columnDifference <= 1;
     }
 
-    private static Move CreateMove(ChessPiece piece, BoardPosition origin, BoardPosition target)
+    private static Move CreateMove(ChessBoard board, ChessPiece piece, BoardPosition origin, BoardPosition target)
     {
         bool isPromotion =
             piece.PieceType == PieceType.Pawn &&
             (piece.PieceColor == PieceColor.White ? target.Row == 0 : target.Row == 7);
 
-        return isPromotion
-            ? new Move(origin, target, PieceType.Queen)
+        bool isEnPassant = IsEnPassantMove(
+            board,
+            new Move(origin, target),
+            piece.PieceColor
+        );
+
+        if (isPromotion)
+            return new Move(origin, target, PieceType.Queen, isEnPassant);
+
+        return isEnPassant
+            ? new Move(origin, target, null, true)
             : new Move(origin, target);
     }
 

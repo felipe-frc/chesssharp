@@ -163,6 +163,19 @@ public class ChessBot
         if (ChessRules.IsCastlingMove(board, move, piece.PieceColor))
         {
             ApplyCastlingMove(board, move);
+            board.RegisterMove(move);
+            return;
+        }
+
+        if (ChessRules.IsEnPassantMove(board, move, piece.PieceColor))
+        {
+            var capturedPawnPosition = board.LastMove!.Value.Target;
+
+            board.SetPieceAt(capturedPawnPosition, null);
+            board.MovePiece(move.Origin, move.Target);
+            piece.MarkAsMoved();
+            board.RegisterMove(move with { IsEnPassant = true });
+
             return;
         }
 
@@ -176,6 +189,8 @@ public class ChessBot
 
             board.SetPieceAt(move.Target, promotedPiece);
         }
+
+        board.RegisterMove(move);
     }
 
     private static void ApplyCastlingMove(ChessBoard board, Move move)

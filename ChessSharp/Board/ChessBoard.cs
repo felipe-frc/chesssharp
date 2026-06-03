@@ -1,4 +1,5 @@
 using ChessSharp.Enums;
+using ChessSharp.Game;
 using ChessSharp.Pieces;
 
 namespace ChessSharp.Board;
@@ -6,6 +7,8 @@ namespace ChessSharp.Board;
 public class ChessBoard
 {
     private readonly ChessPiece?[,] _squares = new ChessPiece?[8, 8];
+
+    public Move? LastMove { get; private set; }
 
     public ChessPiece? GetPieceAt(BoardPosition position)
     {
@@ -64,6 +67,11 @@ public class ChessBoard
         SetPieceAt(origin, null);
     }
 
+    public void RegisterMove(Move move)
+    {
+        LastMove = move;
+    }
+
     public bool IsPathClear(BoardPosition currentPosition, BoardPosition targetPosition)
     {
         int rowStep = Math.Sign(targetPosition.Row - currentPosition.Row);
@@ -99,6 +107,9 @@ public class ChessBoard
                     clone._squares[row, column] = ClonePiece(piece);
             }
         }
+
+        if (LastMove is not null)
+            clone.RegisterMove(LastMove.Value);
 
         return clone;
     }
@@ -141,6 +152,8 @@ public class ChessBoard
                 _squares[row, column] = null;
             }
         }
+
+        LastMove = null;
     }
 
     private static ChessPiece ClonePiece(ChessPiece piece)
