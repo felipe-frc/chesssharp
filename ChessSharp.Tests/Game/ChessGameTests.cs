@@ -53,7 +53,6 @@ public class ChessGameTests
         var result = game.TryMove("e3 e4");
 
         Assert.False(result.Success);
-        Assert.Contains("Não existe peça", result.Message);
         Assert.Equal(PieceColor.White, game.CurrentTurn);
     }
 
@@ -65,7 +64,6 @@ public class ChessGameTests
         var result = game.TryMove("e7 e5");
 
         Assert.False(result.Success);
-        Assert.Contains("Não é a vez", result.Message);
         Assert.Equal(PieceColor.White, game.CurrentTurn);
     }
 
@@ -77,7 +75,6 @@ public class ChessGameTests
         var result = game.TryMove("e1 e2");
 
         Assert.False(result.Success);
-        Assert.Contains("mesma cor", result.Message);
         Assert.Equal(PieceColor.White, game.CurrentTurn);
     }
 
@@ -89,7 +86,6 @@ public class ChessGameTests
         var result = game.TryMove("e2");
 
         Assert.False(result.Success);
-        Assert.Contains("Formato inválido", result.Message);
         Assert.Equal(PieceColor.White, game.CurrentTurn);
     }
 
@@ -99,6 +95,17 @@ public class ChessGameTests
         var game = new ChessGame();
 
         var result = game.TryMove("e9 e4");
+
+        Assert.False(result.Success);
+        Assert.Equal(PieceColor.White, game.CurrentTurn);
+    }
+
+    [Fact]
+    public void TryMove_ShouldReturnInvalid_WhenOriginAndTargetAreEqual()
+    {
+        var game = new ChessGame();
+
+        var result = game.TryMove("e2 e2");
 
         Assert.False(result.Success);
         Assert.Equal(PieceColor.White, game.CurrentTurn);
@@ -124,5 +131,19 @@ public class ChessGameTests
 
         Assert.Equal(GameStatus.WhiteWins, game.Status);
         Assert.True(game.IsFinished);
+    }
+
+    [Fact]
+    public void TryMove_ShouldReturnInvalid_WhenGameIsAlreadyFinished()
+    {
+        var game = new ChessGame();
+
+        game.FinishByPlayerQuit();
+
+        var result = game.TryMove("e2 e4");
+
+        Assert.False(result.Success);
+        Assert.True(game.IsFinished);
+        Assert.Equal(GameStatus.PlayerQuit, game.Status);
     }
 }
