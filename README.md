@@ -9,7 +9,7 @@ Jogo de xadrez desenvolvido em **C# com .NET**, executado no console, com foco e
 
 O projeto permite jogar uma partida de xadrez contra a máquina, utilizando comandos no formato padrão de coordenadas do tabuleiro, como `e2 e4`. O jogador pode escolher se deseja jogar com as peças brancas ou pretas, enquanto a máquina controla a cor oposta por meio de um bot simples que prioriza capturas de maior valor.
 
-A versão atual conta com renderização visual aprimorada no console, peças Unicode, escolha de cor do jogador e regras mais próximas do xadrez real, incluindo detecção de xeque e xeque-mate.
+A versão atual conta com renderização visual aprimorada no console, peças Unicode, escolha de cor do jogador, detecção de xeque e xeque-mate, além de regras especiais como **roque** e **promoção de peão**.
 
 ---
 
@@ -22,6 +22,7 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 - Modelagem de domínio com classes, enums e responsabilidades bem definidas;
 - Implementação de regras de movimentação das peças de xadrez;
 - Implementação de regras reais de xeque e xeque-mate;
+- Implementação de regras especiais como roque e promoção de peão;
 - Manipulação de matrizes para representação de tabuleiro;
 - Validação de entradas do usuário;
 - Criação de um bot simples para jogar contra o usuário;
@@ -95,6 +96,26 @@ e2 e4
 - Impedimento de movimentos que deixam o próprio rei em xeque;
 - Encerramento correto da partida por xeque-mate.
 
+### 🏰 Regras Especiais
+
+- Promoção de peão ao alcançar a última fileira;
+- Promoção automática para rainha quando nenhuma peça é informada;
+- Escolha da peça de promoção por notação:
+  - `q` para rainha;
+  - `r` para torre;
+  - `b` para bispo;
+  - `n` para cavalo.
+- Roque pequeno;
+- Roque grande;
+- Roque disponível para peças brancas e pretas;
+- Movimento automático da torre durante o roque;
+- Bloqueio de roque quando o rei já se moveu;
+- Bloqueio de roque quando a torre já se moveu;
+- Bloqueio de roque quando há peças entre o rei e a torre;
+- Bloqueio de roque quando o rei está em xeque;
+- Bloqueio de roque quando o rei passa por casa atacada;
+- Bloqueio de roque quando o rei termina em casa atacada.
+
 ### 🤖 Bot da Máquina
 
 - Bot simples para jogar contra o usuário;
@@ -102,7 +123,8 @@ e2 e4
 - Prioriza capturas de peças adversárias;
 - Escolhe a captura com maior valor de peça;
 - Caso não exista captura, realiza um movimento válido aleatório;
-- Respeita as regras de xeque e não escolhe movimentos ilegais que deixem o próprio rei em risco.
+- Respeita as regras de xeque e não escolhe movimentos ilegais que deixem o próprio rei em risco;
+- Promove peões automaticamente para rainha quando uma promoção estiver disponível.
 
 ### 🏁 Fim de Jogo
 
@@ -175,7 +197,9 @@ ChessSharp/
 │   │   └── BoardPositionTests.cs
 │   │
 │   ├── Game/
-│   │   └── ChessGameTests.cs
+│   │   ├── CastlingTests.cs
+│   │   ├── ChessGameTests.cs
+│   │   └── PawnPromotionTests.cs
 │   │
 │   └── Pieces/
 │       ├── BishopTests.cs
@@ -261,6 +285,21 @@ Exemplo:
 e2 e4
 ```
 
+Para promover um peão, é possível informar a peça desejada como terceiro argumento:
+
+```txt
+e7 e8 q
+```
+
+Opções disponíveis para promoção:
+
+```txt
+q - Rainha
+r - Torre
+b - Bispo
+n - Cavalo
+```
+
 Após o movimento do jogador, a máquina joga automaticamente com a cor oposta.
 
 Para sair da partida, digite:
@@ -291,7 +330,15 @@ O projeto possui testes automatizados com xUnit cobrindo:
 - Detecção de xeque-mate;
 - Bloqueio de captura direta do rei;
 - Bloqueio de movimentos que deixam o próprio rei em xeque;
-- Cenário de xeque-mate com Fool's Mate.
+- Cenário de xeque-mate com Fool's Mate;
+- Promoção de peão;
+- Promoção para rainha, torre, bispo e cavalo;
+- Bloqueio de promoção inválida;
+- Roque pequeno;
+- Roque grande;
+- Bloqueio de roque inválido;
+- Bloqueio de roque quando o rei está em xeque;
+- Bloqueio de roque passando por casa atacada.
 
 Para executar os testes:
 
@@ -354,19 +401,27 @@ O workflow executa:
 
 ### v1.4.0
 
-- Implementar roque;
 - Implementar promoção de peão;
-- Adicionar testes automatizados para regras especiais;
+- Implementar roque pequeno;
+- Implementar roque grande;
+- Adicionar testes automatizados para promoção de peão;
+- Adicionar testes automatizados para roque;
 - Melhorar a cobertura das regras oficiais do xadrez.
 
 ### v1.5.0
+
+- Implementar en passant;
+- Adicionar testes automatizados para en passant;
+- Completar as principais regras especiais do xadrez.
+
+### v1.6.0
 
 - Evoluir o bot para minimax simples;
 - Implementar avaliação básica de tabuleiro;
 - Melhorar a tomada de decisão da máquina;
 - Adicionar testes para a lógica de decisão do bot.
 
-### v1.6.0
+### v1.7.0
 
 - Adicionar coleta de cobertura de testes com Coverlet;
 - Gerar relatório de cobertura;
@@ -400,6 +455,10 @@ O workflow executa:
 ---
 
 ## 📦 Releases
+
+### v1.4.0 - Roque e promoção de peão
+
+Versão focada na implementação de regras especiais do xadrez, adicionando promoção de peão, roque pequeno, roque grande e validações específicas para impedir roques ilegais.
 
 ### v1.3.0 - Xeque e xeque-mate real
 
