@@ -1,4 +1,4 @@
-﻿using ChessSharp.Board;
+using ChessSharp.Board;
 using ChessSharp.Enums;
 
 namespace ChessSharp.Pieces;
@@ -19,6 +19,18 @@ public class King : ChessPiece
         int rowDifference = Math.Abs(targetPosition.Row - currentPosition.Row);
         int columnDifference = Math.Abs(targetPosition.Column - currentPosition.Column);
 
-        return rowDifference <= 1 && columnDifference <= 1;
+        bool isStandardKingMove = rowDifference <= 1 && columnDifference <= 1;
+
+        if (isStandardKingMove)
+            return true;
+
+        bool isCastlingAttempt =
+            rowDifference == 0 &&
+            columnDifference == 2 &&
+            currentPosition.Column == 4 &&
+            targetPosition.Column is 2 or 6 &&
+            currentPosition.Row is 0 or 7;
+
+        return isCastlingAttempt;
     }
 }

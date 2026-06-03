@@ -94,21 +94,33 @@ public class ChessGame
         if (!ChessRules.IsLegalMove(Board, move, CurrentTurn))
             return MoveResult.Invalid("Movimento inválido. O rei ficaria em xeque.");
 
-        Board.MovePiece(move.Origin, move.Target);
-        piece.MarkAsMoved();
+        string moveMessage;
 
-        string moveMessage = targetPiece is null
-            ? $"Movimento realizado: {move.Origin} para {move.Target}."
-            : $"Movimento realizado: {move.Origin} capturou {targetPiece.PieceType} em {move.Target}.";
-
-        if (IsPawnPromotionMove(piece, move.Target))
+        if (ChessRules.IsCastlingMove(Board, move, CurrentTurn))
         {
-            var promotionPieceType = move.PromotionPieceType ?? PieceType.Queen;
-            var promotedPiece = CreatePromotedPiece(piece.PieceColor, promotionPieceType);
+            ExecuteCastlingMove(move);
+            moveMessage = move.Target.Column == 6
+                ? "Roque pequeno realizado."
+                : "Roque grande realizado.";
+        }
+        else
+        {
+            Board.MovePiece(move.Origin, move.Target);
+            piece.MarkAsMoved();
 
-            Board.SetPieceAt(move.Target, promotedPiece);
+            moveMessage = targetPiece is null
+                ? $"Movimento realizado: {move.Origin} para {move.Target}."
+                : $"Movimento realizado: {move.Origin} capturou {targetPiece.PieceType} em {move.Target}.";
 
-            moveMessage += $" Peão promovido para {GetPieceName(promotionPieceType)}.";
+            if (IsPawnPromotionMove(piece, move.Target))
+            {
+                var promotionPieceType = move.PromotionPieceType ?? PieceType.Queen;
+                var promotedPiece = CreatePromotedPiece(piece.PieceColor, promotionPieceType);
+
+                Board.SetPieceAt(move.Target, promotedPiece);
+
+                moveMessage += $" Peão promovido para {GetPieceName(promotionPieceType)}.";
+            }
         }
 
         var opponentColor = CurrentTurn == PieceColor.White
@@ -138,6 +150,34 @@ public class ChessGame
     public void FinishWithWhiteWin()
     {
         Status = GameStatus.WhiteWins;
+    }
+
+    private void ExecuteCastlingMove(Move move)
+    {
+        var king = Board.GetPieceAt(move.Origin);
+
+        if (king is null)
+            throw new InvalidOperationException("Não existe rei na posição de origem do roque.");
+
+        bool isKingSideCastle = move.Target.Column == 6;
+
+        int row = move.Origin.Row;
+        int rookOriginColumn = isKingSideCastle ? 7 : 0;
+        int rookTargetColumn = isKingSideCastle ? 5 : 3;
+
+        var rookOrigin = new BoardPosition(row, rookOriginColumn);
+        var rookTarget = new BoardPosition(row, rookTargetColumn);
+
+        var rook = Board.GetPieceAt(rookOrigin);
+
+        if (rook is null)
+            throw new InvalidOperationException("Não existe torre na posição de origem do roque.");
+
+        Board.MovePiece(move.Origin, move.Target);
+        Board.MovePiece(rookOrigin, rookTarget);
+
+        king.MarkAsMoved();
+        rook.MarkAsMoved();
     }
 
     private static bool IsPawnPromotionMove(ChessPiece piece, BoardPosition targetPosition)
