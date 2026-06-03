@@ -1,4 +1,5 @@
 ﻿using ChessSharp.Board;
+using ChessSharp.Enums;
 
 namespace ChessSharp.UI;
 
@@ -8,29 +9,77 @@ public static class ConsoleRenderer
     {
         Console.Clear();
 
-        Console.WriteLine("   a  b  c  d  e  f  g  h");
-        Console.WriteLine("  -------------------------");
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("  ♟ ChessSharp");
+        Console.ResetColor();
+
+        Console.WriteLine();
+
+        RenderFilesHeader();
 
         for (int row = 0; row < 8; row++)
         {
             int rank = 8 - row;
 
-            Console.Write($"{rank} |");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($" {rank} ");
 
             for (int column = 0; column < 8; column++)
             {
                 var position = new BoardPosition(row, column);
                 var piece = board.GetPieceAt(position);
 
-                string content = piece?.Symbol ?? ".";
+                bool isLightSquare = (row + column) % 2 == 0;
 
-                Console.Write($" {content} ");
+                Console.BackgroundColor = isLightSquare
+                    ? ConsoleColor.Gray
+                    : ConsoleColor.DarkYellow;
+
+                if (piece is null)
+                {
+                    Console.ForegroundColor = isLightSquare
+                        ? ConsoleColor.Gray
+                        : ConsoleColor.DarkYellow;
+
+                    Console.Write("     ");
+                }
+                else
+                {
+                    Console.ForegroundColor = piece.PieceColor == PieceColor.White
+                        ? ConsoleColor.White
+                        : ConsoleColor.Black;
+
+                    Console.Write($"  {piece.Symbol}  ");
+                }
+
+                Console.ResetColor();
             }
 
-            Console.WriteLine($"| {rank}");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write($" {rank}");
+            Console.ResetColor();
+            Console.WriteLine();
         }
 
-        Console.WriteLine("  -------------------------");
-        Console.WriteLine("   a  b  c  d  e  f  g  h");
+        RenderFilesHeader();
+
+        Console.WriteLine();
+    }
+
+    private static void RenderFilesHeader()
+    {
+        Console.ForegroundColor = ConsoleColor.White;
+        Console.Write("    ");
+
+        for (char file = 'a'; file <= 'h'; file++)
+        {
+            Console.Write($"  {file}  ");
+        }
+
+        Console.ResetColor();
+        Console.WriteLine();
     }
 }

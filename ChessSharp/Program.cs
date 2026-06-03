@@ -1,7 +1,11 @@
-﻿using ChessSharp.AI;
+﻿using System.Text;
+using ChessSharp.AI;
 using ChessSharp.Enums;
 using ChessSharp.Game;
 using ChessSharp.UI;
+
+Console.OutputEncoding = Encoding.UTF8;
+Console.InputEncoding = Encoding.UTF8;
 
 var game = new ChessGame();
 var bot = new ChessBot(PieceColor.Black);
