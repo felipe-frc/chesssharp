@@ -1,4 +1,4 @@
-﻿using ChessSharp.Board;
+using ChessSharp.Board;
 using ChessSharp.Enums;
 
 namespace ChessSharp.Game;
@@ -69,8 +69,14 @@ public class ChessGame
         if (targetPiece is not null && targetPiece.PieceColor == piece.PieceColor)
             return MoveResult.Invalid("Você não pode capturar uma peça da mesma cor.");
 
+        if (targetPiece is not null && targetPiece.PieceType == PieceType.King)
+            return MoveResult.Invalid("O rei não pode ser capturado. A partida deve terminar por xeque-mate.");
+
         if (!piece.IsValidMove(move.Origin, move.Target, Board))
             return MoveResult.Invalid("Movimento inválido para essa peça.");
+
+        if (!ChessRules.IsLegalMove(Board, move, CurrentTurn))
+            return MoveResult.Invalid("Movimento inválido: seu rei ficaria ou permaneceria em xeque.");
 
         Board.MovePiece(move.Origin, move.Target);
         piece.MarkAsMoved();
@@ -79,10 +85,21 @@ public class ChessGame
             ? $"Movimento realizado: {move.Origin} para {move.Target}."
             : $"Movimento realizado: {move.Origin} capturou {targetPiece.PieceType} em {move.Target}.";
 
-        UpdateGameStatus();
+        var opponentColor = ChessRules.GetOpponentColor(CurrentTurn);
 
-        if (!IsFinished)
-            ChangeTurn();
+        if (ChessRules.IsCheckmate(Board, opponentColor))
+        {
+            Status = CurrentTurn == PieceColor.White
+                ? GameStatus.WhiteWins
+                : GameStatus.BlackWins;
+
+            return MoveResult.Valid($"{moveMessage} Xeque-mate.");
+        }
+
+        if (ChessRules.IsKingInCheck(Board, opponentColor))
+            moveMessage = $"{moveMessage} Xeque.";
+
+        ChangeTurn();
 
         return MoveResult.Valid(moveMessage);
     }
@@ -95,23 +112,6 @@ public class ChessGame
     public void FinishWithWhiteWin()
     {
         Status = GameStatus.WhiteWins;
-    }
-
-    private void UpdateGameStatus()
-    {
-        bool whiteKingExists = Board.HasKing(PieceColor.White);
-        bool blackKingExists = Board.HasKing(PieceColor.Black);
-
-        if (!whiteKingExists)
-        {
-            Status = GameStatus.BlackWins;
-            return;
-        }
-
-        if (!blackKingExists)
-        {
-            Status = GameStatus.WhiteWins;
-        }
     }
 
     private void ChangeTurn()

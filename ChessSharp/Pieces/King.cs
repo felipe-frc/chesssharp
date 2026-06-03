@@ -6,7 +6,7 @@ namespace ChessSharp.Pieces;
 public class King : ChessPiece
 {
     public King(PieceColor pieceColor)
-     : base(pieceColor, PieceType.King, pieceColor == PieceColor.White ? "K" : "k")
+        : base(pieceColor, PieceType.King, pieceColor == PieceColor.White ? "♔" : "♚")
     {
     }
 

@@ -6,7 +6,7 @@ namespace ChessSharp.Pieces;
 public class Pawn : ChessPiece
 {
     public Pawn(PieceColor pieceColor)
-     : base(pieceColor, PieceType.Pawn, pieceColor == PieceColor.White ? "P" : "p")
+        : base(pieceColor, PieceType.Pawn, pieceColor == PieceColor.White ? "♙" : "♟")
     {
     }
 

@@ -1,4 +1,4 @@
-﻿using ChessSharp.Enums;
+using ChessSharp.Enums;
 using ChessSharp.Pieces;
 
 namespace ChessSharp.Board;
@@ -15,26 +15,6 @@ public class ChessBoard
         return _squares[position.Row, position.Column];
     }
 
-    public bool HasKing(PieceColor pieceColor)
-    {
-        for (int row = 0; row < 8; row++)
-        {
-            for (int column = 0; column < 8; column++)
-            {
-                var piece = _squares[row, column];
-
-                if (piece is not null &&
-                    piece.PieceColor == pieceColor &&
-                    piece.PieceType == PieceType.King)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
     public void SetPieceAt(BoardPosition position, ChessPiece? piece)
     {
         if (!position.IsValid())
@@ -46,6 +26,31 @@ public class ChessBoard
     public bool IsEmpty(BoardPosition position)
     {
         return GetPieceAt(position) is null;
+    }
+
+    public bool HasKing(PieceColor pieceColor)
+    {
+        return FindKingPosition(pieceColor) is not null;
+    }
+
+    public BoardPosition? FindKingPosition(PieceColor pieceColor)
+    {
+        for (int row = 0; row < 8; row++)
+        {
+            for (int column = 0; column < 8; column++)
+            {
+                var piece = _squares[row, column];
+
+                if (piece is not null &&
+                    piece.PieceColor == pieceColor &&
+                    piece.PieceType == PieceType.King)
+                {
+                    return new BoardPosition(row, column);
+                }
+            }
+        }
+
+        return null;
     }
 
     public void MovePiece(BoardPosition origin, BoardPosition target)
@@ -79,6 +84,25 @@ public class ChessBoard
         return true;
     }
 
+    public ChessBoard Clone()
+    {
+        var clone = new ChessBoard();
+        clone.Clear();
+
+        for (int row = 0; row < 8; row++)
+        {
+            for (int column = 0; column < 8; column++)
+            {
+                var piece = _squares[row, column];
+
+                if (piece is not null)
+                    clone._squares[row, column] = ClonePiece(piece);
+            }
+        }
+
+        return clone;
+    }
+
     public void SetupInitialPosition()
     {
         Clear();
@@ -108,7 +132,7 @@ public class ChessBoard
         SetPieceAt(new BoardPosition(7, 7), new Rook(PieceColor.White));
     }
 
-    private void Clear()
+    public void Clear()
     {
         for (int row = 0; row < 8; row++)
         {
@@ -117,5 +141,24 @@ public class ChessBoard
                 _squares[row, column] = null;
             }
         }
+    }
+
+    private static ChessPiece ClonePiece(ChessPiece piece)
+    {
+        ChessPiece clonedPiece = piece.PieceType switch
+        {
+            PieceType.Pawn => new Pawn(piece.PieceColor),
+            PieceType.Rook => new Rook(piece.PieceColor),
+            PieceType.Knight => new Knight(piece.PieceColor),
+            PieceType.Bishop => new Bishop(piece.PieceColor),
+            PieceType.Queen => new Queen(piece.PieceColor),
+            PieceType.King => new King(piece.PieceColor),
+            _ => throw new InvalidOperationException("Tipo de peça desconhecido.")
+        };
+
+        if (piece.HasMoved)
+            clonedPiece.MarkAsMoved();
+
+        return clonedPiece;
     }
 }

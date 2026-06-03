@@ -6,7 +6,7 @@ namespace ChessSharp.Pieces;
 public class Rook : ChessPiece
 {
     public Rook(PieceColor pieceColor)
-      : base(pieceColor, PieceType.Rook, pieceColor == PieceColor.White ? "R" : "r")
+        : base(pieceColor, PieceType.Rook, pieceColor == PieceColor.White ? "♖" : "♜")
     {
     }
 
