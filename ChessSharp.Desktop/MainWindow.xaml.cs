@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
+using System.Windows.Shapes;
 using ChessSharp.AI;
 using ChessSharp.Board;
 using ChessSharp.Enums;
@@ -10,14 +12,14 @@ namespace ChessSharp.Desktop;
 
 public partial class MainWindow : Window
 {
-    private readonly ChessGame _game = new();
-    private readonly ChessBot _bot = new(PieceColor.Black);
+    private ChessGame _game = new();
+    private ChessBot _bot = new(PieceColor.Black);
 
     private BoardPosition? _selectedPosition;
+    private List<BoardPosition> _legalTargetPositions = new();
 
     private static readonly Brush LightSquareBrush = new SolidColorBrush(Color.FromRgb(239, 216, 156));
     private static readonly Brush DarkSquareBrush = new SolidColorBrush(Color.FromRgb(154, 86, 39));
-    private static readonly Brush SelectedSquareBrush = new SolidColorBrush(Color.FromRgb(245, 191, 66));
 
     public MainWindow()
     {
@@ -25,7 +27,7 @@ public partial class MainWindow : Window
 
         CreateCoordinates();
         RenderBoard();
-        UpdateStatusMessage("Sua vez. Clique em uma peça branca e depois na casa de destino.");
+        UpdateStatusMessage(GetPlayerTurnMessage());
     }
 
     private void CreateCoordinates()
@@ -54,7 +56,7 @@ public partial class MainWindow : Window
         {
             Text = text,
             Foreground = new SolidColorBrush(Color.FromRgb(247, 213, 139)),
-            FontSize = 18,
+            FontSize = 16,
             FontWeight = FontWeights.Bold,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
@@ -73,35 +75,12 @@ public partial class MainWindow : Window
             BoardGrid.ColumnDefinitions.Add(new ColumnDefinition());
         }
 
-        RenderSquares();
-        RenderPieces();
-    }
-
-    private void RenderSquares()
-    {
         for (int row = 0; row < 8; row++)
         {
             for (int column = 0; column < 8; column++)
             {
                 var position = new BoardPosition(row, column);
-                bool isSelected = _selectedPosition is not null && _selectedPosition.Value == position;
-
-                var square = new Border
-                {
-                    Background = isSelected
-                        ? SelectedSquareBrush
-                        : (row + column) % 2 == 0
-                            ? LightSquareBrush
-                            : DarkSquareBrush,
-                    BorderBrush = isSelected
-                        ? new SolidColorBrush(Color.FromRgb(255, 236, 153))
-                        : Brushes.Transparent,
-                    BorderThickness = isSelected ? new Thickness(4) : new Thickness(0),
-                    Tag = position,
-                    Cursor = System.Windows.Input.Cursors.Hand
-                };
-
-                square.MouseLeftButtonDown += Square_MouseLeftButtonDown;
+                var square = CreateSquare(position, row, column);
 
                 Grid.SetRow(square, row);
                 Grid.SetColumn(square, column);
@@ -111,45 +90,108 @@ public partial class MainWindow : Window
         }
     }
 
-    private void RenderPieces()
+    private Grid CreateSquare(BoardPosition position, int row, int column)
     {
-        for (int row = 0; row < 8; row++)
+        var piece = _game.Board.GetPieceAt(position);
+        bool isSelected = _selectedPosition is not null && _selectedPosition.Value == position;
+        bool isLegalTarget = _legalTargetPositions.Contains(position);
+
+        var square = new Grid
         {
-            for (int column = 0; column < 8; column++)
-            {
-                var position = new BoardPosition(row, column);
-                var piece = _game.Board.GetPieceAt(position);
+            Background = (row + column) % 2 == 0 ? LightSquareBrush : DarkSquareBrush,
+            Tag = position,
+            Cursor = System.Windows.Input.Cursors.Hand
+        };
 
-                if (piece is null)
-                    continue;
+        square.MouseLeftButtonDown += Square_MouseLeftButtonDown;
 
-                var pieceText = new TextBlock
-                {
-                    Text = GetPieceUnicode(piece.PieceType, piece.PieceColor),
-                    FontFamily = new FontFamily("Segoe UI Symbol"),
-                    FontSize = 58,
-                    FontWeight = FontWeights.Bold,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    IsHitTestVisible = false,
-                    Foreground = piece.PieceColor == PieceColor.White
-                        ? new SolidColorBrush(Color.FromRgb(250, 248, 240))
-                        : new SolidColorBrush(Color.FromRgb(24, 18, 14)),
-                    Effect = new System.Windows.Media.Effects.DropShadowEffect
-                    {
-                        Color = Colors.Black,
-                        BlurRadius = 4,
-                        ShadowDepth = 2,
-                        Opacity = 0.35
-                    }
-                };
+        if (isSelected)
+            square.Children.Add(CreateSelectedSquareHighlight());
 
-                Grid.SetRow(pieceText, row);
-                Grid.SetColumn(pieceText, column);
-
-                BoardGrid.Children.Add(pieceText);
-            }
+        if (isLegalTarget)
+        {
+            bool isCapture = piece is not null && piece.PieceColor == PieceColor.Black;
+            square.Children.Add(CreateLegalMoveIndicator(isCapture));
         }
+
+        if (piece is not null)
+            square.Children.Add(CreatePieceText(piece.PieceType, piece.PieceColor));
+
+        return square;
+    }
+
+    private static Border CreateSelectedSquareHighlight()
+    {
+        return new Border
+        {
+            Margin = new Thickness(4),
+            CornerRadius = new CornerRadius(8),
+            BorderThickness = new Thickness(3),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(246, 196, 68)),
+            Background = new SolidColorBrush(Color.FromArgb(65, 246, 196, 68)),
+            IsHitTestVisible = false
+        };
+    }
+
+    private static UIElement CreateLegalMoveIndicator(bool isCapture)
+    {
+        var fillColor = isCapture
+            ? Color.FromRgb(190, 82, 60)
+            : Color.FromRgb(70, 140, 76);
+
+        var strokeColor = isCapture
+            ? Color.FromRgb(255, 210, 120)
+            : Color.FromRgb(185, 230, 165);
+
+        return new Polygon
+        {
+            Points = new PointCollection
+            {
+                new Point(0, 15),
+                new Point(15, 0),
+                new Point(30, 15),
+                new Point(15, 30)
+            },
+            Width = 30,
+            Height = 30,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Fill = new SolidColorBrush(Color.FromArgb(210, fillColor.R, fillColor.G, fillColor.B)),
+            Stroke = new SolidColorBrush(strokeColor),
+            StrokeThickness = 2,
+            IsHitTestVisible = false,
+            Effect = new DropShadowEffect
+            {
+                Color = Colors.Black,
+                BlurRadius = 8,
+                ShadowDepth = 0,
+                Opacity = 0.35
+            }
+        };
+    }
+
+    private static TextBlock CreatePieceText(PieceType pieceType, PieceColor pieceColor)
+    {
+        return new TextBlock
+        {
+            Text = GetPieceUnicode(pieceType, pieceColor),
+            FontFamily = new FontFamily("Segoe UI Symbol"),
+            FontSize = 50,
+            FontWeight = FontWeights.Bold,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            IsHitTestVisible = false,
+            Foreground = pieceColor == PieceColor.White
+                ? new SolidColorBrush(Color.FromRgb(250, 248, 240))
+                : new SolidColorBrush(Color.FromRgb(24, 18, 14)),
+            Effect = new DropShadowEffect
+            {
+                Color = Colors.Black,
+                BlurRadius = 4,
+                ShadowDepth = 2,
+                Opacity = 0.35
+            }
+        };
     }
 
     private async void Square_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -157,7 +199,7 @@ public partial class MainWindow : Window
         if (_game.IsFinished)
             return;
 
-        if (sender is not Border square || square.Tag is not BoardPosition clickedPosition)
+        if (sender is not Grid square || square.Tag is not BoardPosition clickedPosition)
             return;
 
         if (_game.CurrentTurn != PieceColor.White)
@@ -166,6 +208,30 @@ public partial class MainWindow : Window
         if (_selectedPosition is null)
         {
             SelectPiece(clickedPosition);
+            return;
+        }
+
+        if (_selectedPosition.Value == clickedPosition)
+        {
+            ClearSelection();
+            UpdateStatusMessage(GetPlayerTurnMessage());
+            RenderBoard();
+            return;
+        }
+
+        var clickedPiece = _game.Board.GetPieceAt(clickedPosition);
+
+        if (clickedPiece is not null &&
+            clickedPiece.PieceColor == PieceColor.White &&
+            !_legalTargetPositions.Contains(clickedPosition))
+        {
+            SelectPiece(clickedPosition);
+            return;
+        }
+
+        if (!_legalTargetPositions.Contains(clickedPosition))
+        {
+            UpdateStatusMessage(GetInvalidTargetMessage());
             return;
         }
 
@@ -178,18 +244,46 @@ public partial class MainWindow : Window
 
         if (piece is null)
         {
-            UpdateStatusMessage("Selecione uma peça branca para mover.");
+            ClearSelection();
+            UpdateStatusMessage("Escolha uma peça branca.");
+            RenderBoard();
             return;
         }
 
         if (piece.PieceColor != PieceColor.White)
         {
-            UpdateStatusMessage("Você joga com as peças brancas. Selecione uma peça branca.");
+            ClearSelection();
+            UpdateStatusMessage("Você joga com as brancas.");
+            RenderBoard();
             return;
         }
 
         _selectedPosition = position;
-        UpdateStatusMessage($"Peça selecionada em {ToChessNotation(position)}. Clique na casa de destino.");
+
+        _legalTargetPositions = ChessRules
+            .GetLegalMoves(_game.Board, PieceColor.White)
+            .Where(move => move.Origin == position)
+            .Select(move => move.Target)
+            .Distinct()
+            .ToList();
+
+        if (_legalTargetPositions.Count == 0)
+        {
+            UpdateStatusMessage(
+                ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
+                    ? "Essa peça não resolve o xeque."
+                    : "Essa peça não possui movimentos legais."
+            );
+
+            RenderBoard();
+            return;
+        }
+
+        UpdateStatusMessage(
+            ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
+                ? "Você está em xeque. Escolha um losango."
+                : "Escolha um losango."
+        );
 
         RenderBoard();
     }
@@ -204,22 +298,22 @@ public partial class MainWindow : Window
 
         var result = _game.TryMove(moveText);
 
-        _selectedPosition = null;
+        ClearSelection();
         RenderBoard();
 
         if (!result.Success)
         {
-            UpdateStatusMessage(result.Message);
+            UpdateStatusMessage(GetInvalidTargetMessage());
             return;
         }
 
         if (_game.IsFinished)
         {
-            UpdateStatusMessage($"{result.Message} {ChessGame.GetStatusMessage(_game.Status)}");
+            UpdateStatusMessage(GetFinalMessage());
             return;
         }
 
-        UpdateStatusMessage(result.Message);
+        UpdateStatusMessage("Movimento realizado.");
 
         await MakeBotMoveAsync();
     }
@@ -229,14 +323,14 @@ public partial class MainWindow : Window
         if (_game.CurrentTurn != PieceColor.Black)
             return;
 
-        UpdateStatusMessage("A máquina está pensando...");
-        await Task.Delay(650);
+        UpdateStatusMessage("Máquina pensando...");
+        await Task.Delay(500);
 
         var botMove = _bot.ChooseMove(_game.Board);
 
         if (botMove is null)
         {
-            UpdateStatusMessage("A máquina não possui movimentos legais.");
+            UpdateStatusMessage("Máquina sem movimentos.");
             return;
         }
 
@@ -246,17 +340,64 @@ public partial class MainWindow : Window
 
         if (!botMoveResult.Success)
         {
-            UpdateStatusMessage($"A máquina tentou um movimento inválido: {botMoveResult.Message}");
+            UpdateStatusMessage("Erro no movimento da máquina.");
             return;
         }
 
         if (_game.IsFinished)
         {
-            UpdateStatusMessage($"Máquina jogou: {botMove.Value}. {botMoveResult.Message} {ChessGame.GetStatusMessage(_game.Status)}");
+            UpdateStatusMessage(GetFinalMessage());
             return;
         }
 
-        UpdateStatusMessage($"Máquina jogou: {botMove.Value}. {botMoveResult.Message} Sua vez. Clique em uma peça branca e depois na casa de destino.");
+        UpdateStatusMessage(GetPlayerTurnMessage());
+    }
+
+    private void NewGameButton_Click(object sender, RoutedEventArgs e)
+    {
+        _game = new ChessGame();
+        _bot = new ChessBot(PieceColor.Black);
+
+        ClearSelection();
+        RenderBoard();
+        UpdateStatusMessage(GetPlayerTurnMessage());
+    }
+
+    private void ExitButton_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    private void ClearSelection()
+    {
+        _selectedPosition = null;
+        _legalTargetPositions.Clear();
+    }
+
+    private string GetPlayerTurnMessage()
+    {
+        return ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
+            ? "Você está em xeque."
+            : "Sua vez.";
+    }
+
+    private string GetInvalidTargetMessage()
+    {
+        return ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
+            ? "Esse movimento não resolve o xeque."
+            : "Escolha uma casa marcada.";
+    }
+
+    private string GetFinalMessage()
+    {
+        return _game.Status switch
+        {
+            GameStatus.WhiteWins => "Você venceu.",
+            GameStatus.BlackWins => "A máquina venceu.",
+            GameStatus.Draw => "Empate.",
+            GameStatus.PlayerQuit => "Partida encerrada.",
+            _ => "Jogo encerrado."
+        };
     }
 
     private void UpdateStatusMessage(string message)
