@@ -21,6 +21,11 @@ public static class ChessRules
         return IsKingInCheck(board, kingColor) && !HasAnyLegalMove(board, kingColor);
     }
 
+    public static bool IsStalemate(ChessBoard board, PieceColor color)
+    {
+        return !IsKingInCheck(board, color) && !HasAnyLegalMove(board, color);
+    }
+
     public static bool HasAnyLegalMove(ChessBoard board, PieceColor pieceColor)
     {
         return GetLegalMoves(board, pieceColor).Count > 0;
@@ -279,7 +284,12 @@ public static class ChessRules
         return rowDifference <= 1 && columnDifference <= 1;
     }
 
-    private static Move CreateMove(ChessBoard board, ChessPiece piece, BoardPosition origin, BoardPosition target)
+    private static Move CreateMove(
+        ChessBoard board,
+        ChessPiece piece,
+        BoardPosition origin,
+        BoardPosition target
+    )
     {
         bool isPromotion =
             piece.PieceType == PieceType.Pawn &&

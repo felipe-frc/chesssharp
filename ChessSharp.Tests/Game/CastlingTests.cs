@@ -59,16 +59,18 @@ public class CastlingTests
     {
         var game = CreateEmptyGame();
 
-        game.Board.SetPieceAt(BoardPosition.FromChessNotation("h1"), new King(PieceColor.White));
+        var blackKing = new King(PieceColor.Black);
+        var blackRook = new Rook(PieceColor.Black);
+
+        game.Board.SetPieceAt(BoardPosition.FromChessNotation("e1"), new King(PieceColor.White));
         game.Board.SetPieceAt(BoardPosition.FromChessNotation("a2"), new Pawn(PieceColor.White));
+        game.Board.SetPieceAt(BoardPosition.FromChessNotation("e8"), blackKing);
+        game.Board.SetPieceAt(BoardPosition.FromChessNotation("h8"), blackRook);
 
-        Assert.True(game.TryMove("a2 a3").Success);
+        var whiteMoveResult = game.TryMove("a2 a3");
 
-        var king = new King(PieceColor.Black);
-        var rook = new Rook(PieceColor.Black);
-
-        game.Board.SetPieceAt(BoardPosition.FromChessNotation("e8"), king);
-        game.Board.SetPieceAt(BoardPosition.FromChessNotation("h8"), rook);
+        Assert.True(whiteMoveResult.Success);
+        Assert.Equal(PieceColor.Black, game.CurrentTurn);
 
         var result = game.TryMove("e8 g8");
 
@@ -77,8 +79,8 @@ public class CastlingTests
         Assert.Equal(PieceType.Rook, game.Board.GetPieceAt(BoardPosition.FromChessNotation("f8"))!.PieceType);
         Assert.Null(game.Board.GetPieceAt(BoardPosition.FromChessNotation("e8")));
         Assert.Null(game.Board.GetPieceAt(BoardPosition.FromChessNotation("h8")));
-        Assert.True(king.HasMoved);
-        Assert.True(rook.HasMoved);
+        Assert.True(blackKing.HasMoved);
+        Assert.True(blackRook.HasMoved);
         Assert.Equal(PieceColor.White, game.CurrentTurn);
     }
 
