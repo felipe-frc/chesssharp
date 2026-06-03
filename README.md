@@ -7,9 +7,9 @@
 
 Jogo de xadrez desenvolvido em **C# com .NET**, executado no console, com foco em lógica de programação, orientação a objetos, validação de regras, testes automatizados, organização de código e evolução incremental por releases.
 
-O projeto permite jogar uma partida de xadrez simplificada contra a máquina, utilizando comandos no formato padrão de coordenadas do tabuleiro, como `e2 e4`. O jogador controla as peças brancas, enquanto a máquina controla as peças pretas por meio de um bot simples que prioriza capturas de maior valor.
+O projeto permite jogar uma partida de xadrez contra a máquina, utilizando comandos no formato padrão de coordenadas do tabuleiro, como `e2 e4`. O jogador pode escolher se deseja jogar com as peças brancas ou pretas, enquanto a máquina controla a cor oposta por meio de um bot simples que prioriza capturas de maior valor.
 
-A versão atual também conta com uma renderização visual aprimorada no console, usando casas coloridas e símbolos Unicode para representar as peças reais do xadrez.
+A versão atual conta com renderização visual aprimorada no console, peças Unicode, escolha de cor do jogador e regras mais próximas do xadrez real, incluindo detecção de xeque e xeque-mate.
 
 ---
 
@@ -21,6 +21,7 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 - Programação orientada a objetos;
 - Modelagem de domínio com classes, enums e responsabilidades bem definidas;
 - Implementação de regras de movimentação das peças de xadrez;
+- Implementação de regras reais de xeque e xeque-mate;
 - Manipulação de matrizes para representação de tabuleiro;
 - Validação de entradas do usuário;
 - Criação de um bot simples para jogar contra o usuário;
@@ -56,12 +57,15 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 - Validação individual de movimentação por peça;
 - Validação de caminho livre para torre, bispo e rainha;
 - Captura de peças adversárias;
-- Bloqueio de captura de peças da mesma cor.
+- Bloqueio de captura de peças da mesma cor;
+- Bloqueio de captura direta do rei.
 
 ### 🎮 Jogabilidade
 
-- Jogador controla as peças brancas;
-- Máquina controla as peças pretas;
+- Jogador pode escolher jogar com peças brancas ou pretas;
+- Máquina controla automaticamente a cor oposta;
+- Quando o jogador escolhe as brancas, ele inicia a partida;
+- Quando o jogador escolhe as pretas, a máquina faz o primeiro movimento;
 - Entrada de movimentos no formato `origem destino`.
 
 Exemplo:
@@ -76,21 +80,35 @@ e2 e4
   - Casa de origem vazia;
   - Tentativa de mover peça adversária;
   - Tentativa de capturar peça da mesma cor;
-  - Turno incorreto.
+  - Tentativa de capturar diretamente o rei;
+  - Turno incorreto;
+  - Movimento que deixa o próprio rei em xeque;
+  - Movimento que não resolve uma situação de xeque.
+
+### 👑 Xeque e Xeque-mate
+
+- Detecção de xeque;
+- Detecção de xeque-mate;
+- Validação de casas sob ataque;
+- Identificação da posição do rei;
+- Simulação de movimentos para verificar a segurança do rei;
+- Impedimento de movimentos que deixam o próprio rei em xeque;
+- Encerramento correto da partida por xeque-mate.
 
 ### 🤖 Bot da Máquina
 
-- Bot simples para jogar com as peças pretas;
-- Busca todos os movimentos válidos disponíveis;
+- Bot simples para jogar contra o usuário;
+- Busca movimentos válidos disponíveis;
 - Prioriza capturas de peças adversárias;
 - Escolhe a captura com maior valor de peça;
-- Caso não exista captura, realiza um movimento válido aleatório.
+- Caso não exista captura, realiza um movimento válido aleatório;
+- Respeita as regras de xeque e não escolhe movimentos ilegais que deixem o próprio rei em risco.
 
-### 🏁 Fim de Jogo Simplificado
+### 🏁 Fim de Jogo
 
-- Vitória das brancas quando o rei preto é capturado;
-- Vitória das pretas quando o rei branco é capturado;
-- Vitória do jogador caso a máquina não tenha movimentos válidos;
+- Vitória das brancas por xeque-mate;
+- Vitória das pretas por xeque-mate;
+- Vitória do jogador caso a máquina não possua movimentos legais;
 - Encerramento manual da partida com o comando:
 
 ```txt
@@ -132,6 +150,7 @@ ChessSharp/
 │   │
 │   ├── Game/
 │   │   ├── ChessGame.cs
+│   │   ├── ChessRules.cs
 │   │   ├── GameStatus.cs
 │   │   ├── Move.cs
 │   │   └── MoveResult.cs
@@ -146,7 +165,8 @@ ChessSharp/
 │   │   └── Rook.cs
 │   │
 │   ├── UI/
-│   │   └── ConsoleRenderer.cs
+│   │   ├── ConsoleRenderer.cs
+│   │   └── PlayerColorSelector.cs
 │   │
 │   └── Program.cs
 │
@@ -220,9 +240,16 @@ dotnet run --project ChessSharp
 
 ## 🎮 Como Jogar
 
-Ao iniciar o jogo, o tabuleiro será exibido no console.
+Ao iniciar o jogo, o usuário escolhe se deseja jogar com as peças brancas ou pretas.
 
-O jogador controla as peças brancas e deve digitar os movimentos usando o formato:
+```txt
+1 - Brancas
+2 - Pretas
+```
+
+Depois da escolha, o tabuleiro será exibido no console.
+
+O jogador deve digitar os movimentos usando o formato:
 
 ```txt
 origem destino
@@ -234,7 +261,7 @@ Exemplo:
 e2 e4
 ```
 
-Após o movimento do jogador, a máquina joga automaticamente com as peças pretas.
+Após o movimento do jogador, a máquina joga automaticamente com a cor oposta.
 
 Para sair da partida, digite:
 
@@ -259,7 +286,12 @@ O projeto possui testes automatizados com xUnit cobrindo:
 - Regras gerais do jogo;
 - Alternância de turno;
 - Validação de movimentos inválidos;
-- Encerramento simplificado da partida.
+- Encerramento da partida;
+- Detecção de xeque;
+- Detecção de xeque-mate;
+- Bloqueio de captura direta do rei;
+- Bloqueio de movimentos que deixam o próprio rei em xeque;
+- Cenário de xeque-mate com Fool's Mate.
 
 Para executar os testes:
 
@@ -310,6 +342,37 @@ O workflow executa:
 - Melhorar as mensagens iniciais da partida;
 - Ajustar a ordem de jogadas quando o usuário escolher jogar com peças pretas.
 
+### v1.3.0
+
+- Implementar detecção de xeque;
+- Implementar detecção de xeque-mate;
+- Substituir a lógica de captura do rei pelo fluxo correto de xadrez;
+- Impedir movimentos que deixam o próprio rei em xeque;
+- Impedir movimentos que não resolvem uma situação de xeque;
+- Ajustar o bot para considerar apenas movimentos legais;
+- Adicionar testes automatizados para xeque e xeque-mate.
+
+### v1.4.0
+
+- Implementar roque;
+- Implementar promoção de peão;
+- Adicionar testes automatizados para regras especiais;
+- Melhorar a cobertura das regras oficiais do xadrez.
+
+### v1.5.0
+
+- Evoluir o bot para minimax simples;
+- Implementar avaliação básica de tabuleiro;
+- Melhorar a tomada de decisão da máquina;
+- Adicionar testes para a lógica de decisão do bot.
+
+### v1.6.0
+
+- Adicionar coleta de cobertura de testes com Coverlet;
+- Gerar relatório de cobertura;
+- Adicionar badge de cobertura no README;
+- Reforçar a validação de qualidade do projeto.
+
 ### v2.0.0
 
 - Criar uma interface gráfica 2D;
@@ -337,6 +400,14 @@ O workflow executa:
 ---
 
 ## 📦 Releases
+
+### v1.3.0 - Xeque e xeque-mate real
+
+Versão focada na evolução do motor de regras do ChessSharp, substituindo a lógica simplificada de captura do rei por detecção real de xeque e xeque-mate.
+
+### v1.2.0 - Escolha de cor do jogador
+
+Versão que permite ao jogador escolher se deseja jogar com as peças brancas ou pretas antes do início da partida.
 
 ### v1.1.0 - Melhorias visuais no tabuleiro
 
