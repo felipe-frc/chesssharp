@@ -1,5 +1,6 @@
 using ChessSharp.Board;
 using ChessSharp.Enums;
+using ChessSharp.Pieces;
 
 namespace ChessSharp.Game;
 
@@ -29,8 +30,8 @@ public class ChessGame
 
         string[] parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-        if (parts.Length != 2)
-            return MoveResult.Invalid("Formato inválido. Use o formato: e2 e4.");
+        if (parts.Length is < 2 or > 3)
+            return MoveResult.Invalid("Formato inválido. Use o formato: e2 e4 ou e7 e8 q.");
 
         BoardPosition origin;
         BoardPosition target;
@@ -45,7 +46,19 @@ public class ChessGame
             return MoveResult.Invalid(exception.Message);
         }
 
-        return TryMove(new Move(origin, target));
+        PieceType? promotionPieceType = null;
+
+        if (parts.Length == 3)
+        {
+            if (!TryParsePromotionPiece(parts[2], out promotionPieceType))
+            {
+                return MoveResult.Invalid(
+                    "Peça de promoção inválida. Use q para rainha, r para torre, b para bispo ou n para cavalo."
+                );
+            }
+        }
+
+        return TryMove(new Move(origin, target, promotionPieceType));
     }
 
     public MoveResult TryMove(Move move)
@@ -70,13 +83,16 @@ public class ChessGame
             return MoveResult.Invalid("Você não pode capturar uma peça da mesma cor.");
 
         if (targetPiece is not null && targetPiece.PieceType == PieceType.King)
-            return MoveResult.Invalid("O rei não pode ser capturado. A partida deve terminar por xeque-mate.");
+            return MoveResult.Invalid("O rei não pode ser capturado diretamente.");
+
+        if (move.PromotionPieceType is not null && !IsPawnPromotionMove(piece, move.Target))
+            return MoveResult.Invalid("Promoção só é permitida quando um peão alcança a última fileira.");
 
         if (!piece.IsValidMove(move.Origin, move.Target, Board))
             return MoveResult.Invalid("Movimento inválido para essa peça.");
 
         if (!ChessRules.IsLegalMove(Board, move, CurrentTurn))
-            return MoveResult.Invalid("Movimento inválido: seu rei ficaria ou permaneceria em xeque.");
+            return MoveResult.Invalid("Movimento inválido. O rei ficaria em xeque.");
 
         Board.MovePiece(move.Origin, move.Target);
         piece.MarkAsMoved();
@@ -85,7 +101,19 @@ public class ChessGame
             ? $"Movimento realizado: {move.Origin} para {move.Target}."
             : $"Movimento realizado: {move.Origin} capturou {targetPiece.PieceType} em {move.Target}.";
 
-        var opponentColor = ChessRules.GetOpponentColor(CurrentTurn);
+        if (IsPawnPromotionMove(piece, move.Target))
+        {
+            var promotionPieceType = move.PromotionPieceType ?? PieceType.Queen;
+            var promotedPiece = CreatePromotedPiece(piece.PieceColor, promotionPieceType);
+
+            Board.SetPieceAt(move.Target, promotedPiece);
+
+            moveMessage += $" Peão promovido para {GetPieceName(promotionPieceType)}.";
+        }
+
+        var opponentColor = CurrentTurn == PieceColor.White
+            ? PieceColor.Black
+            : PieceColor.White;
 
         if (ChessRules.IsCheckmate(Board, opponentColor))
         {
@@ -93,11 +121,9 @@ public class ChessGame
                 ? GameStatus.WhiteWins
                 : GameStatus.BlackWins;
 
-            return MoveResult.Valid($"{moveMessage} Xeque-mate.");
+            moveMessage += " Xeque-mate.";
+            return MoveResult.Valid(moveMessage);
         }
-
-        if (ChessRules.IsKingInCheck(Board, opponentColor))
-            moveMessage = $"{moveMessage} Xeque.";
 
         ChangeTurn();
 
@@ -112,6 +138,54 @@ public class ChessGame
     public void FinishWithWhiteWin()
     {
         Status = GameStatus.WhiteWins;
+    }
+
+    private static bool IsPawnPromotionMove(ChessPiece piece, BoardPosition targetPosition)
+    {
+        if (piece.PieceType != PieceType.Pawn)
+            return false;
+
+        return piece.PieceColor == PieceColor.White
+            ? targetPosition.Row == 0
+            : targetPosition.Row == 7;
+    }
+
+    private static bool TryParsePromotionPiece(string value, out PieceType? pieceType)
+    {
+        pieceType = value.ToLowerInvariant() switch
+        {
+            "q" => PieceType.Queen,
+            "r" => PieceType.Rook,
+            "b" => PieceType.Bishop,
+            "n" => PieceType.Knight,
+            _ => null
+        };
+
+        return pieceType is not null;
+    }
+
+    private static ChessPiece CreatePromotedPiece(PieceColor pieceColor, PieceType pieceType)
+    {
+        return pieceType switch
+        {
+            PieceType.Queen => new Queen(pieceColor),
+            PieceType.Rook => new Rook(pieceColor),
+            PieceType.Bishop => new Bishop(pieceColor),
+            PieceType.Knight => new Knight(pieceColor),
+            _ => throw new ArgumentException("Tipo de peça inválido para promoção.", nameof(pieceType))
+        };
+    }
+
+    private static string GetPieceName(PieceType pieceType)
+    {
+        return pieceType switch
+        {
+            PieceType.Queen => "rainha",
+            PieceType.Rook => "torre",
+            PieceType.Bishop => "bispo",
+            PieceType.Knight => "cavalo",
+            _ => "peça"
+        };
     }
 
     private void ChangeTurn()
