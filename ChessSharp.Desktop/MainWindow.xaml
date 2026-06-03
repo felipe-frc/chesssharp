@@ -26,11 +26,12 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0"
                         HorizontalAlignment="Center"
-                        Margin="0,0,0,22">
+                        Margin="0,0,0,18">
                 <TextBlock Text="♟ ChessSharp"
                            Foreground="#f7d58b"
                            FontSize="42"
@@ -103,6 +104,24 @@
                     </Grid>
                 </Border>
             </Viewbox>
+
+            <Border Grid.Row="2"
+                    Background="#321509"
+                    BorderBrush="#8a4b22"
+                    BorderThickness="2"
+                    CornerRadius="14"
+                    Padding="18"
+                    Margin="0,18,0,0"
+                    HorizontalAlignment="Center"
+                    Width="860">
+                <TextBlock x:Name="StatusTextBlock"
+                           Text="Sua vez. Clique em uma peça branca e depois na casa de destino."
+                           Foreground="#f7d58b"
+                           FontSize="17"
+                           FontWeight="SemiBold"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"/>
+            </Border>
         </Grid>
     </Grid>
 </Window>

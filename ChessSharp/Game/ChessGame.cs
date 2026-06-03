@@ -89,6 +89,7 @@ public class ChessGame
             return MoveResult.Invalid("Promoção só é permitida quando um peão alcança a última fileira.");
 
         bool isEnPassant = ChessRules.IsEnPassantMove(Board, move, CurrentTurn);
+
         var normalizedMove = isEnPassant
             ? move with { IsEnPassant = true }
             : move;
@@ -138,9 +139,7 @@ public class ChessGame
 
         Board.RegisterMove(normalizedMove);
 
-        var opponentColor = CurrentTurn == PieceColor.White
-            ? PieceColor.Black
-            : PieceColor.White;
+        var opponentColor = ChessRules.GetOpponentColor(CurrentTurn);
 
         if (ChessRules.IsCheckmate(Board, opponentColor))
         {
@@ -149,6 +148,13 @@ public class ChessGame
                 : GameStatus.BlackWins;
 
             moveMessage += " Xeque-mate.";
+            return MoveResult.Valid(moveMessage);
+        }
+
+        if (ChessRules.IsStalemate(Board, opponentColor))
+        {
+            Status = GameStatus.Draw;
+            moveMessage += " Empate por afogamento.";
             return MoveResult.Valid(moveMessage);
         }
 
