@@ -18,49 +18,15 @@ public partial class MainWindow : Window
     private BoardPosition? _selectedPosition;
     private List<BoardPosition> _legalTargetPositions = new();
 
-    private static readonly Brush LightSquareBrush = new SolidColorBrush(Color.FromRgb(239, 216, 156));
-    private static readonly Brush DarkSquareBrush = new SolidColorBrush(Color.FromRgb(154, 86, 39));
+    private static readonly Brush LightSquareBrush = new SolidColorBrush(Color.FromRgb(232, 201, 143));
+    private static readonly Brush DarkSquareBrush = new SolidColorBrush(Color.FromRgb(76, 42, 31));
 
     public MainWindow()
     {
         InitializeComponent();
 
-        CreateCoordinates();
         RenderBoard();
         UpdateStatusMessage(GetPlayerTurnMessage());
-    }
-
-    private void CreateCoordinates()
-    {
-        TopFilesPanel.Children.Clear();
-        BottomFilesPanel.Children.Clear();
-        LeftRanksPanel.Children.Clear();
-        RightRanksPanel.Children.Clear();
-
-        for (char file = 'a'; file <= 'h'; file++)
-        {
-            TopFilesPanel.Children.Add(CreateCoordinateText(file.ToString()));
-            BottomFilesPanel.Children.Add(CreateCoordinateText(file.ToString()));
-        }
-
-        for (int rank = 8; rank >= 1; rank--)
-        {
-            LeftRanksPanel.Children.Add(CreateCoordinateText(rank.ToString()));
-            RightRanksPanel.Children.Add(CreateCoordinateText(rank.ToString()));
-        }
-    }
-
-    private static TextBlock CreateCoordinateText(string text)
-    {
-        return new TextBlock
-        {
-            Text = text,
-            Foreground = new SolidColorBrush(Color.FromRgb(247, 213, 139)),
-            FontSize = 16,
-            FontWeight = FontWeights.Bold,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
-        };
     }
 
     private void RenderBoard()
@@ -100,10 +66,18 @@ public partial class MainWindow : Window
         {
             Background = (row + column) % 2 == 0 ? LightSquareBrush : DarkSquareBrush,
             Tag = position,
-            Cursor = System.Windows.Input.Cursors.Hand
+            Cursor = System.Windows.Input.Cursors.Hand,
+            ClipToBounds = true
         };
 
         square.MouseLeftButtonDown += Square_MouseLeftButtonDown;
+
+        square.Children.Add(new Border
+        {
+            BorderBrush = new SolidColorBrush(Color.FromArgb(26, 255, 245, 220)),
+            BorderThickness = new Thickness(0.5),
+            IsHitTestVisible = false
+        });
 
         if (isSelected)
             square.Children.Add(CreateSelectedSquareHighlight());
@@ -124,72 +98,58 @@ public partial class MainWindow : Window
     {
         return new Border
         {
-            Margin = new Thickness(4),
-            CornerRadius = new CornerRadius(8),
-            BorderThickness = new Thickness(3),
-            BorderBrush = new SolidColorBrush(Color.FromRgb(246, 196, 68)),
-            Background = new SolidColorBrush(Color.FromArgb(65, 246, 196, 68)),
+            Background = new SolidColorBrush(Color.FromArgb(70, 214, 162, 63)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(214, 162, 63)),
+            BorderThickness = new Thickness(2),
             IsHitTestVisible = false
         };
     }
 
     private static UIElement CreateLegalMoveIndicator(bool isCapture)
     {
-        var fillColor = isCapture
-            ? Color.FromRgb(190, 82, 60)
-            : Color.FromRgb(70, 140, 76);
-
-        var strokeColor = isCapture
-            ? Color.FromRgb(255, 210, 120)
-            : Color.FromRgb(185, 230, 165);
-
-        return new Polygon
+        return new Ellipse
         {
-            Points = new PointCollection
-            {
-                new Point(0, 15),
-                new Point(15, 0),
-                new Point(30, 15),
-                new Point(15, 30)
-            },
-            Width = 30,
-            Height = 30,
+            Width = 18,
+            Height = 18,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            Fill = new SolidColorBrush(Color.FromArgb(210, fillColor.R, fillColor.G, fillColor.B)),
-            Stroke = new SolidColorBrush(strokeColor),
-            StrokeThickness = 2,
-            IsHitTestVisible = false,
-            Effect = new DropShadowEffect
-            {
-                Color = Colors.Black,
-                BlurRadius = 8,
-                ShadowDepth = 0,
-                Opacity = 0.35
-            }
+            Fill = isCapture
+                ? new SolidColorBrush(Color.FromArgb(135, 176, 68, 52))
+                : new SolidColorBrush(Color.FromArgb(95, 243, 231, 210)),
+            Stroke = isCapture
+                ? new SolidColorBrush(Color.FromArgb(160, 236, 184, 94))
+                : new SolidColorBrush(Color.FromArgb(120, 255, 248, 230)),
+            StrokeThickness = 1,
+            IsHitTestVisible = false
         };
     }
 
     private static TextBlock CreatePieceText(PieceType pieceType, PieceColor pieceColor)
     {
+        var foreground = pieceColor == PieceColor.White
+            ? new SolidColorBrush(Color.FromRgb(243, 231, 213))
+            : new SolidColorBrush(Color.FromRgb(31, 20, 15));
+
+        var shadowColor = pieceColor == PieceColor.White
+            ? Color.FromRgb(42, 25, 14)
+            : Color.FromRgb(155, 111, 49);
+
         return new TextBlock
         {
             Text = GetPieceUnicode(pieceType, pieceColor),
             FontFamily = new FontFamily("Segoe UI Symbol"),
-            FontSize = 50,
+            FontSize = 48,
             FontWeight = FontWeights.Bold,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             IsHitTestVisible = false,
-            Foreground = pieceColor == PieceColor.White
-                ? new SolidColorBrush(Color.FromRgb(250, 248, 240))
-                : new SolidColorBrush(Color.FromRgb(24, 18, 14)),
+            Foreground = foreground,
             Effect = new DropShadowEffect
             {
-                Color = Colors.Black,
-                BlurRadius = 4,
-                ShadowDepth = 2,
-                Opacity = 0.35
+                Color = shadowColor,
+                BlurRadius = 5,
+                ShadowDepth = 1,
+                Opacity = pieceColor == PieceColor.White ? 0.75 : 0.32
             }
         };
     }
@@ -242,18 +202,10 @@ public partial class MainWindow : Window
     {
         var piece = _game.Board.GetPieceAt(position);
 
-        if (piece is null)
+        if (piece is null || piece.PieceColor != PieceColor.White)
         {
             ClearSelection();
-            UpdateStatusMessage("Escolha uma peça branca.");
-            RenderBoard();
-            return;
-        }
-
-        if (piece.PieceColor != PieceColor.White)
-        {
-            ClearSelection();
-            UpdateStatusMessage("Você joga com as brancas.");
+            UpdateStatusMessage(piece is null ? "ESCOLHA UMA PEÇA CLARA." : "VOCÊ JOGA COM AS PEÇAS CLARAS.");
             RenderBoard();
             return;
         }
@@ -271,20 +223,14 @@ public partial class MainWindow : Window
         {
             UpdateStatusMessage(
                 ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
-                    ? "Essa peça não resolve o xeque."
-                    : "Essa peça não possui movimentos legais."
+                    ? "REI EM PERIGO. PROTEJA-O."
+                    : "ESTA PEÇA NÃO POSSUI MOVIMENTOS."
             );
-
             RenderBoard();
             return;
         }
 
-        UpdateStatusMessage(
-            ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
-                ? "Você está em xeque. Escolha um losango."
-                : "Escolha um losango."
-        );
-
+        UpdateStatusMessage("ESCOLHA O DESTINO DA PEÇA.");
         RenderBoard();
     }
 
@@ -313,8 +259,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        UpdateStatusMessage("Movimento realizado.");
-
+        UpdateStatusMessage("MOVIMENTO REALIZADO.");
         await MakeBotMoveAsync();
     }
 
@@ -323,24 +268,23 @@ public partial class MainWindow : Window
         if (_game.CurrentTurn != PieceColor.Black)
             return;
 
-        UpdateStatusMessage("Máquina pensando...");
-        await Task.Delay(500);
+        UpdateStatusMessage("OPONENTE ESTÁ PENSANDO...");
+        await Task.Delay(800);
 
         var botMove = _bot.ChooseMove(_game.Board);
 
         if (botMove is null)
         {
-            UpdateStatusMessage("Máquina sem movimentos.");
+            UpdateStatusMessage("OPONENTE SEM MOVIMENTOS.");
             return;
         }
 
         var botMoveResult = _game.TryMove(botMove.Value);
-
         RenderBoard();
 
         if (!botMoveResult.Success)
         {
-            UpdateStatusMessage("Erro no movimento da máquina.");
+            UpdateStatusMessage("ERRO NA ESTRATÉGIA DO OPONENTE.");
             return;
         }
 
@@ -377,39 +321,38 @@ public partial class MainWindow : Window
     private string GetPlayerTurnMessage()
     {
         return ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
-            ? "Você está em xeque."
-            : "Sua vez.";
+            ? "REI EM XEQUE."
+            : "SUA VEZ DE JOGAR.";
     }
 
     private string GetInvalidTargetMessage()
     {
         return ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
-            ? "Esse movimento não resolve o xeque."
-            : "Escolha uma casa marcada.";
+            ? "MOVIMENTO INVÁLIDO. PROTEJA O REI."
+            : "ESCOLHA UMA CASA VÁLIDA.";
     }
 
     private string GetFinalMessage()
     {
         return _game.Status switch
         {
-            GameStatus.WhiteWins => "Você venceu.",
-            GameStatus.BlackWins => "A máquina venceu.",
-            GameStatus.Draw => "Empate.",
-            GameStatus.PlayerQuit => "Partida encerrada.",
-            _ => "Jogo encerrado."
+            GameStatus.WhiteWins => "VITÓRIA. VOCÊ VENCEU A PARTIDA.",
+            GameStatus.BlackWins => "DERROTA. O OPONENTE VENCEU.",
+            GameStatus.Draw => "EMPATE.",
+            GameStatus.PlayerQuit => "PARTIDA ENCERRADA.",
+            _ => "JOGO FINALIZADO."
         };
     }
 
     private void UpdateStatusMessage(string message)
     {
-        StatusTextBlock.Text = message;
+        StatusText.Text = message.ToUpper();
     }
 
     private static string ToChessNotation(BoardPosition position)
     {
         char file = (char)('a' + position.Column);
         int rank = 8 - position.Row;
-
         return $"{file}{rank}";
     }
 
