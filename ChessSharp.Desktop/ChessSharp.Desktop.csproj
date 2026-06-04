@@ -20,4 +20,8 @@
     <Resource Include="Assets\Images\Pieces\*.png" />
   </ItemGroup>
 
+  <ItemGroup>
+  <Resource Include="Assets\Images\board-premium.png" />
+</ItemGroup>
+
 </Project>
