@@ -3,9 +3,9 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,15 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Assets\Images\logo-chesssharp.png" />
-    <None Remove="Assets\Images\Pieces\*.png" />
-
     <Resource Include="Assets\Images\logo-chesssharp.png" />
+    <Resource Include="Assets\Images\board-premium.png" />
+    <Resource Include="Assets\Images\background-marble.png" />
     <Resource Include="Assets\Images\Pieces\*.png" />
   </ItemGroup>
-
-  <ItemGroup>
-  <Resource Include="Assets\Images\board-premium.png" />
-</ItemGroup>
 
 </Project>

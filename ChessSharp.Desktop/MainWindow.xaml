@@ -7,7 +7,7 @@
         MinWidth="1000"
         MinHeight="800"
         WindowStartupLocation="CenterScreen"
-        Background="#160B08"
+        Background="#050403"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
         TextOptions.TextFormattingMode="Display"
@@ -99,19 +99,33 @@
     </Window.Resources>
 
     <Grid>
-        <!-- Background premium escuro -->
+        <!-- Background premium com mármore preto e veios dourados -->
         <Grid.Background>
-            <RadialGradientBrush Center="0.5,0.42"
-                                 RadiusX="1"
-                                 RadiusY="1">
-                <GradientStop Color="#2A120D"
-                              Offset="0"/>
-                <GradientStop Color="#1A0B07"
-                              Offset="0.62"/>
-                <GradientStop Color="#0E0503"
-                              Offset="1"/>
-            </RadialGradientBrush>
+            <ImageBrush ImageSource="/Assets/Images/background-marble.png"
+                        Stretch="UniformToFill"
+                        AlignmentX="Center"
+                        AlignmentY="Center"/>
         </Grid.Background>
+
+        <!-- Camada escura sutil para manter contraste da interface -->
+        <Rectangle Fill="#66000000"
+                   IsHitTestVisible="False"/>
+
+        <!-- Vinheta para reforçar profundidade visual -->
+        <Rectangle IsHitTestVisible="False">
+            <Rectangle.Fill>
+                <RadialGradientBrush Center="0.5,0.42"
+                                     RadiusX="0.95"
+                                     RadiusY="0.95">
+                    <GradientStop Color="#00000000"
+                                  Offset="0"/>
+                    <GradientStop Color="#33000000"
+                                  Offset="0.62"/>
+                    <GradientStop Color="#99000000"
+                                  Offset="1"/>
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
 
         <!-- Moldura decorativa sutil -->
         <Border BorderBrush="{StaticResource BronzeSoft}"
@@ -152,9 +166,9 @@
                         CornerRadius="8">
                     <Border.Effect>
                         <DropShadowEffect Color="#D6A23F"
-                                          BlurRadius="22"
+                                          BlurRadius="24"
                                           ShadowDepth="0"
-                                          Opacity="0.18"/>
+                                          Opacity="0.22"/>
                     </Border.Effect>
 
                     <!-- 
@@ -174,8 +188,8 @@
 
                         <!-- 
                             Camada das casas, cliques, seleção, movimentos e peças.
-                            Se as peças ficarem um pouco desalinhadas, ajuste somente estes valores:
-                            Margin="56,48,56,64"
+                            Ajuste fino caso necessário:
+                            Width/Height e Margin.
                         -->
                         <Grid x:Name="BoardGrid"
                               Width="656"
