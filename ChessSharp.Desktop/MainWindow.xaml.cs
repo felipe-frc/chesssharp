@@ -19,8 +19,13 @@ public partial class MainWindow : Window
     private BoardPosition? _selectedPosition;
     private List<BoardPosition> _legalTargetPositions = new();
 
-    private static readonly Brush LightSquareBrush = new SolidColorBrush(Color.FromRgb(232, 201, 143));
-    private static readonly Brush DarkSquareBrush = new SolidColorBrush(Color.FromRgb(76, 42, 31));
+    private static readonly Color LightSquareBase = Color.FromRgb(227, 187, 127); // #E3BB7F
+    private static readonly Color LightSquareHighlight = Color.FromRgb(242, 207, 153);
+    private static readonly Color LightSquareShadow = Color.FromRgb(191, 134, 72);
+
+    private static readonly Color DarkSquareBase = Color.FromRgb(72, 54, 46); // #48362E
+    private static readonly Color DarkSquareHighlight = Color.FromRgb(95, 70, 56);
+    private static readonly Color DarkSquareShadow = Color.FromRgb(45, 33, 28);
 
     public MainWindow()
     {
@@ -62,10 +67,11 @@ public partial class MainWindow : Window
         var piece = _game.Board.GetPieceAt(position);
         bool isSelected = _selectedPosition is not null && _selectedPosition.Value == position;
         bool isLegalTarget = _legalTargetPositions.Contains(position);
+        bool isLightSquare = (row + column) % 2 == 0;
 
         var square = new Grid
         {
-            Background = (row + column) % 2 == 0 ? LightSquareBrush : DarkSquareBrush,
+            Background = CreateWoodSquareBrush(isLightSquare, row, column),
             Tag = position,
             Cursor = System.Windows.Input.Cursors.Hand,
             ClipToBounds = true
@@ -73,10 +79,15 @@ public partial class MainWindow : Window
 
         square.MouseLeftButtonDown += Square_MouseLeftButtonDown;
 
+        square.Children.Add(CreateWoodGrainOverlay(isLightSquare, row, column));
+        square.Children.Add(CreateSquareDepthOverlay(isLightSquare));
+
         square.Children.Add(new Border
         {
-            BorderBrush = new SolidColorBrush(Color.FromArgb(26, 255, 245, 220)),
-            BorderThickness = new Thickness(0.5),
+            BorderBrush = isLightSquare
+                ? new SolidColorBrush(Color.FromArgb(34, 255, 239, 198))
+                : new SolidColorBrush(Color.FromArgb(40, 20, 13, 9)),
+            BorderThickness = new Thickness(0.45),
             IsHitTestVisible = false
         });
 
@@ -95,12 +106,119 @@ public partial class MainWindow : Window
         return square;
     }
 
+    private static Brush CreateWoodSquareBrush(bool isLightSquare, int row, int column)
+    {
+        Color baseColor = isLightSquare ? LightSquareBase : DarkSquareBase;
+        Color highlightColor = isLightSquare ? LightSquareHighlight : DarkSquareHighlight;
+        Color shadowColor = isLightSquare ? LightSquareShadow : DarkSquareShadow;
+
+        double offsetVariation = ((row * 3 + column * 5) % 9) / 100.0;
+
+        var brush = new LinearGradientBrush
+        {
+            StartPoint = new Point(0, 0),
+            EndPoint = new Point(1, 1)
+        };
+
+        brush.GradientStops.Add(new GradientStop(highlightColor, 0.00));
+        brush.GradientStops.Add(new GradientStop(baseColor, 0.32 + offsetVariation));
+        brush.GradientStops.Add(new GradientStop(baseColor, 0.58));
+        brush.GradientStops.Add(new GradientStop(shadowColor, 1.00));
+
+        brush.Freeze();
+        return brush;
+    }
+
+    private static UIElement CreateWoodGrainOverlay(bool isLightSquare, int row, int column)
+    {
+        var grid = new Grid
+        {
+            IsHitTestVisible = false,
+            Opacity = isLightSquare ? 0.22 : 0.26
+        };
+
+        Color lineColor = isLightSquare
+            ? Color.FromArgb(76, 118, 72, 31)
+            : Color.FromArgb(88, 201, 143, 82);
+
+        Color softLineColor = isLightSquare
+            ? Color.FromArgb(44, 255, 229, 178)
+            : Color.FromArgb(38, 255, 210, 142);
+
+        for (int index = 0; index < 6; index++)
+        {
+            double topOffset = 7 + ((row * 13 + column * 17 + index * 11) % 62);
+            double thickness = index % 3 == 0 ? 1.4 : 0.8;
+
+            grid.Children.Add(new Rectangle
+            {
+                Height = thickness,
+                Fill = new SolidColorBrush(index % 2 == 0 ? lineColor : softLineColor),
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Top,
+                Margin = new Thickness(0, topOffset, 0, 0)
+            });
+        }
+
+        var glow = new Rectangle
+        {
+            Height = 18,
+            VerticalAlignment = VerticalAlignment.Top,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            IsHitTestVisible = false,
+            Opacity = isLightSquare ? 0.18 : 0.10,
+            Fill = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0),
+                EndPoint = new Point(1, 0),
+                GradientStops =
+                {
+                    new GradientStop(Color.FromArgb(0, 255, 255, 255), 0.00),
+                    new GradientStop(Color.FromArgb(95, 255, 231, 169), 0.45),
+                    new GradientStop(Color.FromArgb(0, 255, 255, 255), 1.00)
+                }
+            },
+            Margin = new Thickness(0, 8 + ((row + column) % 4) * 7, 0, 0)
+        };
+
+        grid.Children.Add(glow);
+
+        return grid;
+    }
+
+    private static UIElement CreateSquareDepthOverlay(bool isLightSquare)
+    {
+        return new Border
+        {
+            IsHitTestVisible = false,
+            Background = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0),
+                EndPoint = new Point(0, 1),
+                GradientStops =
+                {
+                    new GradientStop(
+                        isLightSquare
+                            ? Color.FromArgb(36, 255, 255, 255)
+                            : Color.FromArgb(18, 255, 255, 255),
+                        0.00),
+                    new GradientStop(Color.FromArgb(0, 255, 255, 255), 0.42),
+                    new GradientStop(
+                        isLightSquare
+                            ? Color.FromArgb(34, 89, 45, 17)
+                            : Color.FromArgb(62, 0, 0, 0),
+                        1.00)
+                }
+            }
+        };
+    }
+
     private static Border CreateSelectedSquareHighlight()
     {
         return new Border
         {
-            Background = new SolidColorBrush(Color.FromArgb(70, 214, 162, 63)),
-            BorderBrush = new SolidColorBrush(Color.FromRgb(214, 162, 63)),
+            Background = new SolidColorBrush(Color.FromArgb(58, 214, 162, 63)),
+            BorderBrush = new SolidColorBrush(Color.FromRgb(242, 198, 91)),
             BorderThickness = new Thickness(2),
             IsHitTestVisible = false
         };
@@ -115,11 +233,11 @@ public partial class MainWindow : Window
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             Fill = isCapture
-                ? new SolidColorBrush(Color.FromArgb(135, 176, 68, 52))
-                : new SolidColorBrush(Color.FromArgb(95, 243, 231, 210)),
+                ? new SolidColorBrush(Color.FromArgb(145, 176, 68, 52))
+                : new SolidColorBrush(Color.FromArgb(105, 243, 231, 210)),
             Stroke = isCapture
-                ? new SolidColorBrush(Color.FromArgb(160, 236, 184, 94))
-                : new SolidColorBrush(Color.FromArgb(120, 255, 248, 230)),
+                ? new SolidColorBrush(Color.FromArgb(175, 236, 184, 94))
+                : new SolidColorBrush(Color.FromArgb(135, 255, 248, 230)),
             StrokeThickness = 1,
             IsHitTestVisible = false
         };
@@ -136,7 +254,7 @@ public partial class MainWindow : Window
         bitmap.EndInit();
         bitmap.Freeze();
 
-        return new Image
+        var image = new Image
         {
             Source = bitmap,
             Width = 72,
@@ -156,6 +274,9 @@ public partial class MainWindow : Window
                 Opacity = 0.45
             }
         };
+
+        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+        return image;
     }
 
     private static string GetPieceImagePath(PieceType type, PieceColor color)

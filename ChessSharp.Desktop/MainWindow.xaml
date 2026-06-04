@@ -113,7 +113,7 @@
     </Window.Resources>
 
     <Grid>
-        <!-- Background menos preto, mais madeira escura -->
+        <!-- Background premium escuro -->
         <Grid.Background>
             <RadialGradientBrush Center="0.5,0.45"
                                  RadiusX="1"
@@ -171,9 +171,9 @@
                      HorizontalAlignment="Center"
                      VerticalAlignment="Center">
                 <Border Padding="20"
-                        Background="#160B08"
+                        Background="#100805"
                         BorderBrush="{StaticResource GoldAccent}"
-                        BorderThickness="1"
+                        BorderThickness="1.5"
                         CornerRadius="5">
                     <Border.Effect>
                         <DropShadowEffect Color="Black"
@@ -200,21 +200,21 @@
                                      Grid.Column="1"
                                      Columns="8">
                             <TextBlock Text="A"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="B"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="C"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="D"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="E"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="F"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="G"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="H"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                         </UniformGrid>
 
                         <!-- Coordenadas Inferiores -->
@@ -222,21 +222,21 @@
                                      Grid.Column="1"
                                      Columns="8">
                             <TextBlock Text="A"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="B"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="C"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="D"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="E"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="F"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="G"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="H"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                         </UniformGrid>
 
                         <!-- Coordenadas Esquerdas -->
@@ -244,21 +244,21 @@
                                      Grid.Column="0"
                                      Rows="8">
                             <TextBlock Text="8"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="7"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="6"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="5"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="4"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="3"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="2"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="1"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                         </UniformGrid>
 
                         <!-- Coordenadas Direitas -->
@@ -266,28 +266,36 @@
                                      Grid.Column="2"
                                      Rows="8">
                             <TextBlock Text="8"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="7"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="6"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="5"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="4"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="3"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="2"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                             <TextBlock Text="1"
-                                       Style="{StaticResource CoordinateTextStyle}"/>
+                                    Style="{StaticResource CoordinateTextStyle}"/>
                         </UniformGrid>
 
                         <!-- Tabuleiro -->
                         <Border Grid.Row="1"
                                 Grid.Column="1"
-                                BorderBrush="{StaticResource GoldAccent}"
-                                BorderThickness="4">
+                                BorderBrush="#C8943A"
+                                BorderThickness="4"
+                                Background="#0B0705">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#000000"
+                                                  BlurRadius="16"
+                                                  ShadowDepth="3"
+                                                  Opacity="0.45"/>
+                            </Border.Effect>
+
                             <Grid x:Name="BoardGrid"
                                   Background="#160B08"
                                   ClipToBounds="True"/>
