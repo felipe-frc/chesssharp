@@ -14,7 +14,10 @@
 
   <ItemGroup>
     <None Remove="Assets\Images\logo-chesssharp.png" />
+    <None Remove="Assets\Images\Pieces\*.png" />
+
     <Resource Include="Assets\Images\logo-chesssharp.png" />
+    <Resource Include="Assets\Images\Pieces\*.png" />
   </ItemGroup>
 
 </Project>

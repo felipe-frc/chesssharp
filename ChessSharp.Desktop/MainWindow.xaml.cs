@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ChessSharp.AI;
 using ChessSharp.Board;
@@ -89,7 +90,7 @@ public partial class MainWindow : Window
         }
 
         if (piece is not null)
-            square.Children.Add(CreatePieceText(piece.PieceType, piece.PieceColor));
+            square.Children.Add(CreatePieceImage(piece.PieceType, piece.PieceColor));
 
         return square;
     }
@@ -124,34 +125,55 @@ public partial class MainWindow : Window
         };
     }
 
-    private static TextBlock CreatePieceText(PieceType pieceType, PieceColor pieceColor)
+    private static Image CreatePieceImage(PieceType pieceType, PieceColor pieceColor)
     {
-        var foreground = pieceColor == PieceColor.White
-            ? new SolidColorBrush(Color.FromRgb(243, 231, 213))
-            : new SolidColorBrush(Color.FromRgb(31, 20, 15));
+        string imagePath = GetPieceImagePath(pieceType, pieceColor);
 
-        var shadowColor = pieceColor == PieceColor.White
-            ? Color.FromRgb(42, 25, 14)
-            : Color.FromRgb(155, 111, 49);
+        var bitmap = new BitmapImage();
+        bitmap.BeginInit();
+        bitmap.UriSource = new Uri(imagePath, UriKind.Relative);
+        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+        bitmap.EndInit();
+        bitmap.Freeze();
 
-        return new TextBlock
+        return new Image
         {
-            Text = GetPieceUnicode(pieceType, pieceColor),
-            FontFamily = new FontFamily("Segoe UI Symbol"),
-            FontSize = 48,
-            FontWeight = FontWeights.Bold,
+            Source = bitmap,
+            Width = 72,
+            Height = 72,
+            Stretch = Stretch.Uniform,
+            SnapsToDevicePixels = true,
+            UseLayoutRounding = true,
+            IsHitTestVisible = false,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
-            IsHitTestVisible = false,
-            Foreground = foreground,
+            RenderTransformOrigin = new Point(0.5, 0.5),
             Effect = new DropShadowEffect
             {
-                Color = shadowColor,
-                BlurRadius = 5,
-                ShadowDepth = 1,
-                Opacity = pieceColor == PieceColor.White ? 0.75 : 0.32
+                Color = Colors.Black,
+                BlurRadius = 8,
+                ShadowDepth = 2,
+                Opacity = 0.45
             }
         };
+    }
+
+    private static string GetPieceImagePath(PieceType type, PieceColor color)
+    {
+        string colorName = color == PieceColor.White ? "white" : "black";
+
+        string pieceName = type switch
+        {
+            PieceType.King => "king",
+            PieceType.Queen => "queen",
+            PieceType.Rook => "rook",
+            PieceType.Bishop => "bishop",
+            PieceType.Knight => "knight",
+            PieceType.Pawn => "pawn",
+            _ => throw new InvalidOperationException("Tipo de peça inválido.")
+        };
+
+        return $"Assets/Images/Pieces/{colorName}-{pieceName}.png";
     }
 
     private async void Square_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -354,27 +376,5 @@ public partial class MainWindow : Window
         char file = (char)('a' + position.Column);
         int rank = 8 - position.Row;
         return $"{file}{rank}";
-    }
-
-    private static string GetPieceUnicode(PieceType type, PieceColor color)
-    {
-        return (type, color) switch
-        {
-            (PieceType.King, PieceColor.White) => "♔",
-            (PieceType.Queen, PieceColor.White) => "♕",
-            (PieceType.Rook, PieceColor.White) => "♖",
-            (PieceType.Bishop, PieceColor.White) => "♗",
-            (PieceType.Knight, PieceColor.White) => "♘",
-            (PieceType.Pawn, PieceColor.White) => "♙",
-
-            (PieceType.King, PieceColor.Black) => "♚",
-            (PieceType.Queen, PieceColor.Black) => "♛",
-            (PieceType.Rook, PieceColor.Black) => "♜",
-            (PieceType.Bishop, PieceColor.Black) => "♝",
-            (PieceType.Knight, PieceColor.Black) => "♞",
-            (PieceType.Pawn, PieceColor.Black) => "♟",
-
-            _ => "?"
-        };
     }
 }
