@@ -14,230 +14,230 @@
         TextOptions.TextRenderingMode="ClearType"
         RenderOptions.BitmapScalingMode="HighQuality">
 
-    <Window.Resources>
-        <!-- Paleta premium madeira / dourado / off-white -->
-        <SolidColorBrush x:Key="GoldAccent"
-                         Color="#D6A23F"/>
-        <SolidColorBrush x:Key="GoldSoft"
-                         Color="#E0B85C"/>
-        <SolidColorBrush x:Key="BronzeSoft"
-                         Color="#9A6A2E"/>
-        <SolidColorBrush x:Key="WoodDark"
-                         Color="#1A0B07"/>
-        <SolidColorBrush x:Key="WoodMedium"
-                         Color="#2A120D"/>
-        <SolidColorBrush x:Key="WoodSoft"
-                         Color="#3B1A11"/>
-        <SolidColorBrush x:Key="TextWhite"
-                         Color="#F3E7D5"/>
-        <SolidColorBrush x:Key="TextMuted"
-                         Color="#E8D6B0"/>
-        <SolidColorBrush x:Key="TextGold"
-                         Color="#E0B85C"/>
+        <Window.Resources>
+                <!-- Paleta premium madeira / dourado / off-white -->
+                <SolidColorBrush x:Key="GoldAccent"
+                                 Color="#D6A23F"/>
+                <SolidColorBrush x:Key="GoldSoft"
+                                 Color="#E0B85C"/>
+                <SolidColorBrush x:Key="BronzeSoft"
+                                 Color="#9A6A2E"/>
+                <SolidColorBrush x:Key="WoodDark"
+                                 Color="#1A0B07"/>
+                <SolidColorBrush x:Key="WoodMedium"
+                                 Color="#2A120D"/>
+                <SolidColorBrush x:Key="WoodSoft"
+                                 Color="#3B1A11"/>
+                <SolidColorBrush x:Key="TextWhite"
+                                 Color="#F3E7D5"/>
+                <SolidColorBrush x:Key="TextMuted"
+                                 Color="#E8D6B0"/>
+                <SolidColorBrush x:Key="TextGold"
+                                 Color="#E0B85C"/>
 
-        <!-- Estilo para botões modernos -->
-        <Style x:Key="ModernButtonStyle"
-               TargetType="Button">
-            <Setter Property="Foreground"
-                    Value="{StaticResource TextWhite}"/>
-            <Setter Property="Background"
-                    Value="#24100A"/>
-            <Setter Property="BorderBrush"
-                    Value="{StaticResource GoldAccent}"/>
-            <Setter Property="BorderThickness"
-                    Value="1"/>
-            <Setter Property="Padding"
-                    Value="20,10"/>
-            <Setter Property="FontSize"
-                    Value="14"/>
-            <Setter Property="FontFamily"
-                    Value="Segoe UI"/>
-            <Setter Property="FontWeight"
-                    Value="Medium"/>
-            <Setter Property="Cursor"
-                    Value="Hand"/>
-            <Setter Property="MinWidth"
-                    Value="130"/>
-            <Setter Property="Height"
-                    Value="45"/>
-            <Setter Property="Margin"
-                    Value="10,0,0,0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+                <!-- Estilo para botões modernos -->
+                <Style x:Key="ModernButtonStyle"
+                       TargetType="Button">
+                        <Setter Property="Foreground"
+                                Value="{StaticResource TextWhite}"/>
+                        <Setter Property="Background"
+                                Value="#24100A"/>
+                        <Setter Property="BorderBrush"
+                                Value="{StaticResource GoldAccent}"/>
+                        <Setter Property="BorderThickness"
+                                Value="1"/>
+                        <Setter Property="Padding"
+                                Value="20,10"/>
+                        <Setter Property="FontSize"
+                                Value="14"/>
+                        <Setter Property="FontFamily"
+                                Value="Segoe UI"/>
+                        <Setter Property="FontWeight"
+                                Value="Medium"/>
+                        <Setter Property="Cursor"
+                                Value="Hand"/>
+                        <Setter Property="MinWidth"
+                                Value="130"/>
+                        <Setter Property="Height"
+                                Value="45"/>
+                        <Setter Property="Margin"
+                                Value="10,0,0,0"/>
+                        <Setter Property="Template">
+                                <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        CornerRadius="4">
+                                                        <ContentPresenter HorizontalAlignment="Center"
+                                                                          VerticalAlignment="Center"/>
+                                                </Border>
+                                        </ControlTemplate>
+                                </Setter.Value>
+                        </Setter>
 
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver"
-                         Value="True">
-                    <Setter Property="Background"
-                            Value="#32170D"/>
-                    <Setter Property="BorderBrush"
-                            Value="{StaticResource GoldSoft}"/>
-                    <Setter Property="Foreground"
-                            Value="{StaticResource GoldSoft}"/>
-                </Trigger>
+                        <Style.Triggers>
+                                <Trigger Property="IsMouseOver"
+                                         Value="True">
+                                        <Setter Property="Background"
+                                                Value="#32170D"/>
+                                        <Setter Property="BorderBrush"
+                                                Value="{StaticResource GoldSoft}"/>
+                                        <Setter Property="Foreground"
+                                                Value="{StaticResource GoldSoft}"/>
+                                </Trigger>
 
-                <Trigger Property="IsPressed"
-                         Value="True">
-                    <Setter Property="Background"
-                            Value="#4A2412"/>
-                    <Setter Property="Foreground"
-                            Value="#FFF1C2"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
+                                <Trigger Property="IsPressed"
+                                         Value="True">
+                                        <Setter Property="Background"
+                                                Value="#4A2412"/>
+                                        <Setter Property="Foreground"
+                                                Value="#FFF1C2"/>
+                                </Trigger>
+                        </Style.Triggers>
+                </Style>
+        </Window.Resources>
 
-    <Grid>
-        <!-- Background premium com mármore preto e veios dourados -->
-        <Grid.Background>
-            <ImageBrush ImageSource="/Assets/Images/background-marble.png"
-                        Stretch="UniformToFill"
-                        AlignmentX="Center"
-                        AlignmentY="Center"/>
-        </Grid.Background>
+        <Grid>
+                <!-- Background premium com mármore preto e veios dourados -->
+                <Grid.Background>
+                        <ImageBrush ImageSource="/Assets/Images/background-marble.png"
+                                    Stretch="UniformToFill"
+                                    AlignmentX="Center"
+                                    AlignmentY="Center"/>
+                </Grid.Background>
 
-        <!-- Camada escura sutil para manter contraste da interface -->
-        <Rectangle Fill="#66000000"
-                   IsHitTestVisible="False"/>
+                <!-- Camada escura sutil para manter contraste da interface -->
+                <Rectangle Fill="#66000000"
+                           IsHitTestVisible="False"/>
 
-        <!-- Vinheta para reforçar profundidade visual -->
-        <Rectangle IsHitTestVisible="False">
-            <Rectangle.Fill>
-                <RadialGradientBrush Center="0.5,0.42"
-                                     RadiusX="0.95"
-                                     RadiusY="0.95">
-                    <GradientStop Color="#00000000"
-                                  Offset="0"/>
-                    <GradientStop Color="#33000000"
-                                  Offset="0.62"/>
-                    <GradientStop Color="#99000000"
-                                  Offset="1"/>
-                </RadialGradientBrush>
-            </Rectangle.Fill>
-        </Rectangle>
+                <!-- Vinheta para reforçar profundidade visual -->
+                <Rectangle IsHitTestVisible="False">
+                        <Rectangle.Fill>
+                                <RadialGradientBrush Center="0.5,0.42"
+                                                     RadiusX="0.95"
+                                                     RadiusY="0.95">
+                                        <GradientStop Color="#00000000"
+                                                      Offset="0"/>
+                                        <GradientStop Color="#33000000"
+                                                      Offset="0.62"/>
+                                        <GradientStop Color="#99000000"
+                                                      Offset="1"/>
+                                </RadialGradientBrush>
+                        </Rectangle.Fill>
+                </Rectangle>
 
-        <!-- Moldura decorativa sutil -->
-        <Border BorderBrush="{StaticResource BronzeSoft}"
-                BorderThickness="0.5"
-                Margin="15"
-                Opacity="0.35"
-                CornerRadius="2"/>
+                <!-- Moldura decorativa sutil -->
+                <Border BorderBrush="{StaticResource BronzeSoft}"
+                        BorderThickness="0.5"
+                        Margin="15"
+                        Opacity="0.35"
+                        CornerRadius="2"/>
 
-        <Grid Margin="32,22,32,28">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+                <Grid Margin="32,22,32,28">
+                        <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-            <!-- HEADER -->
-            <StackPanel Grid.Row="0"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Top"
-                        Margin="0,0,0,6">
-                <Image Source="pack://application:,,,/Assets/Images/logo-chesssharp.png"
-                       Width="300"
-                       Height="82"
-                       Stretch="Uniform"
-                       RenderOptions.BitmapScalingMode="HighQuality"/>
-            </StackPanel>
+                        <!-- HEADER -->
+                        <StackPanel Grid.Row="0"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    Margin="0,16,0,20">
+                                <Image Source="pack://application:,,,/Assets/Images/logo-chesssharp.png"
+                                       Width="300"
+                                       Height="82"
+                                       Stretch="Uniform"
+                                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                        </StackPanel>
 
-            <!-- BOARD AREA -->
-            <Viewbox Grid.Row="1"
-                     Stretch="Uniform"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"
-                     Margin="0,0,0,0">
-                <Border Padding="0"
-                        Background="#060504"
-                        BorderBrush="{StaticResource GoldAccent}"
-                        BorderThickness="0"
-                        CornerRadius="8">
-                    <Border.Effect>
-                        <DropShadowEffect Color="#D6A23F"
-                                          BlurRadius="24"
-                                          ShadowDepth="0"
-                                          Opacity="0.22"/>
-                    </Border.Effect>
+                        <!-- BOARD AREA -->
+                        <Viewbox Grid.Row="1"
+                                 Stretch="Uniform"
+                                 HorizontalAlignment="Center"
+                                 VerticalAlignment="Center"
+                                 Margin="0,12,0,0">
+                                <Border Padding="0"
+                                        Background="#060504"
+                                        BorderBrush="{StaticResource GoldAccent}"
+                                        BorderThickness="0"
+                                        CornerRadius="8">
+                                        <Border.Effect>
+                                                <DropShadowEffect Color="#D6A23F"
+                                                                  BlurRadius="24"
+                                                                  ShadowDepth="0"
+                                                                  Opacity="0.22"/>
+                                        </Border.Effect>
 
-                    <!-- 
+                                        <!-- 
                         O tabuleiro premium é uma imagem completa.
                         O BoardGrid transparente fica por cima apenas na área jogável.
                     -->
-                    <Grid Width="760"
-                          Height="760"
-                          ClipToBounds="True"
-                          SnapsToDevicePixels="True">
+                                        <Grid Width="760"
+                                              Height="760"
+                                              ClipToBounds="True"
+                                              SnapsToDevicePixels="True">
 
-                        <Image Source="/Assets/Images/board-premium.png"
-                               Width="760"
-                               Height="760"
-                               Stretch="Fill"
-                               RenderOptions.BitmapScalingMode="HighQuality"/>
+                                                <Image Source="/Assets/Images/board-premium.png"
+                                                       Width="760"
+                                                       Height="760"
+                                                       Stretch="Fill"
+                                                       RenderOptions.BitmapScalingMode="HighQuality"/>
 
-                        <!-- 
+                                                <!-- 
                             Camada das casas, cliques, seleção, movimentos e peças.
                             Ajuste fino caso necessário:
                             Width/Height e Margin.
                         -->
-                        <Grid x:Name="BoardGrid"
-                              Width="656"
-                              Height="656"
-                              Margin="52,52,52,52"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              Background="#01FFFFFF"
-                              ClipToBounds="True"/>
-                    </Grid>
-                </Border>
-            </Viewbox>
+                                                <Grid x:Name="BoardGrid"
+                                                      Width="656"
+                                                      Height="656"
+                                                      Margin="52,52,52,52"
+                                                      HorizontalAlignment="Center"
+                                                      VerticalAlignment="Center"
+                                                      Background="#01FFFFFF"
+                                                      ClipToBounds="True"/>
+                                        </Grid>
+                                </Border>
+                        </Viewbox>
 
-            <!-- FOOTER / STATUS -->
-            <Grid Grid.Row="2"
-                  Margin="0,16,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+                        <!-- FOOTER / STATUS -->
+                        <Grid Grid.Row="2"
+                              Margin="0,16,0,0">
+                                <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0"
-                            VerticalAlignment="Center">
-                    <TextBlock Text="STATUS DA PARTIDA"
-                               Foreground="{StaticResource GoldAccent}"
-                               FontSize="10"
-                               FontWeight="Bold"
-                               Margin="0,0,0,5"/>
-                    <TextBlock x:Name="StatusText"
-                               Text="AGUARDANDO INÍCIO..."
-                               Foreground="{StaticResource TextWhite}"
-                               FontSize="20"
-                               FontFamily="Segoe UI Light"/>
-                </StackPanel>
+                                <StackPanel Grid.Column="0"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="STATUS DA PARTIDA"
+                                                   Foreground="{StaticResource GoldAccent}"
+                                                   FontSize="10"
+                                                   FontWeight="Bold"
+                                                   Margin="0,0,0,5"/>
+                                        <TextBlock x:Name="StatusText"
+                                                   Text="AGUARDANDO INÍCIO..."
+                                                   Foreground="{StaticResource TextWhite}"
+                                                   FontSize="20"
+                                                   FontFamily="Segoe UI Light"/>
+                                </StackPanel>
 
-                <StackPanel Grid.Column="1"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center">
-                    <Button x:Name="NewGameButton"
-                            Content="NEW GAME"
-                            Style="{StaticResource ModernButtonStyle}"
-                            Click="NewGameButton_Click"/>
-                    <Button x:Name="ExitButton"
-                            Content="EXIT"
-                            Style="{StaticResource ModernButtonStyle}"
-                            Click="ExitButton_Click"/>
-                </StackPanel>
-            </Grid>
+                                <StackPanel Grid.Column="1"
+                                            Orientation="Horizontal"
+                                            VerticalAlignment="Center">
+                                        <Button x:Name="NewGameButton"
+                                                Content="NEW GAME"
+                                                Style="{StaticResource ModernButtonStyle}"
+                                                Click="NewGameButton_Click"/>
+                                        <Button x:Name="ExitButton"
+                                                Content="EXIT"
+                                                Style="{StaticResource ModernButtonStyle}"
+                                                Click="ExitButton_Click"/>
+                                </StackPanel>
+                        </Grid>
+                </Grid>
         </Grid>
-    </Grid>
 </Window>
