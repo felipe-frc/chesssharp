@@ -57,13 +57,15 @@ public partial class MainWindow : Window
     private Grid CreateSquare(BoardPosition position)
     {
         var piece = _game.Board.GetPieceAt(position);
-        bool isSelected = _selectedPosition is not null && _selectedPosition.Value == position;
+
+        bool isSelected = _selectedPosition is not null &&
+                          _selectedPosition.Value == position;
+
         bool isLegalTarget = _legalTargetPositions.Contains(position);
 
         var square = new Grid
         {
-            // Alpha 1 para continuar clicável no WPF,
-            // mas sem esconder o tabuleiro premium de fundo.
+            // Alpha 1 mantém a casa clicável sem esconder o tabuleiro premium.
             Background = new SolidColorBrush(Color.FromArgb(1, 255, 255, 255)),
             Tag = position,
             Cursor = System.Windows.Input.Cursors.Hand,
@@ -77,12 +79,14 @@ public partial class MainWindow : Window
 
         if (isLegalTarget)
         {
-            bool isCapture = piece is not null && piece.PieceColor == PieceColor.Black;
+            bool isCapture = piece is not null &&
+                             piece.PieceColor == PieceColor.Black;
+
             square.Children.Add(CreateLegalMoveIndicator(isCapture));
         }
 
         if (piece is not null)
-            square.Children.Add(CreatePieceImage(piece.PieceType, piece.PieceColor));
+            square.Children.Add(CreatePieceImage(piece.PieceType, piece.PieceColor, isSelected));
 
         return square;
     }
@@ -91,17 +95,18 @@ public partial class MainWindow : Window
     {
         return new Border
         {
-            Background = new SolidColorBrush(Color.FromArgb(54, 224, 184, 92)),
-            BorderBrush = new SolidColorBrush(Color.FromRgb(242, 184, 54)),
-            BorderThickness = new Thickness(2),
-            CornerRadius = new CornerRadius(2),
+            Margin = new Thickness(3),
+            CornerRadius = new CornerRadius(4),
+            Background = new SolidColorBrush(Color.FromArgb(36, 255, 238, 160)),
+            BorderBrush = new SolidColorBrush(Color.FromArgb(255, 255, 240, 175)),
+            BorderThickness = new Thickness(2.5),
             IsHitTestVisible = false,
             Effect = new DropShadowEffect
             {
-                Color = Color.FromRgb(214, 162, 63),
-                BlurRadius = 10,
+                Color = Color.FromRgb(255, 230, 150),
+                BlurRadius = 24,
                 ShadowDepth = 0,
-                Opacity = 0.35
+                Opacity = 0.95
             }
         };
     }
@@ -112,43 +117,44 @@ public partial class MainWindow : Window
         {
             return new Border
             {
-                Margin = new Thickness(7),
-                BorderThickness = new Thickness(3),
-                BorderBrush = new SolidColorBrush(Color.FromArgb(205, 229, 166, 73)),
-                Background = new SolidColorBrush(Color.FromArgb(40, 176, 68, 52)),
+                Margin = new Thickness(4),
                 CornerRadius = new CornerRadius(4),
+                Background = new SolidColorBrush(Color.FromArgb(34, 176, 68, 52)),
+                BorderBrush = new SolidColorBrush(Color.FromArgb(255, 255, 228, 150)),
+                BorderThickness = new Thickness(2.8),
                 IsHitTestVisible = false,
                 Effect = new DropShadowEffect
                 {
-                    Color = Color.FromRgb(214, 162, 63),
-                    BlurRadius = 12,
+                    Color = Color.FromRgb(255, 210, 110),
+                    BlurRadius = 24,
                     ShadowDepth = 0,
-                    Opacity = 0.32
+                    Opacity = 0.9
                 }
             };
         }
 
-        return new Ellipse
+        return new Border
         {
-            Width = 18,
-            Height = 18,
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            Fill = new SolidColorBrush(Color.FromArgb(138, 246, 222, 177)),
-            Stroke = new SolidColorBrush(Color.FromArgb(195, 214, 162, 63)),
-            StrokeThickness = 1.4,
+            Margin = new Thickness(5),
+            CornerRadius = new CornerRadius(4),
+            Background = new SolidColorBrush(Color.FromArgb(22, 255, 245, 190)),
+            BorderBrush = new SolidColorBrush(Color.FromArgb(235, 255, 238, 165)),
+            BorderThickness = new Thickness(2.4),
             IsHitTestVisible = false,
             Effect = new DropShadowEffect
             {
-                Color = Color.FromRgb(214, 162, 63),
-                BlurRadius = 8,
+                Color = Color.FromRgb(255, 228, 140),
+                BlurRadius = 22,
                 ShadowDepth = 0,
-                Opacity = 0.25
+                Opacity = 0.82
             }
         };
     }
 
-    private static Image CreatePieceImage(PieceType pieceType, PieceColor pieceColor)
+    private static Image CreatePieceImage(
+        PieceType pieceType,
+        PieceColor pieceColor,
+        bool isSelected = false)
     {
         string imagePath = GetPieceImagePath(pieceType, pieceColor);
 
@@ -164,8 +170,8 @@ public partial class MainWindow : Window
         {
             Source = bitmap,
 
-            // Ajustado para o BoardGrid 648x648.
-            // Cada casa fica com 81px. Peça com 74px encaixa bem e não invade demais.
+            // BoardGrid atual: 656x656.
+            // Cada casa tem 82px. Peça com 64px encaixa bem sem invadir.
             Width = 64,
             Height = 64,
 
@@ -176,20 +182,38 @@ public partial class MainWindow : Window
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             RenderTransformOrigin = new Point(0.5, 0.5),
-            Margin = new Thickness(0, -2, 0, 0),
-            Effect = new DropShadowEffect
-            {
-                Color = Colors.Black,
-                BlurRadius = 10,
-                ShadowDepth = 3,
-                Opacity = 0.55
-            }
+            Margin = new Thickness(0),
+            Effect = isSelected
+                ? CreateSelectedPieceGlow()
+                : CreateDefaultPieceShadow()
         };
 
         RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
         RenderOptions.SetEdgeMode(image, EdgeMode.Unspecified);
 
         return image;
+    }
+
+    private static Effect CreateSelectedPieceGlow()
+    {
+        return new DropShadowEffect
+        {
+            Color = Color.FromRgb(255, 235, 150),
+            BlurRadius = 26,
+            ShadowDepth = 0,
+            Opacity = 1
+        };
+    }
+
+    private static Effect CreateDefaultPieceShadow()
+    {
+        return new DropShadowEffect
+        {
+            Color = Colors.Black,
+            BlurRadius = 10,
+            ShadowDepth = 3,
+            Opacity = 0.55
+        };
     }
 
     private static string GetPieceImagePath(PieceType type, PieceColor color)
@@ -210,7 +234,9 @@ public partial class MainWindow : Window
         return $"Assets/Images/Pieces/{colorName}-{pieceName}.png";
     }
 
-    private async void Square_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private async void Square_MouseLeftButtonDown(
+        object sender,
+        System.Windows.Input.MouseButtonEventArgs e)
     {
         if (_game.IsFinished)
             return;
@@ -261,7 +287,11 @@ public partial class MainWindow : Window
         if (piece is null || piece.PieceColor != PieceColor.White)
         {
             ClearSelection();
-            UpdateStatusMessage(piece is null ? "ESCOLHA UMA PEÇA CLARA." : "VOCÊ JOGA COM AS PEÇAS CLARAS.");
+            UpdateStatusMessage(
+                piece is null
+                    ? "ESCOLHA UMA PEÇA CLARA."
+                    : "VOCÊ JOGA COM AS PEÇAS CLARAS.");
+
             RenderBoard();
             return;
         }
@@ -280,8 +310,8 @@ public partial class MainWindow : Window
             UpdateStatusMessage(
                 ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
                     ? "REI EM PERIGO. PROTEJA-O."
-                    : "ESTA PEÇA NÃO POSSUI MOVIMENTOS."
-            );
+                    : "ESTA PEÇA NÃO POSSUI MOVIMENTOS.");
+
             RenderBoard();
             return;
         }
