@@ -23,22 +23,15 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 - Programação orientada a objetos;
 - Modelagem de domínio com classes, enums e responsabilidades bem definidas;
 - Implementação de regras de movimentação das peças de xadrez;
-- Implementação de regras reais de xeque e xeque-mate;
+- Implementação de regras reais de xeque, xeque-mate e afogamento;
 - Implementação de regras especiais como roque, promoção de peão e en passant;
-- Detecção de empate por afogamento;
-- Manipulação de matrizes para representação de tabuleiro;
 - Validação de entradas do usuário;
-- Movimentação por mouse na interface gráfica;
+- Manipulação de matrizes para representação do tabuleiro;
 - Criação de um bot para jogar contra o usuário;
-- Implementação de busca minimax simples;
-- Avaliação material do tabuleiro;
-- Simulação de jogadas futuras;
-- Separação entre regra de negócio, renderização, controle do jogo e inteligência da máquina;
+- Implementação de busca minimax simples com poda alpha-beta;
 - Testes automatizados com xUnit;
 - Coleta de cobertura de testes com Coverlet;
-- Geração de relatório de cobertura com ReportGenerator;
 - Integração contínua com GitHub Actions;
-- Versionamento com Git e GitHub;
 - Organização de projeto para portfólio profissional.
 
 ---
@@ -55,7 +48,8 @@ Este projeto foi desenvolvido com o objetivo de praticar e demonstrar conhecimen
 - Captura de peças adversárias;
 - Bloqueio de captura de peças da mesma cor;
 - Bloqueio de captura direta do rei;
-- Bloqueio de movimentos que deixam o próprio rei em xeque.
+- Bloqueio de movimentos que deixam o próprio rei em xeque;
+- Encerramento correto da partida com base no estado do jogo.
 
 ### 🧩 Peças
 
@@ -89,6 +83,11 @@ e2 e4
   - Brancas;
   - Pretas.
 - Máquina controla automaticamente a cor oposta;
+- Promoção com peça opcional via notação:
+  - `q` para rainha;
+  - `r` para torre;
+  - `b` para bispo;
+  - `n` para cavalo.
 - Encerramento manual da partida com o comando:
 
 ```txt
@@ -100,8 +99,7 @@ sair
 - Projeto desktop criado com WPF;
 - Tabuleiro visual 8x8;
 - Visual em tons de madeira;
-- Coordenadas exibidas ao redor do tabuleiro;
-- Peças renderizadas visualmente na interface;
+- Peças renderizadas com imagens PNG;
 - Seleção de peças com o mouse;
 - Movimentação por clique na casa de destino;
 - Botões de:
@@ -111,7 +109,7 @@ sair
 - Integração da interface gráfica com o motor de regras existente;
 - Máquina joga automaticamente após o movimento do usuário;
 - Destaque visual da peça selecionada;
-- Destaque dos movimentos legais usando marcadores em formato de losango;
+- Destaque dos movimentos legais;
 - Exibição apenas de movimentos válidos para a peça selecionada;
 - Em situação de xeque, a interface mostra apenas movimentos que resolvem o xeque;
 - Bloqueio de tentativas de movimento fora das casas destacadas.
@@ -131,11 +129,7 @@ sair
 
 - Promoção de peão ao alcançar a última fileira;
 - Promoção automática para rainha quando nenhuma peça é informada;
-- Escolha da peça de promoção por notação:
-  - `q` para rainha;
-  - `r` para torre;
-  - `b` para bispo;
-  - `n` para cavalo.
+- Escolha da peça de promoção por notação na versão console;
 - Roque pequeno;
 - Roque grande;
 - Roque disponível para peças brancas e pretas;
@@ -172,25 +166,24 @@ sair
 - Testes automatizados com xUnit;
 - Pipeline de CI com GitHub Actions;
 - Coleta de cobertura com Coverlet;
-- Geração de relatório de cobertura com ReportGenerator;
 - Badge de cobertura exibido no README;
-- Relatório de cobertura disponibilizado como artefato no GitHub Actions.
+- Relatório de cobertura disponibilizado pelo pipeline.
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
-| Camada            | Tecnologia                 |
-| ----------------- | -------------------------- |
-| Linguagem         | C#                         |
-| Plataforma        | .NET                       |
-| Interface Console | Console Application        |
-| Interface Desktop | WPF                        |
-| Testes            | xUnit                      |
-| Cobertura         | Coverlet / ReportGenerator |
-| CI/CD             | GitHub Actions             |
-| Versionamento     | Git / GitHub               |
-| IDE recomendada   | Visual Studio 2022         |
+| Camada               | Tecnologia                 |
+| -------------------- | -------------------------- |
+| Linguagem            | C#                         |
+| Plataforma principal | .NET                       |
+| Aplicação console    | .NET 8                     |
+| Aplicação desktop    | WPF em .NET 9 para Windows |
+| Testes               | xUnit                      |
+| Cobertura            | Coverlet                   |
+| CI/CD                | GitHub Actions             |
+| Versionamento        | Git / GitHub               |
+| IDE recomendada      | Visual Studio 2022         |
 
 ---
 
@@ -239,6 +232,8 @@ ChessSharp/
 │   ├── App.xaml.cs
 │   ├── MainWindow.xaml
 │   ├── MainWindow.xaml.cs
+│   ├── Assets/
+│   │   └── Images/
 │   └── ChessSharp.Desktop.csproj
 │
 ├── ChessSharp.Tests/
@@ -251,7 +246,6 @@ ChessSharp/
 │   ├── Game/
 │   │   ├── CastlingTests.cs
 │   │   ├── ChessGameTests.cs
-│   │   ├── EnPassantTests.cs
 │   │   └── PawnPromotionTests.cs
 │   │
 │   └── Pieces/
@@ -282,9 +276,12 @@ ChessSharp/
 
 Antes de iniciar, é necessário ter instalado:
 
-- .NET SDK;
+- .NET SDK 9;
+- Windows para executar a versão desktop;
 - Git;
 - Visual Studio 2022 ou outro editor compatível com C#.
+
+> O uso do SDK 9 simplifica a execução de toda a solução, porque o projeto possui uma aplicação `net8.0` e uma aplicação `net9.0-windows`.
 
 ---
 
@@ -313,7 +310,7 @@ dotnet restore
 ### 3. Execute a versão console
 
 ```bash
-dotnet run --project ChessSharp
+dotnet run --project ChessSharp/ChessSharp.csproj
 ```
 
 ---
@@ -321,13 +318,7 @@ dotnet run --project ChessSharp
 ### 4. Execute a versão desktop 2D
 
 ```bash
-dotnet run --project ChessSharp.Desktop
-```
-
-Caso esteja dentro da pasta `ChessSharp.Desktop`, execute:
-
-```bash
-dotnet run
+dotnet run --project ChessSharp.Desktop/ChessSharp.Desktop.csproj
 ```
 
 ---
@@ -385,13 +376,20 @@ sair
 Na interface gráfica 2D:
 
 - Clique em uma peça branca;
-- As casas legais serão marcadas com losangos;
-- Clique em uma das casas marcadas para mover;
+- As casas legais serão destacadas;
+- Clique em uma das casas destacadas para mover;
 - A máquina joga automaticamente após o seu movimento;
-- Use o botão **Nova partida** para reiniciar;
-- Use o botão **Sair** para fechar o jogo.
+- Use o botão **New Game** para reiniciar;
+- Use o botão **Exit** para fechar o jogo.
 
 Quando o rei estiver em xeque, a interface destacará apenas os movimentos que resolvem o xeque.
+
+### Observações importantes da versão desktop atual
+
+- O jogador controla as peças brancas;
+- O bot joga com as peças pretas;
+- A promoção via interface gráfica ainda promove automaticamente para rainha;
+- A escolha manual da peça de promoção está disponível apenas na versão console.
 
 ---
 
@@ -424,9 +422,6 @@ O projeto possui testes automatizados com xUnit cobrindo:
 - Bloqueio de roque inválido;
 - Bloqueio de roque quando o rei está em xeque;
 - Bloqueio de roque passando por casa atacada;
-- En passant;
-- Bloqueio de en passant fora da jogada imediatamente seguinte;
-- Empate por afogamento;
 - Validação de movimentos legais do bot;
 - Validação de promoção de peão pelo bot;
 - Validação para impedir o bot de capturar diretamente o rei;
@@ -435,10 +430,17 @@ O projeto possui testes automatizados com xUnit cobrindo:
 Para executar os testes:
 
 ```bash
-dotnet test
+dotnet test ChessSharp.Tests/ChessSharp.Tests.csproj
 ```
 
-A cobertura dos testes é coletada automaticamente pelo GitHub Actions utilizando **Coverlet** e **ReportGenerator**. O badge de cobertura é atualizado no README após a execução do workflow na branch `main`.
+Para compilar os projetos principais manualmente:
+
+```bash
+dotnet build ChessSharp/ChessSharp.csproj
+dotnet build ChessSharp.Desktop/ChessSharp.Desktop.csproj
+```
+
+A cobertura dos testes é coletada automaticamente pelo GitHub Actions utilizando **Coverlet**. O badge de cobertura é atualizado no README após a execução do workflow na branch `main`.
 
 ---
 
@@ -449,12 +451,11 @@ O projeto utiliza **GitHub Actions** para executar automaticamente o fluxo de va
 O workflow executa:
 
 - Restauração das dependências;
+- Compilação da solução;
 - Execução dos testes automatizados;
 - Coleta da cobertura de testes;
-- Geração do relatório de cobertura;
-- Atualização automática do badge de cobertura;
-- Upload do relatório de cobertura como artefato do workflow;
-- Validação da solução no ambiente do GitHub Actions.
+- Atualização do badge de cobertura;
+- Publicação dos resultados do pipeline.
 
 ---
 
@@ -465,8 +466,8 @@ A cobertura de testes é gerada automaticamente durante o pipeline de CI.
 O processo utiliza:
 
 - **Coverlet** para coletar cobertura dos testes;
-- **ReportGenerator** para gerar relatório visual e badge SVG;
-- **GitHub Actions** para executar a coleta e publicar o badge atualizado no repositório.
+- **GitHub Actions** para executar a coleta;
+- Geração de badge SVG atualizado no repositório.
 
 O badge de cobertura fica disponível no topo do README:
 
@@ -476,7 +477,20 @@ O badge de cobertura fica disponível no topo do README:
 
 ---
 
-## 📌 Roadmap
+## 📌 Melhorias e Próximos Passos
+
+Hoje, os principais pontos de evolução do projeto são:
+
+- Permitir que a interface desktop escolha a cor do jogador;
+- Adicionar seleção visual da peça de promoção na UI desktop;
+- Exibir histórico de jogadas e última jogada realizada;
+- Implementar regras adicionais de empate, como repetição de posição, regra dos 50 lances e material insuficiente;
+- Permitir configuração de profundidade do bot;
+- Separar mais responsabilidades da interface desktop, reduzindo o volume de lógica no `MainWindow.xaml.cs`.
+
+---
+
+## 🗺️ Roadmap
 
 ### v1.0.0
 
@@ -536,15 +550,13 @@ O badge de cobertura fica disponível no topo do README:
 ### v1.6.0
 
 - Adicionar coleta de cobertura de testes com Coverlet;
-- Gerar relatório de cobertura com ReportGenerator;
 - Adicionar badge de cobertura no README;
-- Atualizar o workflow de CI para publicar relatório de cobertura;
+- Atualizar o workflow de CI para publicar o badge automaticamente;
 - Reforçar a validação de qualidade do projeto.
 
 ### v1.7.0
 
 - Implementar en passant;
-- Adicionar testes automatizados para en passant;
 - Completar as principais regras especiais do xadrez.
 
 ### v2.0.0
@@ -560,7 +572,7 @@ O badge de cobertura fica disponível no topo do README:
 - Adicionar botão de sair;
 - Melhorar mensagens da interface;
 - Destacar peça selecionada;
-- Destacar movimentos legais com marcadores em formato de losango;
+- Destacar movimentos legais;
 - Exibir apenas movimentos válidos em situação de xeque;
 - Manter compatibilidade com o motor de regras existente.
 
@@ -588,6 +600,22 @@ O badge de cobertura fica disponível no topo do README:
 
 ## 📦 Releases
 
+### v2.3.0 - Refinamento do footer e feedback visual
+
+Versão focada no polimento visual da interface desktop, refinando o footer, os botões de ação, o painel de status e o feedback de seleção e movimentos legais para uma experiência mais consistente com a identidade premium do projeto.
+
+### v2.2.0 - Fundo premium e refinamento da interface desktop
+
+Versão focada na atmosfera visual da interface desktop, adicionando fundo premium em mármore escuro, consolidando o tabuleiro premium e refinando o layout geral da tela para um acabamento mais forte de portfólio.
+
+### v2.1.0 - Tabuleiro premium e refinamento visual do jogo
+
+Versão focada na substituição do tabuleiro renderizado por código por um tabuleiro premium em imagem, com melhor integração visual entre peças, fundo, coordenadas e layout da interface.
+
+### v2.0.1 - Refinamento visual da interface desktop
+
+Versão focada em melhorar a apresentação da primeira interface gráfica do ChessSharp, com ajustes de paleta, logo, harmonia visual, acabamento do layout e preservação do fluxo funcional já existente.
+
 ### v2.0.0 - Interface gráfica 2D com WPF
 
 Versão focada na evolução visual do ChessSharp, adicionando uma interface gráfica desktop em WPF, tabuleiro 2D, movimentação por mouse, integração com o bot e marcadores visuais para movimentos legais.
@@ -598,7 +626,7 @@ Versão focada na implementação da regra especial en passant, completando as p
 
 ### v1.6.0 - Cobertura de testes com badge
 
-Versão focada na validação de qualidade do projeto, adicionando coleta de cobertura com Coverlet, relatório com ReportGenerator e badge de cobertura no README.
+Versão focada na validação de qualidade do projeto, adicionando coleta de cobertura com Coverlet e badge de cobertura no README.
 
 ### v1.5.0 - Bot com minimax simples
 
@@ -628,7 +656,7 @@ Primeira versão jogável do ChessSharp, com tabuleiro, peças, movimentação, 
 
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ---
 
