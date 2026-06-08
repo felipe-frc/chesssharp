@@ -18,6 +18,8 @@ public partial class MainWindow : Window
     private BoardPosition? _selectedPosition;
     private List<BoardPosition> _legalTargetPositions = new();
 
+    private static readonly Dictionary<string, BitmapSource> PieceBitmapCache = new();
+
     public MainWindow()
     {
         InitializeComponent();
@@ -159,7 +161,7 @@ public partial class MainWindow : Window
 
         var image = new Image
         {
-            Source = CreateNormalizedPieceBitmap(imagePath),
+            Source = GetOrCreateNormalizedPieceBitmap(imagePath),
             Height = profile.Height,
             MaxWidth = profile.MaxWidth,
             Stretch = Stretch.Uniform,
@@ -226,6 +228,17 @@ public partial class MainWindow : Window
 
             _ => throw new InvalidOperationException("Tipo de peça inválido.")
         };
+    }
+
+    private static BitmapSource GetOrCreateNormalizedPieceBitmap(string imagePath)
+    {
+        if (PieceBitmapCache.TryGetValue(imagePath, out var cachedBitmap))
+            return cachedBitmap;
+
+        var normalizedBitmap = CreateNormalizedPieceBitmap(imagePath);
+        PieceBitmapCache[imagePath] = normalizedBitmap;
+
+        return normalizedBitmap;
     }
 
     private static BitmapSource CreateNormalizedPieceBitmap(string imagePath)
@@ -570,7 +583,7 @@ public partial class MainWindow : Window
             return;
 
         UpdateStatusMessage("OPONENTE ESTÁ PENSANDO...");
-        await Task.Delay(800);
+        await Task.Delay(300);
 
         var botMove = _bot.ChooseMove(_game.Board);
 
