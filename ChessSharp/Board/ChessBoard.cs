@@ -31,11 +31,6 @@ public class ChessBoard
         return GetPieceAt(position) is null;
     }
 
-    public bool HasKing(PieceColor pieceColor)
-    {
-        return FindKingPosition(pieceColor) is not null;
-    }
-
     public BoardPosition? FindKingPosition(PieceColor pieceColor)
     {
         for (int row = 0; row < 8; row++)

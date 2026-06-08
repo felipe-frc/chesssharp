@@ -246,7 +246,7 @@ public partial class MainWindow : Window
         var originalBitmap = new BitmapImage();
 
         originalBitmap.BeginInit();
-        originalBitmap.UriSource = new Uri(imagePath, UriKind.Relative);
+        originalBitmap.UriSource = new Uri(imagePath, UriKind.Absolute);
         originalBitmap.CacheOption = BitmapCacheOption.OnLoad;
         originalBitmap.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
         originalBitmap.EndInit();
@@ -458,7 +458,7 @@ public partial class MainWindow : Window
             _ => throw new InvalidOperationException("Tipo de peça inválido.")
         };
 
-        return $"Assets/Images/Pieces/{colorName}-{pieceName}.png";
+        return $"pack://application:,,,/Assets/Images/Pieces/{colorName}-{pieceName}.png";
     }
 
     private async void Square_MouseLeftButtonDown(

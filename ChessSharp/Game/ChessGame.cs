@@ -1,6 +1,5 @@
 using ChessSharp.Board;
 using ChessSharp.Enums;
-using ChessSharp.Pieces;
 
 namespace ChessSharp.Game;
 
@@ -85,8 +84,11 @@ public class ChessGame
         if (targetPiece is not null && targetPiece.PieceType == PieceType.King)
             return MoveResult.Invalid("O rei não pode ser capturado diretamente.");
 
-        if (move.PromotionPieceType is not null && !IsPawnPromotionMove(piece, move.Target))
+        if (move.PromotionPieceType is not null &&
+            !ChessRules.IsPawnPromotionMove(piece, move.Target))
+        {
             return MoveResult.Invalid("Promoção só é permitida quando um peão alcança a última fileira.");
+        }
 
         bool isEnPassant = ChessRules.IsEnPassantMove(Board, move, CurrentTurn);
 
@@ -102,6 +104,7 @@ public class ChessGame
         if (ChessRules.IsCastlingMove(Board, normalizedMove, CurrentTurn))
         {
             ExecuteCastlingMove(normalizedMove);
+
             moveMessage = normalizedMove.Target.Column == 6
                 ? "Roque pequeno realizado."
                 : "Roque grande realizado.";
@@ -125,15 +128,12 @@ public class ChessGame
                 ? $"Movimento realizado: {normalizedMove.Origin} para {normalizedMove.Target}."
                 : $"Movimento realizado: {normalizedMove.Origin} capturou {targetPiece.PieceType} em {normalizedMove.Target}.";
 
-            if (IsPawnPromotionMove(piece, normalizedMove.Target))
+            if (ChessRules.IsPawnPromotionMove(piece, move.Target))
             {
-                var promotionPieceType = normalizedMove.PromotionPieceType ?? PieceType.Queen;
+                var promotionPieceType = move.PromotionPieceType ?? PieceType.Queen;
                 var promotedPiece = ChessRules.CreatePromotedPiece(piece.PieceColor, promotionPieceType);
-                promotedPiece.MarkAsMoved();
 
-                Board.SetPieceAt(normalizedMove.Target, promotedPiece);
-
-                moveMessage += $" Peão promovido para {GetPieceName(promotionPieceType)}.";
+                Board.SetPieceAt(move.Target, promotedPiece);
             }
         }
 
@@ -201,16 +201,6 @@ public class ChessGame
         rook.MarkAsMoved();
     }
 
-    private static bool IsPawnPromotionMove(ChessPiece piece, BoardPosition targetPosition)
-    {
-        if (piece.PieceType != PieceType.Pawn)
-            return false;
-
-        return piece.PieceColor == PieceColor.White
-            ? targetPosition.Row == 0
-            : targetPosition.Row == 7;
-    }
-
     private static bool TryParsePromotionPiece(string value, out PieceType? pieceType)
     {
         pieceType = value.ToLowerInvariant() switch
@@ -223,18 +213,6 @@ public class ChessGame
         };
 
         return pieceType is not null;
-    }
-
-    private static string GetPieceName(PieceType pieceType)
-    {
-        return pieceType switch
-        {
-            PieceType.Queen => "rainha",
-            PieceType.Rook => "torre",
-            PieceType.Bishop => "bispo",
-            PieceType.Knight => "cavalo",
-            _ => "peça"
-        };
     }
 
     private void ChangeTurn()

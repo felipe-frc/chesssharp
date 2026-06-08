@@ -20,14 +20,10 @@
                                 Color="#D6A23F"/>
                 <SolidColorBrush x:Key="GoldSoft"
                                 Color="#E0B85C"/>
-                <SolidColorBrush x:Key="GoldMuted"
-                                Color="#9A6A2E"/>
                 <SolidColorBrush x:Key="BronzeSoft"
                                 Color="#9A6A2E"/>
                 <SolidColorBrush x:Key="TextWhite"
                                 Color="#F3E7D5"/>
-                <SolidColorBrush x:Key="TextMuted"
-                                Color="#D7C5A2"/>
 
                 <!-- Botão premium sutil -->
                 <Style x:Key="PremiumFooterButtonStyle"
@@ -337,8 +333,7 @@
                                                                     HorizontalAlignment="Right"
                                                                     VerticalAlignment="Center">
 
-                                                                <Button x:Name="NewGameButton"
-                                                                        Style="{StaticResource PremiumFooterButtonStyle}"
+                                                                <Button Style="{StaticResource PremiumFooterButtonStyle}"
                                                                         Click="NewGameButton_Click"
                                                                         Width="145"
                                                                         Height="36">
@@ -347,8 +342,7 @@
                                                                                    FontWeight="SemiBold"/>
                                                                 </Button>
 
-                                                                <Button x:Name="ExitButton"
-                                                                        Style="{StaticResource PremiumFooterButtonStyle}"
+                                                                <Button Style="{StaticResource PremiumFooterButtonStyle}"
                                                                         Click="ExitButton_Click"
                                                                         Width="105"
                                                                         Height="36">

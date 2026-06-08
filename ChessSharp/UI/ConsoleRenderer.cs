@@ -9,8 +9,6 @@ public static class ConsoleRenderer
     {
         Console.Clear();
 
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
-
         Console.WriteLine();
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("  ♟ ChessSharp");

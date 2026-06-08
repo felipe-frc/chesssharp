@@ -309,7 +309,7 @@ public static class ChessRules
             : new Move(origin, target);
     }
 
-    private static bool IsPawnPromotionMove(ChessPiece piece, BoardPosition targetPosition)
+    public static bool IsPawnPromotionMove(ChessPiece piece, BoardPosition targetPosition)
     {
         if (piece.PieceType != PieceType.Pawn)
             return false;
