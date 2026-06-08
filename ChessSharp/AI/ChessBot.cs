@@ -1,8 +1,6 @@
 using ChessSharp.Board;
 using ChessSharp.Enums;
 using ChessSharp.Game;
-using ChessSharp.Pieces;
-
 namespace ChessSharp.AI;
 
 public class ChessBot
@@ -148,8 +146,9 @@ public class ChessBot
             priority += BoardEvaluator.GetPieceValue(targetPiece) * 10;
 
         if (movingPiece is not null && move.PromotionPieceType is not null)
-            priority += BoardEvaluator.GetPieceValue(CreatePromotedPiece(movingPiece.PieceColor, move.PromotionPieceType.Value));
-
+            priority += BoardEvaluator.GetPieceValue(
+            ChessRules.CreatePromotedPiece(movingPiece.PieceColor, move.PromotionPieceType.Value)
+);  
         return priority;
     }
 
@@ -184,7 +183,7 @@ public class ChessBot
 
         if (move.PromotionPieceType is not null)
         {
-            var promotedPiece = CreatePromotedPiece(piece.PieceColor, move.PromotionPieceType.Value);
+            var promotedPiece = ChessRules.CreatePromotedPiece(piece.PieceColor, move.PromotionPieceType.Value);
             promotedPiece.MarkAsMoved();
 
             board.SetPieceAt(move.Target, promotedPiece);
@@ -219,15 +218,4 @@ public class ChessBot
         rook.MarkAsMoved();
     }
 
-    private static ChessPiece CreatePromotedPiece(PieceColor pieceColor, PieceType pieceType)
-    {
-        return pieceType switch
-        {
-            PieceType.Queen => new Queen(pieceColor),
-            PieceType.Rook => new Rook(pieceColor),
-            PieceType.Bishop => new Bishop(pieceColor),
-            PieceType.Knight => new Knight(pieceColor),
-            _ => throw new ArgumentException("Tipo de peça inválido para promoção.", nameof(pieceType))
-        };
-    }
 }

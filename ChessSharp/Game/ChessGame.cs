@@ -128,7 +128,7 @@ public class ChessGame
             if (IsPawnPromotionMove(piece, normalizedMove.Target))
             {
                 var promotionPieceType = normalizedMove.PromotionPieceType ?? PieceType.Queen;
-                var promotedPiece = CreatePromotedPiece(piece.PieceColor, promotionPieceType);
+                var promotedPiece = ChessRules.CreatePromotedPiece(piece.PieceColor, promotionPieceType);
                 promotedPiece.MarkAsMoved();
 
                 Board.SetPieceAt(normalizedMove.Target, promotedPiece);
@@ -223,18 +223,6 @@ public class ChessGame
         };
 
         return pieceType is not null;
-    }
-
-    private static ChessPiece CreatePromotedPiece(PieceColor pieceColor, PieceType pieceType)
-    {
-        return pieceType switch
-        {
-            PieceType.Queen => new Queen(pieceColor),
-            PieceType.Rook => new Rook(pieceColor),
-            PieceType.Bishop => new Bishop(pieceColor),
-            PieceType.Knight => new Knight(pieceColor),
-            _ => throw new ArgumentException("Tipo de peça inválido para promoção.", nameof(pieceType))
-        };
     }
 
     private static string GetPieceName(PieceType pieceType)

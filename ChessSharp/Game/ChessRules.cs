@@ -319,7 +319,7 @@ public static class ChessRules
             : targetPosition.Row == 7;
     }
 
-    private static ChessPiece CreatePromotedPiece(PieceColor pieceColor, PieceType pieceType)
+    public static ChessPiece CreatePromotedPiece(PieceColor pieceColor, PieceType pieceType)
     {
         return pieceType switch
         {
