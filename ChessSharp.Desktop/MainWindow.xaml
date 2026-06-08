@@ -132,6 +132,94 @@
                                 </Setter.Value>
                         </Setter>
                 </Style>
+
+                <Style x:Key="PromotionChoiceButtonStyle"
+                       TargetType="Button">
+                        <Setter Property="Width"
+                                        Value="118"/>
+                        <Setter Property="Height"
+                                        Value="148"/>
+                        <Setter Property="Margin"
+                                        Value="8,0"/>
+                        <Setter Property="Padding"
+                                        Value="10"/>
+                        <Setter Property="Cursor"
+                                        Value="Hand"/>
+                        <Setter Property="Foreground"
+                                        Value="{StaticResource TextWhite}"/>
+                        <Setter Property="Background"
+                                        Value="#120A07"/>
+                        <Setter Property="BorderBrush"
+                                        Value="#8C6630"/>
+                        <Setter Property="BorderThickness"
+                                        Value="1"/>
+                        <Setter Property="Template">
+                                <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                                <Border x:Name="ButtonBorder"
+                                                        Background="{TemplateBinding Background}"
+                                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                                        CornerRadius="8"
+                                                        SnapsToDevicePixels="True">
+                                                        <Border.Effect>
+                                                                <DropShadowEffect Color="#D6A23F"
+                                                                                  BlurRadius="14"
+                                                                                  ShadowDepth="0"
+                                                                                  Opacity="0.12"/>
+                                                        </Border.Effect>
+
+                                                        <Grid ClipToBounds="True">
+                                                                <Rectangle RadiusX="8"
+                                                                           RadiusY="8"
+                                                                           Opacity="0.16">
+                                                                        <Rectangle.Fill>
+                                                                                <LinearGradientBrush StartPoint="0,0"
+                                                                                                     EndPoint="1,1">
+                                                                                        <GradientStop Color="#22FFFFFF"
+                                                                                                        Offset="0"/>
+                                                                                        <GradientStop Color="#00000000"
+                                                                                                        Offset="0.55"/>
+                                                                                        <GradientStop Color="#22D6A23F"
+                                                                                                        Offset="1"/>
+                                                                                </LinearGradientBrush>
+                                                                        </Rectangle.Fill>
+                                                                </Rectangle>
+
+                                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                                  VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                </Border>
+
+                                                <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver"
+                                                                        Value="True">
+                                                                <Setter TargetName="ButtonBorder"
+                                                                        Property="BorderBrush"
+                                                                        Value="{StaticResource GoldAccent}"/>
+                                                                <Setter Property="Foreground"
+                                                                        Value="{StaticResource GoldSoft}"/>
+                                                        </Trigger>
+
+                                                        <Trigger Property="IsPressed"
+                                                                        Value="True">
+                                                                <Setter Property="Foreground"
+                                                                        Value="#FFF1C2"/>
+                                                        </Trigger>
+                                                </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                </Setter.Value>
+                        </Setter>
+                </Style>
+
+                <Style x:Key="ColorChoiceButtonStyle"
+                       TargetType="Button"
+                       BasedOn="{StaticResource PromotionChoiceButtonStyle}">
+                        <Setter Property="Width"
+                                        Value="180"/>
+                        <Setter Property="Height"
+                                        Value="168"/>
+                </Style>
         </Window.Resources>
 
         <Grid>
@@ -355,6 +443,110 @@
                                         </Grid>
                                 </Border>
                         </Grid>
+                </Grid>
+
+                <Grid x:Name="ColorSelectionOverlay"
+                      Visibility="Collapsed"
+                      Background="#90000000">
+                        <Border Width="520"
+                                Padding="28,24,28,28"
+                                Background="#E10F0806"
+                                BorderBrush="{StaticResource GoldAccent}"
+                                BorderThickness="1"
+                                CornerRadius="14"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <Border.Effect>
+                                        <DropShadowEffect Color="#D6A23F"
+                                                          BlurRadius="26"
+                                                          ShadowDepth="0"
+                                                          Opacity="0.22"/>
+                                </Border.Effect>
+
+                                <StackPanel>
+                                        <TextBlock Text="ESCOLHA SUA COR"
+                                                   Foreground="{StaticResource GoldAccent}"
+                                                   FontSize="15"
+                                                   FontWeight="Bold"
+                                                   HorizontalAlignment="Center"/>
+
+                                        <TextBlock Text="Defina quem faz a primeira jogada"
+                                                   Foreground="{StaticResource TextWhite}"
+                                                   FontSize="18"
+                                                   Margin="0,8,0,22"
+                                                   HorizontalAlignment="Center"/>
+
+                                        <UniformGrid Columns="2"
+                                                     HorizontalAlignment="Center">
+                                                <Button x:Name="ChooseWhiteButton"
+                                                        Style="{StaticResource ColorChoiceButtonStyle}"
+                                                        Tag="White"
+                                                        Click="ColorOptionButton_Click"/>
+
+                                                <Button x:Name="ChooseBlackButton"
+                                                        Style="{StaticResource ColorChoiceButtonStyle}"
+                                                        Tag="Black"
+                                                        Click="ColorOptionButton_Click"/>
+                                        </UniformGrid>
+                                </StackPanel>
+                        </Border>
+                </Grid>
+
+                <Grid x:Name="PromotionOverlay"
+                      Visibility="Collapsed"
+                      Background="#90000000">
+                        <Border Width="640"
+                                Padding="28,24,28,28"
+                                Background="#E10F0806"
+                                BorderBrush="{StaticResource GoldAccent}"
+                                BorderThickness="1"
+                                CornerRadius="14"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                                <Border.Effect>
+                                        <DropShadowEffect Color="#D6A23F"
+                                                          BlurRadius="26"
+                                                          ShadowDepth="0"
+                                                          Opacity="0.22"/>
+                                </Border.Effect>
+
+                                <StackPanel>
+                                        <TextBlock Text="PROMOÇÃO DE PEÃO"
+                                                   Foreground="{StaticResource GoldAccent}"
+                                                   FontSize="15"
+                                                   FontWeight="Bold"
+                                                   HorizontalAlignment="Center"/>
+
+                                        <TextBlock Text="Escolha a peça para concluir a jogada"
+                                                   Foreground="{StaticResource TextWhite}"
+                                                   FontSize="18"
+                                                   Margin="0,8,0,22"
+                                                   HorizontalAlignment="Center"/>
+
+                                        <UniformGrid Columns="4"
+                                                     HorizontalAlignment="Center">
+                                                <Button x:Name="PromotionQueenButton"
+                                                        Style="{StaticResource PromotionChoiceButtonStyle}"
+                                                        Tag="Queen"
+                                                        Click="PromotionOptionButton_Click"/>
+
+                                                <Button x:Name="PromotionRookButton"
+                                                        Style="{StaticResource PromotionChoiceButtonStyle}"
+                                                        Tag="Rook"
+                                                        Click="PromotionOptionButton_Click"/>
+
+                                                <Button x:Name="PromotionBishopButton"
+                                                        Style="{StaticResource PromotionChoiceButtonStyle}"
+                                                        Tag="Bishop"
+                                                        Click="PromotionOptionButton_Click"/>
+
+                                                <Button x:Name="PromotionKnightButton"
+                                                        Style="{StaticResource PromotionChoiceButtonStyle}"
+                                                        Tag="Knight"
+                                                        Click="PromotionOptionButton_Click"/>
+                                        </UniformGrid>
+                                </StackPanel>
+                        </Border>
                 </Grid>
         </Grid>
 </Window>

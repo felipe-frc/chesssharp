@@ -14,9 +14,12 @@ public partial class MainWindow : Window
 {
     private ChessGame _game = new();
     private ChessBot _bot = new(PieceColor.Black);
+    private PieceColor _playerColor = PieceColor.White;
 
     private BoardPosition? _selectedPosition;
     private List<BoardPosition> _legalTargetPositions = new();
+    private TaskCompletionSource<PieceColor>? _colorSelectionSource;
+    private TaskCompletionSource<PieceType>? _promotionSelectionSource;
 
     private static readonly Dictionary<string, BitmapSource> PieceBitmapCache = new();
 
@@ -24,8 +27,11 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        Loaded += MainWindow_Loaded;
+        ConfigureColorOptions();
+        ConfigurePromotionOptions();
         RenderBoard();
-        UpdateStatusMessage(GetPlayerTurnMessage());
+        UpdateStatusMessage("ESCOLHA SUA COR.");
     }
 
     private void RenderBoard()
@@ -80,7 +86,7 @@ public partial class MainWindow : Window
         if (isLegalTarget)
         {
             bool isCapture = piece is not null &&
-                             piece.PieceColor == PieceColor.Black;
+                             piece.PieceColor != _playerColor;
 
             square.Children.Add(CreateLegalMoveIndicator(isCapture));
         }
@@ -465,13 +471,15 @@ public partial class MainWindow : Window
         object sender,
         System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (_game.IsFinished)
+        if (_game.IsFinished ||
+            _promotionSelectionSource is not null ||
+            _colorSelectionSource is not null)
             return;
 
         if (sender is not Grid square || square.Tag is not BoardPosition clickedPosition)
             return;
 
-        if (_game.CurrentTurn != PieceColor.White)
+        if (_game.CurrentTurn != _playerColor)
             return;
 
         if (_selectedPosition is null)
@@ -511,14 +519,14 @@ public partial class MainWindow : Window
     {
         var piece = _game.Board.GetPieceAt(position);
 
-        if (piece is null || piece.PieceColor != PieceColor.White)
+        if (piece is null || piece.PieceColor != _playerColor)
         {
             ClearSelection();
 
             UpdateStatusMessage(
                 piece is null
                     ? "ESCOLHA UMA PEÇA CLARA."
-                    : "VOCÊ JOGA COM AS PEÇAS CLARAS.");
+                    : $"VOCÊ JOGA COM AS PEÇAS {GetColorName(_playerColor)}.");
 
             RenderBoard();
             return;
@@ -527,7 +535,7 @@ public partial class MainWindow : Window
         _selectedPosition = position;
 
         _legalTargetPositions = ChessRules
-            .GetLegalMoves(_game.Board, PieceColor.White)
+            .GetLegalMoves(_game.Board, _playerColor)
             .Where(move => move.Origin == position)
             .Select(move => move.Target)
             .Distinct()
@@ -536,7 +544,7 @@ public partial class MainWindow : Window
         if (_legalTargetPositions.Count == 0)
         {
             UpdateStatusMessage(
-                ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
+                ChessRules.IsKingInCheck(_game.Board, _playerColor)
                     ? "REI EM PERIGO. PROTEJA-O."
                     : "ESTA PEÇA NÃO POSSUI MOVIMENTOS.");
 
@@ -554,9 +562,22 @@ public partial class MainWindow : Window
             return;
 
         var origin = _selectedPosition.Value;
-        string moveText = $"{ToChessNotation(origin)} {ToChessNotation(targetPosition)}";
+        var movingPiece = _game.Board.GetPieceAt(origin);
 
-        var result = _game.TryMove(moveText);
+        if (movingPiece is null)
+            return;
+
+        PieceType? promotionPieceType = null;
+
+        if (ChessRules.IsPawnPromotionMove(movingPiece, targetPosition))
+        {
+            promotionPieceType = await RequestPromotionPieceAsync();
+
+            if (promotionPieceType is null)
+                return;
+        }
+
+        var result = _game.TryMove(new Move(origin, targetPosition, promotionPieceType));
 
         ClearSelection();
         RenderBoard();
@@ -579,7 +600,7 @@ public partial class MainWindow : Window
 
     private async Task MakeBotMoveAsync()
     {
-        if (_game.CurrentTurn != PieceColor.Black)
+        if (_game.CurrentTurn != _bot.BotColor)
             return;
 
         UpdateStatusMessage("OPONENTE ESTÁ PENSANDO...");
@@ -613,17 +634,39 @@ public partial class MainWindow : Window
 
     private void NewGameButton_Click(object sender, RoutedEventArgs e)
     {
-        _game = new ChessGame();
-        _bot = new ChessBot(PieceColor.Black);
-
-        ClearSelection();
-        RenderBoard();
-        UpdateStatusMessage(GetPlayerTurnMessage());
+        _ = PromptForColorAndStartGameAsync();
     }
 
     private void ExitButton_Click(object sender, RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void PromotionOptionButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button ||
+            button.Tag is not string pieceTypeName ||
+            !Enum.TryParse(pieceTypeName, out PieceType selectedPiece))
+        {
+            return;
+        }
+
+        HidePromotionOverlay();
+        _promotionSelectionSource?.TrySetResult(selectedPiece);
+    }
+
+    private async void ColorOptionButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button button ||
+            button.Tag is not string colorName ||
+            !Enum.TryParse(colorName, out PieceColor selectedColor))
+        {
+            return;
+        }
+
+        HideColorSelectionOverlay();
+        _colorSelectionSource?.TrySetResult(selectedColor);
+        await Task.CompletedTask;
     }
 
     private void ClearSelection()
@@ -634,24 +677,29 @@ public partial class MainWindow : Window
 
     private string GetPlayerTurnMessage()
     {
-        return ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
+        return ChessRules.IsKingInCheck(_game.Board, _playerColor)
             ? "REI EM XEQUE."
             : "SUA VEZ DE JOGAR.";
     }
 
     private string GetInvalidTargetMessage()
     {
-        return ChessRules.IsKingInCheck(_game.Board, PieceColor.White)
+        return ChessRules.IsKingInCheck(_game.Board, _playerColor)
             ? "MOVIMENTO INVÁLIDO. PROTEJA O REI."
             : "ESCOLHA UMA CASA VÁLIDA.";
     }
 
     private string GetFinalMessage()
     {
+        bool playerWon =
+            (_playerColor == PieceColor.White && _game.Status == GameStatus.WhiteWins) ||
+            (_playerColor == PieceColor.Black && _game.Status == GameStatus.BlackWins);
+
         return _game.Status switch
         {
-            GameStatus.WhiteWins => "VITÓRIA. VOCÊ VENCEU A PARTIDA.",
-            GameStatus.BlackWins => "DERROTA. O OPONENTE VENCEU.",
+            GameStatus.WhiteWins or GameStatus.BlackWins => playerWon
+                ? "VITÓRIA. VOCÊ VENCEU A PARTIDA."
+                : "DERROTA. O OPONENTE VENCEU.",
             GameStatus.Draw => "EMPATE.",
             GameStatus.PlayerQuit => "PARTIDA ENCERRADA.",
             _ => "JOGO FINALIZADO."
@@ -661,6 +709,186 @@ public partial class MainWindow : Window
     private void UpdateStatusMessage(string message)
     {
         StatusText.Text = message.ToUpper();
+    }
+
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        Loaded -= MainWindow_Loaded;
+        await PromptForColorAndStartGameAsync();
+    }
+
+    private void ConfigureColorOptions()
+    {
+        ChooseWhiteButton.Content = CreateColorOptionContent(PieceColor.White, "BRANCAS", "VOCÊ COMEÇA");
+        ChooseBlackButton.Content = CreateColorOptionContent(PieceColor.Black, "PRETAS", "A MÁQUINA COMEÇA");
+    }
+
+    private void ConfigurePromotionOptions()
+    {
+        UpdatePromotionOptionContent();
+    }
+
+    private void UpdatePromotionOptionContent()
+    {
+        PromotionQueenButton.Content = CreatePromotionOptionContent(PieceType.Queen, "RAINHA", _playerColor);
+        PromotionRookButton.Content = CreatePromotionOptionContent(PieceType.Rook, "TORRE", _playerColor);
+        PromotionBishopButton.Content = CreatePromotionOptionContent(PieceType.Bishop, "BISPO", _playerColor);
+        PromotionKnightButton.Content = CreatePromotionOptionContent(PieceType.Knight, "CAVALO", _playerColor);
+    }
+
+    private static UIElement CreateColorOptionContent(
+        PieceColor pieceColor,
+        string label,
+        string subtitle)
+    {
+        var image = new Image
+        {
+            Source = GetOrCreateNormalizedPieceBitmap(GetPieceImagePath(PieceType.King, pieceColor)),
+            Height = 88,
+            Stretch = Stretch.Uniform,
+            IsHitTestVisible = false,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Effect = CreateSelectedPieceGlow()
+        };
+
+        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+
+        return new StackPanel
+        {
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Children =
+            {
+                image,
+                new TextBlock
+                {
+                    Text = label,
+                    FontSize = 14,
+                    FontWeight = FontWeights.SemiBold,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 10, 0, 0)
+                },
+                new TextBlock
+                {
+                    Text = subtitle,
+                    FontSize = 10,
+                    Foreground = new SolidColorBrush(Color.FromRgb(215, 197, 162)),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 4, 0, 0)
+                }
+            }
+        };
+    }
+
+    private static UIElement CreatePromotionOptionContent(
+        PieceType pieceType,
+        string label,
+        PieceColor pieceColor)
+    {
+        var image = new Image
+        {
+            Source = GetOrCreateNormalizedPieceBitmap(GetPieceImagePath(pieceType, pieceColor)),
+            Height = 72,
+            Stretch = Stretch.Uniform,
+            IsHitTestVisible = false,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center,
+            Effect = CreateSelectedPieceGlow()
+        };
+
+        RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+
+        return new StackPanel
+        {
+            VerticalAlignment = VerticalAlignment.Center,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Children =
+            {
+                image,
+                new TextBlock
+                {
+                    Text = label,
+                    FontSize = 12,
+                    FontWeight = FontWeights.SemiBold,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 10, 0, 0)
+                }
+            }
+        };
+    }
+
+    private async Task PromptForColorAndStartGameAsync()
+    {
+        var selectedColor = await RequestPlayerColorAsync();
+        await StartNewGameAsync(selectedColor);
+    }
+
+    private async Task StartNewGameAsync(PieceColor playerColor)
+    {
+        _playerColor = playerColor;
+        _game = new ChessGame();
+        _bot = new ChessBot(ChessRules.GetOpponentColor(playerColor));
+
+        ClearSelection();
+        HidePromotionOverlay();
+        UpdatePromotionOptionContent();
+        RenderBoard();
+
+        if (_game.CurrentTurn == _playerColor)
+        {
+            UpdateStatusMessage(GetPlayerTurnMessage());
+            return;
+        }
+
+        await MakeBotMoveAsync();
+    }
+
+    private async Task<PieceColor> RequestPlayerColorAsync()
+    {
+        _colorSelectionSource = new TaskCompletionSource<PieceColor>();
+        ColorSelectionOverlay.Visibility = Visibility.Visible;
+        UpdateStatusMessage("ESCOLHA SUA COR.");
+
+        try
+        {
+            return await _colorSelectionSource.Task;
+        }
+        finally
+        {
+            _colorSelectionSource = null;
+        }
+    }
+
+    private async Task<PieceType?> RequestPromotionPieceAsync()
+    {
+        _promotionSelectionSource = new TaskCompletionSource<PieceType>();
+        PromotionOverlay.Visibility = Visibility.Visible;
+        UpdateStatusMessage("ESCOLHA A PEÇA DA PROMOÇÃO.");
+
+        try
+        {
+            return await _promotionSelectionSource.Task;
+        }
+        finally
+        {
+            _promotionSelectionSource = null;
+        }
+    }
+
+    private void HidePromotionOverlay()
+    {
+        PromotionOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private void HideColorSelectionOverlay()
+    {
+        ColorSelectionOverlay.Visibility = Visibility.Collapsed;
+    }
+
+    private static string GetColorName(PieceColor color)
+    {
+        return color == PieceColor.White ? "CLARAS" : "ESCURAS";
     }
 
     private static string ToChessNotation(BoardPosition position)
