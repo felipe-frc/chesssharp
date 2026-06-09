@@ -41,7 +41,7 @@
 
                                     @if (piece is not null)
                                     {
-                                        <img class="piece-image"
+                                        <img class="piece-image @GetPieceCssClass(piece)"
                                              src="@GetPieceAssetPath(piece.PieceType, piece.PieceColor)"
                                              alt="@GetPieceAltText(piece)"
                                              draggable="false" />
@@ -55,8 +55,14 @@
 
             <div class="status-strip">
                 <div class="status-ledger">
-                    <span class="status-kicker">Status da partida</span>
-                    <strong>@_statusMessage.ToUpperInvariant()</strong>
+                    <div class="status-ledger-head">
+                        <span class="@GetStatusOrbClass()"></span>
+                        <div>
+                            <span class="status-kicker">Status da partida</span>
+                            <strong>@_statusMessage.ToUpperInvariant()</strong>
+                        </div>
+                    </div>
+                    <span class="status-support">@GetStatusSupportText()</span>
                 </div>
 
                 <div class="status-meta">
@@ -464,6 +470,25 @@
     private string GetTurnOwner() =>
         _game.CurrentTurn == _playerColor ? "Você" : "Máquina";
 
+    private string GetStatusSupportText()
+    {
+        if (_showColorSelection)
+            return "Defina a cor para iniciar a próxima partida.";
+
+        if (_showPromotionSelection)
+            return "Promoção pendente. Escolha a peça para concluir o lance.";
+
+        if (_isBotThinking)
+            return "A engine está calculando a próxima resposta localmente no navegador.";
+
+        if (_game.IsFinished)
+            return "Partida encerrada. Você pode iniciar uma nova rodada a qualquer momento.";
+
+        return _game.CurrentTurn == _playerColor
+            ? "Selecione uma peça da sua cor e escolha um destino válido."
+            : "Aguarde a conclusão do lance do bot.";
+    }
+
     private string GetGameStateLabel() =>
         _game.Status switch
         {
@@ -495,6 +520,36 @@
 
         if (IsSelected(position))
             classes.Add("board-square-selected");
+
+        return string.Join(" ", classes);
+    }
+
+    private string GetPieceCssClass(ChessPiece piece) =>
+        piece.PieceType switch
+        {
+            PieceType.Pawn => "piece-pawn",
+            PieceType.Rook => "piece-rook",
+            PieceType.Knight => "piece-knight",
+            PieceType.Bishop => "piece-bishop",
+            PieceType.Queen => "piece-queen",
+            PieceType.King => "piece-king",
+            _ => string.Empty
+        };
+
+    private string GetStatusOrbClass()
+    {
+        var classes = new List<string> { "status-orb" };
+
+        if (_showColorSelection || _showPromotionSelection)
+            classes.Add("status-orb-attention");
+        else if (_isBotThinking)
+            classes.Add("status-orb-thinking");
+        else if (_game.IsFinished)
+            classes.Add("status-orb-finished");
+        else if (ChessRules.IsKingInCheck(_game.Board, _playerColor))
+            classes.Add("status-orb-alert");
+        else
+            classes.Add("status-orb-ready");
 
         return string.Join(" ", classes);
     }
