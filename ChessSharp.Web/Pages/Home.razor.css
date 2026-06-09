@@ -116,6 +116,7 @@
     z-index: 2;
     left: 50%;
     transform: translateX(-50%);
+    display: block;
     object-fit: contain;
     pointer-events: none;
     user-select: none;
@@ -124,39 +125,39 @@
 }
 
 .piece-pawn {
-    width: 45%;
-    height: 66%;
-    bottom: 8%;
+    width: 56%;
+    height: 80%;
+    bottom: 4%;
 }
 
 .piece-rook {
-    width: 56%;
-    height: 74%;
-    bottom: 6%;
+    width: 68%;
+    height: 88%;
+    bottom: 3%;
 }
 
 .piece-knight {
-    width: 60%;
-    height: 75%;
-    bottom: 6%;
+    width: 72%;
+    height: 88%;
+    bottom: 3%;
 }
 
 .piece-bishop {
-    width: 54%;
-    height: 79%;
-    bottom: 5%;
+    width: 66%;
+    height: 90%;
+    bottom: 2%;
 }
 
 .piece-queen {
-    width: 58%;
-    height: 80%;
-    bottom: 5%;
+    width: 74%;
+    height: 92%;
+    bottom: 2%;
 }
 
 .piece-king {
-    width: 59%;
-    height: 79%;
-    bottom: 5%;
+    width: 74%;
+    height: 92%;
+    bottom: 2%;
 }
 
 .status-strip {
@@ -462,5 +463,23 @@
 
     .piece-image {
         filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.48));
+    }
+
+    .piece-pawn {
+        width: 58%;
+        height: 82%;
+    }
+
+    .piece-rook,
+    .piece-knight,
+    .piece-bishop {
+        width: 70%;
+        height: 89%;
+    }
+
+    .piece-queen,
+    .piece-king {
+        width: 76%;
+        height: 92%;
     }
 }
