@@ -1,0 +1,521 @@
+@page "/"
+@using ChessSharp.AI
+@using ChessSharp.Board
+@using ChessSharp.Enums
+@using ChessSharp.Game
+@using ChessSharp.Pieces
+
+<PageTitle>ChessSharp Web</PageTitle>
+
+<div class="web-shell">
+    <div class="hero">
+        <div>
+            <p class="eyebrow">ChessSharp no navegador</p>
+            <h1>Jogue xadrez no Blazor WebAssembly</h1>
+            <p class="hero-copy">
+                A mesma engine em C# agora roda no browser, com seleção de cor, promoção, jogadas legais destacadas
+                e resposta automática do bot.
+            </p>
+        </div>
+
+        <div class="hero-actions">
+            <button class="action-button action-button-primary" @onclick="PromptForColorSelection">
+                Novo jogo
+            </button>
+        </div>
+    </div>
+
+    <div class="play-surface">
+        <section class="board-panel">
+            <div class="board-frame">
+                <div class="board-grid">
+                    @foreach (var row in DisplayRows)
+                    {
+                        @foreach (var column in DisplayColumns)
+                        {
+                            var position = new BoardPosition(row, column);
+                            var piece = _game.Board.GetPieceAt(position);
+
+                            <button class="@GetSquareClass(position)"
+                                    @onclick="() => OnSquareClickedAsync(position)">
+                                @if (ShouldShowRank(position))
+                                {
+                                    <span class="rank-label">@GetRankLabel(position)</span>
+                                }
+
+                                @if (ShouldShowFile(position))
+                                {
+                                    <span class="file-label">@GetFileLabel(position)</span>
+                                }
+
+                                @if (piece is not null)
+                                {
+                                    <span class="piece-glyph @GetPieceClass(piece)">@GetPieceGlyph(piece)</span>
+                                }
+                                else if (IsLegalTarget(position))
+                                {
+                                    <span class="move-dot"></span>
+                                }
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+        </section>
+
+        <aside class="info-panel">
+            <div class="card">
+                <p class="card-label">Status</p>
+                <h2>@_statusMessage</h2>
+                <p class="card-copy">@GetSupportingStatus()</p>
+            </div>
+
+            <div class="card compact-card">
+                <div>
+                    <p class="card-label">Você joga com</p>
+                    <p class="metric">@GetColorName(_playerColor)</p>
+                </div>
+
+                <div>
+                    <p class="card-label">Bot</p>
+                    <p class="metric">@GetColorName(_bot.BotColor)</p>
+                </div>
+            </div>
+
+            <div class="card compact-card">
+                <div>
+                    <p class="card-label">Turno atual</p>
+                    <p class="metric">@GetTurnOwner()</p>
+                </div>
+
+                <div>
+                    <p class="card-label">Estado</p>
+                    <p class="metric">@GetGameStateLabel()</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <p class="card-label">Como jogar</p>
+                <ul class="tips">
+                    <li>Clique em uma peça da sua cor para ver os destinos válidos.</li>
+                    <li>Escolha a casa destacada para concluir a jogada.</li>
+                    <li>Ao promover um peão, escolha a peça no modal.</li>
+                    <li>Se jogar com as pretas, o bot faz a primeira jogada.</li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    @if (_showColorSelection)
+    {
+        <div class="overlay">
+            <div class="modal-card">
+                <p class="eyebrow">Escolha sua cor</p>
+                <h2>Quem faz a primeira jogada?</h2>
+                <div class="choice-grid">
+                    <button class="choice-button" @onclick="() => StartNewGameAsync(PieceColor.White)">
+                        <span class="choice-piece choice-piece-light">♔</span>
+                        <span class="choice-title">Brancas</span>
+                        <span class="choice-copy">Você começa a partida.</span>
+                    </button>
+
+                    <button class="choice-button" @onclick="() => StartNewGameAsync(PieceColor.Black)">
+                        <span class="choice-piece choice-piece-dark">♚</span>
+                        <span class="choice-title">Pretas</span>
+                        <span class="choice-copy">A máquina faz a primeira jogada.</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (_showPromotionSelection)
+    {
+        <div class="overlay">
+            <div class="modal-card">
+                <p class="eyebrow">Promoção de peão</p>
+                <h2>Escolha a peça para concluir a jogada</h2>
+                <div class="choice-grid promotion-grid">
+                    @foreach (var pieceType in PromotionChoices)
+                    {
+                        <button class="choice-button"
+                                @onclick="() => CompletePromotionAsync(pieceType)">
+                            <span class="@($"choice-piece {(_playerColor == PieceColor.White ? "choice-piece-light" : "choice-piece-dark")}")">
+                                @GetPieceGlyph(pieceType, _playerColor)
+                            </span>
+                            <span class="choice-title">@GetPieceTypeName(pieceType)</span>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private readonly PieceType[] PromotionChoices =
+    [
+        PieceType.Queen,
+        PieceType.Rook,
+        PieceType.Bishop,
+        PieceType.Knight
+    ];
+
+    private ChessGame _game = new();
+    private ChessBot _bot = new(PieceColor.Black);
+    private PieceColor _playerColor = PieceColor.White;
+    private BoardPosition? _selectedPosition;
+    private List<BoardPosition> _legalTargetPositions = [];
+    private string _statusMessage = "Escolha sua cor para começar.";
+    private bool _showColorSelection = true;
+    private bool _showPromotionSelection;
+    private bool _isBotThinking;
+    private BoardPosition? _pendingPromotionOrigin;
+    private BoardPosition? _pendingPromotionTarget;
+
+    private IEnumerable<int> DisplayRows =>
+        _playerColor == PieceColor.White
+            ? Enumerable.Range(0, 8)
+            : Enumerable.Range(0, 8).Reverse();
+
+    private IEnumerable<int> DisplayColumns =>
+        _playerColor == PieceColor.White
+            ? Enumerable.Range(0, 8)
+            : Enumerable.Range(0, 8).Reverse();
+
+    private async Task OnSquareClickedAsync(BoardPosition clickedPosition)
+    {
+        if (_showColorSelection || _showPromotionSelection || _isBotThinking || _game.IsFinished)
+            return;
+
+        if (_game.CurrentTurn != _playerColor)
+            return;
+
+        if (_selectedPosition is null)
+        {
+            SelectPiece(clickedPosition);
+            return;
+        }
+
+        if (_selectedPosition.Value == clickedPosition)
+        {
+            ClearSelection();
+            _statusMessage = GetPlayerTurnMessage();
+            return;
+        }
+
+        var clickedPiece = _game.Board.GetPieceAt(clickedPosition);
+
+        if (clickedPiece is not null &&
+            clickedPiece.PieceColor == _playerColor &&
+            !_legalTargetPositions.Contains(clickedPosition))
+        {
+            SelectPiece(clickedPosition);
+            return;
+        }
+
+        if (!_legalTargetPositions.Contains(clickedPosition))
+        {
+            _statusMessage = GetInvalidTargetMessage();
+            return;
+        }
+
+        await TryMoveSelectedPieceAsync(clickedPosition);
+    }
+
+    private void SelectPiece(BoardPosition position)
+    {
+        var piece = _game.Board.GetPieceAt(position);
+
+        if (piece is null || piece.PieceColor != _playerColor)
+        {
+            ClearSelection();
+            _statusMessage = piece is null
+                ? "Escolha uma peça sua."
+                : $"Você joga com as peças {GetColorName(_playerColor).ToLowerInvariant()}.";
+            return;
+        }
+
+        _selectedPosition = position;
+        _legalTargetPositions = ChessRules
+            .GetLegalMoves(_game.Board, _playerColor)
+            .Where(move => move.Origin == position)
+            .Select(move => move.Target)
+            .Distinct()
+            .ToList();
+
+        if (_legalTargetPositions.Count == 0)
+        {
+            _statusMessage = ChessRules.IsKingInCheck(_game.Board, _playerColor)
+                ? "Rei em perigo. Escolha outra peça para se defender."
+                : "Essa peça não possui movimentos válidos.";
+            return;
+        }
+
+        _statusMessage = "Escolha uma casa destacada para mover.";
+    }
+
+    private async Task TryMoveSelectedPieceAsync(BoardPosition targetPosition)
+    {
+        if (_selectedPosition is null)
+            return;
+
+        var origin = _selectedPosition.Value;
+        var movingPiece = _game.Board.GetPieceAt(origin);
+
+        if (movingPiece is null)
+            return;
+
+        if (ChessRules.IsPawnPromotionMove(movingPiece, targetPosition))
+        {
+            _pendingPromotionOrigin = origin;
+            _pendingPromotionTarget = targetPosition;
+            _showPromotionSelection = true;
+            _statusMessage = "Escolha a peça da promoção.";
+            return;
+        }
+
+        await ExecutePlayerMoveAsync(new Move(origin, targetPosition));
+    }
+
+    private async Task CompletePromotionAsync(PieceType pieceType)
+    {
+        if (_pendingPromotionOrigin is null || _pendingPromotionTarget is null)
+            return;
+
+        _showPromotionSelection = false;
+
+        var move = new Move(
+            _pendingPromotionOrigin.Value,
+            _pendingPromotionTarget.Value,
+            pieceType);
+
+        _pendingPromotionOrigin = null;
+        _pendingPromotionTarget = null;
+
+        await ExecutePlayerMoveAsync(move);
+    }
+
+    private async Task ExecutePlayerMoveAsync(Move move)
+    {
+        var result = _game.TryMove(move);
+        ClearSelection();
+
+        if (!result.Success)
+        {
+            _statusMessage = GetInvalidTargetMessage();
+            return;
+        }
+
+        if (_game.IsFinished)
+        {
+            _statusMessage = GetFinalMessage();
+            return;
+        }
+
+        _statusMessage = "Movimento realizado. A máquina está pensando...";
+        await MakeBotMoveAsync();
+    }
+
+    private async Task MakeBotMoveAsync()
+    {
+        if (_game.CurrentTurn != _bot.BotColor)
+            return;
+
+        _isBotThinking = true;
+        _statusMessage = $"A máquina está jogando com as peças {GetColorName(_bot.BotColor).ToLowerInvariant()}...";
+
+        await Task.Delay(500);
+
+        try
+        {
+            var botMove = _bot.ChooseMove(_game.Board);
+
+            if (botMove is null)
+            {
+                _statusMessage = "Oponente sem movimentos disponíveis.";
+                return;
+            }
+
+            var botMoveResult = _game.TryMove(botMove.Value);
+
+            if (!botMoveResult.Success)
+            {
+                _statusMessage = "A máquina tentou uma jogada inválida.";
+                return;
+            }
+
+            _statusMessage = _game.IsFinished
+                ? GetFinalMessage()
+                : GetPlayerTurnMessage();
+        }
+        finally
+        {
+            _isBotThinking = false;
+        }
+    }
+
+    private async Task StartNewGameAsync(PieceColor playerColor)
+    {
+        _showColorSelection = false;
+        _showPromotionSelection = false;
+        _pendingPromotionOrigin = null;
+        _pendingPromotionTarget = null;
+        _playerColor = playerColor;
+        _game = new ChessGame();
+        _bot = new ChessBot(ChessRules.GetOpponentColor(playerColor));
+        ClearSelection();
+
+        _statusMessage = GetPlayerTurnMessage();
+
+        if (_game.CurrentTurn != _playerColor)
+            await MakeBotMoveAsync();
+    }
+
+    private void PromptForColorSelection()
+    {
+        _showPromotionSelection = false;
+        _pendingPromotionOrigin = null;
+        _pendingPromotionTarget = null;
+        ClearSelection();
+        _showColorSelection = true;
+        _statusMessage = "Escolha sua cor para iniciar uma nova partida.";
+    }
+
+    private void ClearSelection()
+    {
+        _selectedPosition = null;
+        _legalTargetPositions.Clear();
+    }
+
+    private string GetPlayerTurnMessage()
+    {
+        return ChessRules.IsKingInCheck(_game.Board, _playerColor)
+            ? "Seu rei está em xeque."
+            : "Sua vez de jogar.";
+    }
+
+    private string GetInvalidTargetMessage()
+    {
+        return ChessRules.IsKingInCheck(_game.Board, _playerColor)
+            ? "Movimento inválido. Você precisa sair do xeque."
+            : "Escolha uma casa válida para essa jogada.";
+    }
+
+    private string GetFinalMessage()
+    {
+        bool playerWon =
+            (_playerColor == PieceColor.White && _game.Status == GameStatus.WhiteWins) ||
+            (_playerColor == PieceColor.Black && _game.Status == GameStatus.BlackWins);
+
+        return _game.Status switch
+        {
+            GameStatus.WhiteWins or GameStatus.BlackWins => playerWon
+                ? "Vitória. Você venceu a partida."
+                : "Derrota. O oponente venceu.",
+            GameStatus.Draw => "Empate por afogamento.",
+            GameStatus.PlayerQuit => "Partida encerrada.",
+            _ => "Jogo finalizado."
+        };
+    }
+
+    private string GetSupportingStatus()
+    {
+        if (_showColorSelection)
+            return "Escolha jogar com brancas ou pretas antes de começar.";
+
+        if (_showPromotionSelection)
+            return "A promoção está pendente. Escolha uma peça para continuar.";
+
+        if (_isBotThinking)
+            return "O bot usa a mesma engine do jogo e calcula a próxima jogada no navegador.";
+
+        return "Tudo roda em C# no browser com Blazor WebAssembly.";
+    }
+
+    private string GetTurnOwner()
+    {
+        return _game.CurrentTurn == _playerColor ? "Você" : "Máquina";
+    }
+
+    private string GetGameStateLabel()
+    {
+        return _game.Status switch
+        {
+            GameStatus.InProgress => "Em andamento",
+            GameStatus.WhiteWins or GameStatus.BlackWins => "Finalizado",
+            GameStatus.Draw => "Empate",
+            GameStatus.PlayerQuit => "Encerrado",
+            _ => "Desconhecido"
+        };
+    }
+
+    private bool IsSelected(BoardPosition position) =>
+        _selectedPosition is not null && _selectedPosition.Value == position;
+
+    private bool IsLegalTarget(BoardPosition position) =>
+        _legalTargetPositions.Contains(position);
+
+    private string GetSquareClass(BoardPosition position)
+    {
+        var classes = new List<string>
+        {
+            "board-square",
+            (position.Row + position.Column) % 2 == 0 ? "board-square-light" : "board-square-dark"
+        };
+
+        if (IsSelected(position))
+            classes.Add("board-square-selected");
+
+        if (IsLegalTarget(position))
+            classes.Add("board-square-legal");
+
+        return string.Join(" ", classes);
+    }
+
+    private static string GetPieceClass(ChessPiece piece) =>
+        piece.PieceColor == PieceColor.White ? "piece-light" : "piece-dark";
+
+    private static string GetPieceGlyph(ChessPiece piece) =>
+        GetPieceGlyph(piece.PieceType, piece.PieceColor);
+
+    private static string GetPieceGlyph(PieceType pieceType, PieceColor color) =>
+        (pieceType, color) switch
+        {
+            (PieceType.King, PieceColor.White) => "♔",
+            (PieceType.Queen, PieceColor.White) => "♕",
+            (PieceType.Rook, PieceColor.White) => "♖",
+            (PieceType.Bishop, PieceColor.White) => "♗",
+            (PieceType.Knight, PieceColor.White) => "♘",
+            (PieceType.Pawn, PieceColor.White) => "♙",
+            (PieceType.King, PieceColor.Black) => "♚",
+            (PieceType.Queen, PieceColor.Black) => "♛",
+            (PieceType.Rook, PieceColor.Black) => "♜",
+            (PieceType.Bishop, PieceColor.Black) => "♝",
+            (PieceType.Knight, PieceColor.Black) => "♞",
+            _ => "♟"
+        };
+
+    private bool ShouldShowRank(BoardPosition position) =>
+        _playerColor == PieceColor.White ? position.Column == 0 : position.Column == 7;
+
+    private bool ShouldShowFile(BoardPosition position) =>
+        _playerColor == PieceColor.White ? position.Row == 7 : position.Row == 0;
+
+    private static string GetRankLabel(BoardPosition position) => (8 - position.Row).ToString();
+
+    private static string GetFileLabel(BoardPosition position) => ((char)('a' + position.Column)).ToString();
+
+    private static string GetColorName(PieceColor color) =>
+        color == PieceColor.White ? "Brancas" : "Pretas";
+
+    private static string GetPieceTypeName(PieceType pieceType) =>
+        pieceType switch
+        {
+            PieceType.Queen => "Rainha",
+            PieceType.Rook => "Torre",
+            PieceType.Bishop => "Bispo",
+            PieceType.Knight => "Cavalo",
+            _ => pieceType.ToString()
+        };
+}
