@@ -41,7 +41,7 @@
 
                                     @if (piece is not null)
                                     {
-                                        <img class="piece-image @GetPieceCssClass(piece)"
+                                        <img class="piece-image @GetPieceCssClass(piece) @(piece.PieceColor == PieceColor.White ? "piece-light" : "piece-dark")"
                                              src="@GetPieceAssetPath(piece.PieceType, piece.PieceColor)"
                                              alt="@GetPieceAltText(piece)"
                                              draggable="false" />

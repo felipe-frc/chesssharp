@@ -112,11 +112,18 @@
 }
 
 .piece-image {
+    --piece-width: 62%;
+    --piece-height: 82%;
+    --piece-bottom: 4%;
+    --piece-bottom-adjust: 0%;
     position: absolute;
     z-index: 2;
     left: 50%;
     transform: translateX(-50%);
     display: block;
+    width: var(--piece-width);
+    height: var(--piece-height);
+    bottom: calc(var(--piece-bottom) + var(--piece-bottom-adjust));
     object-fit: contain;
     pointer-events: none;
     user-select: none;
@@ -125,39 +132,47 @@
 }
 
 .piece-pawn {
-    width: 56%;
-    height: 80%;
-    bottom: 4%;
+    --piece-width: 50%;
+    --piece-height: 73%;
+    --piece-bottom: 5%;
 }
 
 .piece-rook {
-    width: 68%;
-    height: 88%;
-    bottom: 3%;
+    --piece-width: 59%;
+    --piece-height: 78%;
+    --piece-bottom: 4%;
 }
 
 .piece-knight {
-    width: 72%;
-    height: 88%;
-    bottom: 3%;
+    --piece-width: 62%;
+    --piece-height: 79%;
+    --piece-bottom: 4%;
 }
 
 .piece-bishop {
-    width: 66%;
-    height: 90%;
-    bottom: 2%;
+    --piece-width: 57%;
+    --piece-height: 80%;
+    --piece-bottom: 4%;
 }
 
 .piece-queen {
-    width: 74%;
-    height: 92%;
-    bottom: 2%;
+    --piece-width: 63%;
+    --piece-height: 81%;
+    --piece-bottom: 4%;
 }
 
 .piece-king {
-    width: 74%;
-    height: 92%;
-    bottom: 2%;
+    --piece-width: 63%;
+    --piece-height: 81%;
+    --piece-bottom: 4%;
+}
+
+.piece-light {
+    --piece-bottom-adjust: -3%;
+}
+
+.piece-dark {
+    --piece-bottom-adjust: 0%;
 }
 
 .status-strip {
@@ -466,20 +481,20 @@
     }
 
     .piece-pawn {
-        width: 58%;
-        height: 82%;
+        --piece-width: 51%;
+        --piece-height: 74%;
     }
 
     .piece-rook,
     .piece-knight,
     .piece-bishop {
-        width: 70%;
-        height: 89%;
+        --piece-width: 60%;
+        --piece-height: 79%;
     }
 
     .piece-queen,
     .piece-king {
-        width: 76%;
-        height: 92%;
+        --piece-width: 64%;
+        --piece-height: 82%;
     }
 }
