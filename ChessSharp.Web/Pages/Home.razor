@@ -34,6 +34,16 @@
                                         <span class="selected-highlight"></span>
                                     }
 
+                                    @if (IsLastMoveSquare(position))
+                                    {
+                                        <span class="last-move-highlight"></span>
+                                    }
+
+                                    @if (IsCheckedKingSquare(position))
+                                    {
+                                        <span class="check-highlight"></span>
+                                    }
+
                                     @if (IsLegalTarget(position))
                                     {
                                         <span class="@(IsCaptureTarget(position) ? "move-indicator move-indicator-capture" : "move-indicator")"></span>
@@ -52,102 +62,100 @@
                     </div>
                 </div>
             </div>
-
-            <div class="status-strip">
-                <div class="status-ledger">
-                    <div class="status-ledger-head">
-                        <span class="@GetStatusOrbClass()"></span>
-                        <div>
-                            <span class="status-kicker">Status da partida</span>
-                            <strong>@_statusMessage.ToUpperInvariant()</strong>
-                        </div>
-                    </div>
-                    <span class="status-support">@GetStatusSupportText()</span>
-                </div>
-
-                <div class="status-meta">
-                    <div class="status-meta-item">
-                        <span>Sua cor</span>
-                        <strong>@GetColorName(_playerColor)</strong>
-                    </div>
-
-                    <div class="status-meta-item">
-                        <span>Último lance</span>
-                        <strong>@GetLastMoveLabel()</strong>
-                    </div>
-
-                    <div class="status-meta-item">
-                        <span>Turno</span>
-                        <strong>@GetTurnOwner()</strong>
-                    </div>
-                </div>
-
-                <div class="status-actions">
-                    <button class="footer-button footer-button-primary" @onclick="PromptForColorSelection">
-                        Novo jogo
-                    </button>
-
-                    <button class="footer-button" @onclick="PromptForColorSelection">
-                        Escolher cor
-                    </button>
-                </div>
-            </div>
         </section>
 
         <aside class="info-panel">
-            <div class="card hero-card">
-                <p class="card-label">Mesa premium</p>
-                <h1>Agora a versão web começa a herdar a identidade visual do WPF.</h1>
-                <p class="card-copy">
-                    O tabuleiro, o mármore, o logo e as peças agora usam a mesma base visual da versão desktop,
-                    enquanto a engine continua rodando 100% em C# no browser.
-                </p>
+            <div class="card sidebar-primary">
+                <p class="card-label">Painel da partida</p>
+                <h1>@GetHeroPanelTitle()</h1>
+
+                <div class="sidebar-status">
+                    <span class="@GetStatusOrbClass()"></span>
+                    <div class="sidebar-status-copy">
+                        <strong>@_statusMessage</strong>
+                        <span>@GetStatusSupportText()</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-actions">
+                    <button class="footer-button footer-button-primary" @onclick="PromptForColorSelection">
+                        Novo jogo
+                    </button>
+                    <button class="footer-button" @onclick="PromptForColorSelection">
+                        Trocar cor
+                    </button>
+                </div>
+
+                <div class="sidebar-versus">
+                    <div class="sidebar-player">
+                        <img class="sidebar-player-piece" src="@GetPieceAssetPath(PieceType.King, _playerColor)" alt="Seu rei" />
+                        <div>
+                            <strong>Você</strong>
+                            <span>@GetColorName(_playerColor)</span>
+                        </div>
+                    </div>
+
+                    <span class="sidebar-versus-mark">vs</span>
+
+                    <div class="sidebar-player">
+                        <img class="sidebar-player-piece" src="@GetPieceAssetPath(PieceType.King, _bot.BotColor)" alt="Rei do bot" />
+                        <div>
+                            <strong>Bot</strong>
+                            <span>@GetColorName(_bot.BotColor)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-meta">
+                    <span>Sua cor: <strong>@GetColorName(_playerColor)</strong></span>
+                    <span>Último lance: <strong>@GetLastMoveLabel()</strong></span>
+                </div>
             </div>
 
-            <div class="card compact-card">
-                <div>
-                    <p class="card-label">Você joga com</p>
-                    <p class="metric">@GetColorName(_playerColor)</p>
-                </div>
+            <div class="card sidebar-summary">
+                <p class="card-label">Leitura rápida</p>
 
-                <div>
-                    <p class="card-label">Bot</p>
-                    <p class="metric">@GetColorName(_bot.BotColor)</p>
-                </div>
-            </div>
-
-            <div class="card compact-card">
-                <div>
-                    <p class="card-label">Rei</p>
-                    <p class="metric">@GetKingSafetyLabel()</p>
-                </div>
-
-                <div>
-                    <p class="card-label">Estado</p>
-                    <p class="metric">@GetGameStateLabel()</p>
-                </div>
-            </div>
-
-            <div class="card compact-card">
-                <div>
-                    <p class="card-label">Peças suas</p>
-                    <p class="metric">@GetRemainingPieceCount(_playerColor)</p>
-                </div>
-
-                <div>
-                    <p class="card-label">Peças do bot</p>
-                    <p class="metric">@GetRemainingPieceCount(_bot.BotColor)</p>
+                <div class="summary-lines">
+                    <div class="summary-line">
+                        <span>Fase</span>
+                        <strong>@GetPhaseLabel()</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Turno</span>
+                        <strong>@GetTurnOwner()</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Rei</span>
+                        <strong>@GetKingSafetyLabel()</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Material</span>
+                        <strong>@GetMaterialSwingLabel()</strong>
+                    </div>
                 </div>
             </div>
 
-            <div class="card">
-                <p class="card-label">Como jogar</p>
-                <ul class="tips">
-                    <li>Clique em uma peça da sua cor para revelar os destinos válidos.</li>
-                    <li>Casas com borda indicam jogadas possíveis e capturas.</li>
-                    <li>Ao promover um peão, escolha a peça no modal.</li>
-                    <li>Se você escolher as pretas, o bot faz a primeira jogada.</li>
-                </ul>
+            <div class="card sidebar-secondary">
+                <div class="sidebar-secondary-head">
+                    <p class="card-label">Histórico recente</p>
+                    <p class="sidebar-mini-copy">@GetFlowSummary()</p>
+                </div>
+
+                @if (_moveHistory.Count == 0)
+                {
+                    <p class="card-copy">Nenhum lance registrado ainda. Escolha uma cor para iniciar a partida.</p>
+                }
+                else
+                {
+                    <div class="history-list">
+                        @foreach (var entry in RecentHistory)
+                        {
+                            <div class="history-item">
+                                <span class="history-line">@entry.Number.ToString("00"). @entry.SideLabel: @entry.Notation</span>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
         </aside>
     </div>
@@ -224,6 +232,7 @@
     private bool _isBotThinking;
     private BoardPosition? _pendingPromotionOrigin;
     private BoardPosition? _pendingPromotionTarget;
+    private readonly List<MoveHistoryEntry> _moveHistory = [];
 
     private IEnumerable<int> DisplayRows =>
         _playerColor == PieceColor.White
@@ -234,6 +243,9 @@
         _playerColor == PieceColor.White
             ? Enumerable.Range(0, 8)
             : Enumerable.Range(0, 8).Reverse();
+
+    private IEnumerable<MoveHistoryEntry> RecentHistory =>
+        _moveHistory.TakeLast(8).Reverse();
 
     private async Task OnSquareClickedAsync(BoardPosition clickedPosition)
     {
@@ -359,6 +371,8 @@
             return;
         }
 
+        RegisterMoveHistory(move, _playerColor);
+
         if (_game.IsFinished)
         {
             _statusMessage = GetFinalMessage();
@@ -397,6 +411,8 @@
                 return;
             }
 
+            RegisterMoveHistory(botMove.Value, _bot.BotColor);
+
             _statusMessage = _game.IsFinished
                 ? GetFinalMessage()
                 : GetPlayerTurnMessage();
@@ -416,6 +432,7 @@
         _playerColor = playerColor;
         _game = new ChessGame();
         _bot = new ChessBot(ChessRules.GetOpponentColor(playerColor));
+        _moveHistory.Clear();
         ClearSelection();
 
         _statusMessage = GetPlayerTurnMessage();
@@ -473,31 +490,21 @@
     private string GetStatusSupportText()
     {
         if (_showColorSelection)
-            return "Defina a cor para iniciar a próxima partida.";
+            return "Defina a cor da próxima partida.";
 
         if (_showPromotionSelection)
             return "Promoção pendente. Escolha a peça para concluir o lance.";
 
         if (_isBotThinking)
-            return "A engine está calculando a próxima resposta localmente no navegador.";
+            return "A engine está calculando localmente no navegador.";
 
         if (_game.IsFinished)
-            return "Partida encerrada. Você pode iniciar uma nova rodada a qualquer momento.";
+            return "Partida encerrada. Você pode iniciar outra rodada.";
 
         return _game.CurrentTurn == _playerColor
             ? "Selecione uma peça da sua cor e escolha um destino válido."
-            : "Aguarde a conclusão do lance do bot.";
+            : "Aguarde a resposta do bot.";
     }
-
-    private string GetGameStateLabel() =>
-        _game.Status switch
-        {
-            GameStatus.InProgress => "Em andamento",
-            GameStatus.WhiteWins or GameStatus.BlackWins => "Finalizado",
-            GameStatus.Draw => "Empate",
-            GameStatus.PlayerQuit => "Encerrado",
-            _ => "Desconhecido"
-        };
 
     private string GetKingSafetyLabel() =>
         ChessRules.IsKingInCheck(_game.Board, _playerColor) ? "Em xeque" : "Protegido";
@@ -512,6 +519,24 @@
     {
         var piece = _game.Board.GetPieceAt(position);
         return piece is not null && piece.PieceColor != _playerColor;
+    }
+
+    private bool IsLastMoveSquare(BoardPosition position)
+    {
+        if (_game.Board.LastMove is null)
+            return false;
+
+        var move = _game.Board.LastMove.Value;
+        return move.Origin == position || move.Target == position;
+    }
+
+    private bool IsCheckedKingSquare(BoardPosition position)
+    {
+        if (!ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn))
+            return false;
+
+        var kingPosition = _game.Board.FindKingPosition(_game.CurrentTurn);
+        return kingPosition is not null && kingPosition.Value == position;
     }
 
     private string GetSquareClass(BoardPosition position)
@@ -602,7 +627,67 @@
         return $"{GetBoardNotation(move.Origin)} -> {GetBoardNotation(move.Target)}";
     }
 
-    private int GetRemainingPieceCount(PieceColor color)
+    private string GetFlowSummary()
+    {
+        if (_moveHistory.Count == 0)
+            return "A partida começa assim que você escolher uma cor.";
+
+        if (_game.IsFinished)
+            return "Sequência final disponível para revisão.";
+
+        if (ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn))
+            return "O lado da vez está em xeque.";
+
+        return _game.CurrentTurn == _playerColor
+            ? "Seu turno está ativo."
+            : "O bot está calculando a resposta.";
+    }
+
+    private string GetHeroPanelTitle()
+    {
+        if (_showColorSelection)
+            return "Escolha o lado.";
+
+        if (_game.IsFinished)
+            return "Partida encerrada.";
+
+        return _game.CurrentTurn == _playerColor
+            ? "Sua vez."
+            : "Bot pensando.";
+    }
+
+    private string GetPhaseLabel()
+    {
+        if (_moveHistory.Count < 8)
+            return "Abertura";
+
+        if (_moveHistory.Count < 24)
+            return "Meio-jogo";
+
+        return "Final";
+    }
+
+    private string GetMaterialSwingLabel()
+    {
+        int delta = GetMaterialDelta(_playerColor);
+
+        if (delta > 0)
+            return $"+{delta} para você";
+
+        if (delta < 0)
+            return $"{delta} para você";
+
+        return "Igualado";
+    }
+
+    private int GetMaterialDelta(PieceColor perspective)
+    {
+        int own = GetMaterialScore(perspective);
+        int opponent = GetMaterialScore(ChessRules.GetOpponentColor(perspective));
+        return own - opponent;
+    }
+
+    private int GetMaterialScore(PieceColor color)
     {
         int total = 0;
 
@@ -612,8 +697,18 @@
             {
                 var piece = _game.Board.GetPieceAt(new BoardPosition(row, column));
 
-                if (piece?.PieceColor == color)
-                    total++;
+                if (piece?.PieceColor != color)
+                    continue;
+
+                total += piece.PieceType switch
+                {
+                    PieceType.Pawn => 1,
+                    PieceType.Knight => 3,
+                    PieceType.Bishop => 3,
+                    PieceType.Rook => 5,
+                    PieceType.Queen => 9,
+                    _ => 0
+                };
             }
         }
 
@@ -622,6 +717,24 @@
 
     private static string GetBoardNotation(BoardPosition position) =>
         $"{(char)('a' + position.Column)}{8 - position.Row}";
+
+    private void RegisterMoveHistory(Move move, PieceColor side)
+    {
+        _moveHistory.Add(new MoveHistoryEntry(
+            _moveHistory.Count + 1,
+            side == _playerColor ? "Você" : "Bot",
+            BuildMoveNotation(move)));
+    }
+
+    private string BuildMoveNotation(Move move)
+    {
+        string notation = $"{GetBoardNotation(move.Origin)} -> {GetBoardNotation(move.Target)}";
+
+        if (move.PromotionPieceType is not null)
+            notation += $" = {GetPieceTypeName(move.PromotionPieceType.Value)}";
+
+        return notation;
+    }
 
     private static string GetColorName(PieceColor color) =>
         color == PieceColor.White ? "Brancas" : "Pretas";
@@ -637,4 +750,6 @@
             PieceType.Pawn => "Peão",
             _ => pieceType.ToString()
         };
+
+    private sealed record MoveHistoryEntry(int Number, string SideLabel, string Notation);
 }
