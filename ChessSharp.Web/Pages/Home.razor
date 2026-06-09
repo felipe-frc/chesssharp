@@ -8,66 +8,128 @@
 <PageTitle>ChessSharp Web</PageTitle>
 
 <div class="web-shell">
-    <div class="hero">
-        <div>
-            <p class="eyebrow">ChessSharp no navegador</p>
-            <h1>Jogue xadrez no Blazor WebAssembly</h1>
+    <header class="hero">
+        <div class="hero-copy-block">
+            <p class="eyebrow">ChessSharp premium no navegador</p>
+            <h1>Uma mesa de jogo mais digna da versão desktop</h1>
             <p class="hero-copy">
-                A mesma engine em C# agora roda no browser, com seleção de cor, promoção, jogadas legais destacadas
-                e resposta automática do bot.
+                A mesma engine em C# agora roda no browser com escolha de cor, promoção, destaques de jogadas
+                legais e resposta automática do bot, em uma apresentação mais próxima da atmosfera do WPF.
             </p>
         </div>
 
-        <div class="hero-actions">
-            <button class="action-button action-button-primary" @onclick="PromptForColorSelection">
-                Novo jogo
-            </button>
+        <div class="hero-summary">
+            <div class="summary-chip">
+                <span class="summary-label">Sua cor</span>
+                <strong>@GetColorName(_playerColor)</strong>
+            </div>
+
+            <div class="summary-chip">
+                <span class="summary-label">Perspectiva</span>
+                <strong>@GetPerspectiveLabel()</strong>
+            </div>
+
+            <div class="summary-chip">
+                <span class="summary-label">Engine</span>
+                <strong>Bot local em C#</strong>
+            </div>
         </div>
-    </div>
+    </header>
 
     <div class="play-surface">
-        <section class="board-panel">
-            <div class="board-frame">
-                <div class="board-grid">
-                    @foreach (var row in DisplayRows)
-                    {
-                        @foreach (var column in DisplayColumns)
+        <section class="board-stage">
+            <div class="stage-header">
+                <div>
+                    <p class="card-label">Mesa de jogo</p>
+                    <h2>Partida clássica contra o bot</h2>
+                    <p class="stage-copy">
+                        A área central agora prioriza o tabuleiro e reserva o painel lateral para comando, status
+                        e leitura rápida da partida.
+                    </p>
+                </div>
+
+                <div class="stage-badges">
+                    <span class="stage-badge">Promoção</span>
+                    <span class="stage-badge">Roque</span>
+                    <span class="stage-badge">Xeque-mate</span>
+                </div>
+            </div>
+
+            <div class="board-shell">
+                <div class="board-glow"></div>
+
+                <div class="board-frame">
+                    <div class="board-grid">
+                        @foreach (var row in DisplayRows)
                         {
-                            var position = new BoardPosition(row, column);
-                            var piece = _game.Board.GetPieceAt(position);
+                            @foreach (var column in DisplayColumns)
+                            {
+                                var position = new BoardPosition(row, column);
+                                var piece = _game.Board.GetPieceAt(position);
 
-                            <button class="@GetSquareClass(position)"
-                                    @onclick="() => OnSquareClickedAsync(position)">
-                                @if (ShouldShowRank(position))
-                                {
-                                    <span class="rank-label">@GetRankLabel(position)</span>
-                                }
+                                <button class="@GetSquareClass(position)"
+                                        @onclick="() => OnSquareClickedAsync(position)">
+                                    @if (ShouldShowRank(position))
+                                    {
+                                        <span class="rank-label">@GetRankLabel(position)</span>
+                                    }
 
-                                @if (ShouldShowFile(position))
-                                {
-                                    <span class="file-label">@GetFileLabel(position)</span>
-                                }
+                                    @if (ShouldShowFile(position))
+                                    {
+                                        <span class="file-label">@GetFileLabel(position)</span>
+                                    }
 
-                                @if (piece is not null)
-                                {
-                                    <span class="piece-glyph @GetPieceClass(piece)">@GetPieceGlyph(piece)</span>
-                                }
-                                else if (IsLegalTarget(position))
-                                {
-                                    <span class="move-dot"></span>
-                                }
-                            </button>
+                                    @if (piece is not null)
+                                    {
+                                        <span class="piece-glyph @GetPieceClass(piece)">@GetPieceGlyph(piece)</span>
+                                    }
+                                    else if (IsLegalTarget(position))
+                                    {
+                                        <span class="move-dot"></span>
+                                    }
+                                </button>
+                            }
                         }
-                    }
+                    </div>
+                </div>
+            </div>
+
+            <div class="board-footer">
+                <div class="footer-stat">
+                    <span class="footer-label">Último lance</span>
+                    <strong>@GetLastMoveLabel()</strong>
+                </div>
+
+                <div class="footer-stat">
+                    <span class="footer-label">Peças suas</span>
+                    <strong>@GetRemainingPieceCount(_playerColor)</strong>
+                </div>
+
+                <div class="footer-stat">
+                    <span class="footer-label">Peças do bot</span>
+                    <strong>@GetRemainingPieceCount(_bot.BotColor)</strong>
                 </div>
             </div>
         </section>
 
         <aside class="info-panel">
-            <div class="card">
+            <div class="card status-card">
                 <p class="card-label">Status</p>
                 <h2>@_statusMessage</h2>
                 <p class="card-copy">@GetSupportingStatus()</p>
+            </div>
+
+            <div class="card action-card">
+                <p class="card-label">Comando</p>
+                <div class="action-stack">
+                    <button class="action-button action-button-primary" @onclick="PromptForColorSelection">
+                        Novo jogo
+                    </button>
+
+                    <button class="action-button action-button-secondary" @onclick="PromptForColorSelection">
+                        Escolher cor
+                    </button>
+                </div>
             </div>
 
             <div class="card compact-card">
@@ -94,6 +156,18 @@
                 </div>
             </div>
 
+            <div class="card compact-card">
+                <div>
+                    <p class="card-label">Último lance</p>
+                    <p class="metric metric-small">@GetLastMoveLabel()</p>
+                </div>
+
+                <div>
+                    <p class="card-label">Rei</p>
+                    <p class="metric metric-small">@GetKingSafetyLabel()</p>
+                </div>
+            </div>
+
             <div class="card">
                 <p class="card-label">Como jogar</p>
                 <ul class="tips">
@@ -114,15 +188,15 @@
                 <h2>Quem faz a primeira jogada?</h2>
                 <div class="choice-grid">
                     <button class="choice-button" @onclick="() => StartNewGameAsync(PieceColor.White)">
-                        <span class="choice-piece choice-piece-light">♔</span>
+                        <span class="choice-piece choice-piece-light">@GetPieceGlyph(PieceType.King, PieceColor.White)</span>
                         <span class="choice-title">Brancas</span>
-                        <span class="choice-copy">Você começa a partida.</span>
+                        <span class="choice-copy">Você começa a partida e enxerga a mesa pela base clara.</span>
                     </button>
 
                     <button class="choice-button" @onclick="() => StartNewGameAsync(PieceColor.Black)">
-                        <span class="choice-piece choice-piece-dark">♚</span>
+                        <span class="choice-piece choice-piece-dark">@GetPieceGlyph(PieceType.King, PieceColor.Black)</span>
                         <span class="choice-title">Pretas</span>
-                        <span class="choice-copy">A máquina faz a primeira jogada.</span>
+                        <span class="choice-copy">A máquina abre a partida e o tabuleiro gira para a base escura.</span>
                     </button>
                 </div>
             </div>
@@ -430,7 +504,7 @@
         if (_isBotThinking)
             return "O bot usa a mesma engine do jogo e calcula a próxima jogada no navegador.";
 
-        return "Tudo roda em C# no browser com Blazor WebAssembly.";
+        return "Tudo roda em C# no navegador com Blazor WebAssembly, sem depender do desktop.";
     }
 
     private string GetTurnOwner()
@@ -482,18 +556,18 @@
     private static string GetPieceGlyph(PieceType pieceType, PieceColor color) =>
         (pieceType, color) switch
         {
-            (PieceType.King, PieceColor.White) => "♔",
-            (PieceType.Queen, PieceColor.White) => "♕",
-            (PieceType.Rook, PieceColor.White) => "♖",
-            (PieceType.Bishop, PieceColor.White) => "♗",
-            (PieceType.Knight, PieceColor.White) => "♘",
-            (PieceType.Pawn, PieceColor.White) => "♙",
-            (PieceType.King, PieceColor.Black) => "♚",
-            (PieceType.Queen, PieceColor.Black) => "♛",
-            (PieceType.Rook, PieceColor.Black) => "♜",
-            (PieceType.Bishop, PieceColor.Black) => "♝",
-            (PieceType.Knight, PieceColor.Black) => "♞",
-            _ => "♟"
+            (PieceType.King, PieceColor.White) => "\u2654",
+            (PieceType.Queen, PieceColor.White) => "\u2655",
+            (PieceType.Rook, PieceColor.White) => "\u2656",
+            (PieceType.Bishop, PieceColor.White) => "\u2657",
+            (PieceType.Knight, PieceColor.White) => "\u2658",
+            (PieceType.Pawn, PieceColor.White) => "\u2659",
+            (PieceType.King, PieceColor.Black) => "\u265A",
+            (PieceType.Queen, PieceColor.Black) => "\u265B",
+            (PieceType.Rook, PieceColor.Black) => "\u265C",
+            (PieceType.Bishop, PieceColor.Black) => "\u265D",
+            (PieceType.Knight, PieceColor.Black) => "\u265E",
+            _ => "\u265F"
         };
 
     private bool ShouldShowRank(BoardPosition position) =>
@@ -508,6 +582,42 @@
 
     private static string GetColorName(PieceColor color) =>
         color == PieceColor.White ? "Brancas" : "Pretas";
+
+    private string GetPerspectiveLabel() =>
+        _playerColor == PieceColor.White ? "Base clara" : "Base escura";
+
+    private string GetLastMoveLabel()
+    {
+        if (_game.Board.LastMove is null)
+            return "Aguardando abertura";
+
+        var move = _game.Board.LastMove.Value;
+        return $"{GetBoardNotation(move.Origin)} → {GetBoardNotation(move.Target)}";
+    }
+
+    private string GetKingSafetyLabel() =>
+        ChessRules.IsKingInCheck(_game.Board, _playerColor) ? "Em xeque" : "Protegido";
+
+    private int GetRemainingPieceCount(PieceColor color)
+    {
+        int total = 0;
+
+        for (int row = 0; row < 8; row++)
+        {
+            for (int column = 0; column < 8; column++)
+            {
+                var piece = _game.Board.GetPieceAt(new BoardPosition(row, column));
+
+                if (piece?.PieceColor == color)
+                    total++;
+            }
+        }
+
+        return total;
+    }
+
+    private static string GetBoardNotation(BoardPosition position) =>
+        $"{(char)('a' + position.Column)}{8 - position.Row}";
 
     private static string GetPieceTypeName(PieceType pieceType) =>
         pieceType switch

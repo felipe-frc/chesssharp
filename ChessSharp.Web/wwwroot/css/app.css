@@ -1,12 +1,24 @@
+:root {
+    --bg-900: #080504;
+    --bg-850: #100906;
+    --bg-800: #140d09;
+    --gold-strong: #d6a23f;
+    --gold-soft: #e0b85c;
+    --gold-muted: #c89b48;
+    --text-main: #f3e7d5;
+    --text-soft: #dbc7a7;
+}
+
 html,
 body {
     margin: 0;
     min-height: 100%;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    color: #f3e7d5;
+    color: var(--text-main);
     background:
-        radial-gradient(circle at top, rgba(214, 162, 63, 0.16), transparent 38%),
-        linear-gradient(180deg, #140d09 0%, #080504 100%);
+        radial-gradient(circle at top, rgba(214, 162, 63, 0.16), transparent 28%),
+        radial-gradient(circle at 85% 20%, rgba(123, 78, 40, 0.14), transparent 24%),
+        linear-gradient(180deg, var(--bg-800) 0%, var(--bg-900) 100%);
 }
 
 body {
@@ -22,8 +34,68 @@ button {
     border: 0;
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 #app {
     min-height: 100vh;
+}
+
+.loading-progress {
+    width: 88px;
+    height: 88px;
+    margin: 38vh auto 1rem;
+    display: block;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke-width: 0.38rem;
+    transform-origin: center;
+}
+
+.loading-progress circle:first-child {
+    stroke: rgba(214, 162, 63, 0.16);
+}
+
+.loading-progress circle:last-child {
+    stroke: var(--gold-strong);
+    stroke-linecap: round;
+    stroke-dasharray: 180%;
+    stroke-dashoffset: 155%;
+    animation: chesssharp-spin 1.2s ease-in-out infinite;
+}
+
+.loading-progress-text {
+    color: var(--text-soft);
+    text-align: center;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+}
+
+.loading-progress-text::after {
+    content: "Carregando tabuleiro";
+}
+
+@keyframes chesssharp-spin {
+    0% {
+        transform: rotate(0deg);
+        stroke-dashoffset: 155%;
+    }
+
+    50% {
+        transform: rotate(180deg);
+        stroke-dashoffset: 45%;
+    }
+
+    100% {
+        transform: rotate(360deg);
+        stroke-dashoffset: 155%;
+    }
 }
 
 #blazor-error-ui {
