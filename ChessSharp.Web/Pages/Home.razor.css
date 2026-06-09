@@ -1,18 +1,18 @@
 .web-shell {
     position: relative;
     min-height: 100vh;
-    padding: 0.9rem 1.1rem 1.15rem;
+    padding: 0.72rem 0.88rem 0.95rem;
 }
 
 .brand-header {
     display: grid;
     justify-items: center;
-    gap: 0.35rem;
-    margin-bottom: 0.8rem;
+    gap: 0.28rem;
+    margin-bottom: 0.5rem;
 }
 
 .brand-logo {
-    width: min(290px, 46vw);
+    width: min(290px, 44vw);
     height: auto;
 }
 
@@ -26,10 +26,10 @@
 
 .play-surface {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(250px, 25.5%);
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr) minmax(255px, 24.5%);
+    gap: 0.6rem;
     align-items: start;
-    max-width: 1500px;
+    max-width: 1640px;
     margin: 0 auto;
 }
 
@@ -38,16 +38,16 @@
 }
 
 .board-chamber {
-    padding: 0.52rem;
+    padding: 0.5rem;
     border: 1px solid rgba(214, 162, 63, 0.24);
     border-radius: 16px;
-    background: rgba(10, 7, 5, 0.5);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.26);
+    background: rgba(10, 7, 5, 0.52);
+    box-shadow: 0 24px 68px rgba(0, 0, 0, 0.26);
 }
 
 .board-art {
     position: relative;
-    width: min(74vw, calc(100vh - 162px), 950px);
+    width: min(86vw, calc(100vh - 132px), 1090px);
     aspect-ratio: 1;
     margin: 0 auto;
 }
@@ -85,7 +85,7 @@
 }
 
 .board-square:hover::before {
-    background: radial-gradient(circle at center, rgba(255, 236, 174, 0.1) 0%, rgba(255, 236, 174, 0.04) 44%, transparent 72%);
+    background: radial-gradient(circle at center, rgba(255, 236, 174, 0.11) 0%, rgba(255, 236, 174, 0.04) 44%, transparent 72%);
 }
 
 .last-move-highlight {
@@ -97,18 +97,18 @@
 
 .selected-highlight {
     position: absolute;
-    inset: 6px;
+    inset: 4px;
     border-radius: 999px;
-    background: radial-gradient(circle, rgba(255, 240, 175, 0.18) 0%, rgba(255, 233, 170, 0.08) 48%, transparent 76%);
-    box-shadow: 0 0 22px rgba(255, 226, 138, 0.34);
+    background: radial-gradient(circle, rgba(255, 240, 175, 0.28) 0%, rgba(255, 233, 170, 0.12) 44%, transparent 76%);
+    box-shadow: 0 0 28px rgba(255, 226, 138, 0.52);
 }
 
 .check-highlight {
     position: absolute;
     inset: 6px;
     border-radius: 999px;
-    background: radial-gradient(circle, rgba(173, 53, 34, 0.26) 0%, rgba(173, 53, 34, 0.12) 48%, transparent 78%);
-    box-shadow: 0 0 20px rgba(204, 88, 52, 0.32);
+    background: radial-gradient(circle, rgba(173, 53, 34, 0.28) 0%, rgba(173, 53, 34, 0.12) 48%, transparent 78%);
+    box-shadow: 0 0 20px rgba(204, 88, 52, 0.34);
 }
 
 .move-indicator {
@@ -120,20 +120,20 @@
     content: "";
     position: absolute;
     inset: 50%;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     transform: translate(-50%, -50%);
     border-radius: 999px;
-    background: radial-gradient(circle, rgba(255, 233, 170, 0.95) 0%, rgba(255, 219, 117, 0.4) 48%, rgba(255, 219, 117, 0.06) 100%);
-    box-shadow: 0 0 20px rgba(255, 216, 119, 0.28);
+    background: radial-gradient(circle, rgba(255, 233, 170, 0.95) 0%, rgba(255, 219, 117, 0.42) 48%, rgba(255, 219, 117, 0.06) 100%);
+    box-shadow: 0 0 18px rgba(255, 216, 119, 0.28);
 }
 
 .move-indicator-capture::before {
-    width: 58px;
-    height: 58px;
-    background: transparent;
-    border: 2px solid rgba(255, 231, 161, 0.78);
-    box-shadow: 0 0 26px rgba(255, 210, 103, 0.22), inset 0 0 16px rgba(255, 210, 103, 0.12);
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(173, 53, 34, 0.1) 0%, rgba(173, 53, 34, 0.02) 68%, transparent 100%);
+    border: 2px solid rgba(191, 88, 53, 0.88);
+    box-shadow: 0 0 24px rgba(191, 88, 53, 0.24), inset 0 0 16px rgba(255, 190, 120, 0.08);
 }
 
 .piece-image {
@@ -141,10 +141,11 @@
     --piece-height: 82%;
     --piece-bottom: 4%;
     --piece-bottom-adjust: 0%;
+    --anim-x: 0px;
+    --anim-y: 0px;
     position: absolute;
     z-index: 2;
     left: 50%;
-    transform: translateX(-50%);
     display: block;
     width: var(--piece-width);
     height: var(--piece-height);
@@ -153,6 +154,8 @@
     pointer-events: none;
     user-select: none;
     transform-origin: center bottom;
+    transform: translate(calc(-50% + var(--anim-x)), var(--anim-y));
+    transition: transform 190ms ease-out, filter 160ms ease;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.48));
 }
 
@@ -205,9 +208,9 @@
 }
 
 .card {
-    padding: 1rem;
+    padding: 0.88rem 0.9rem 0.92rem;
     border-radius: 16px;
-    background: rgba(13, 9, 7, 0.82);
+    background: rgba(13, 9, 7, 0.84);
 }
 
 .control-panel {
@@ -226,28 +229,42 @@
 
 .panel-top {
     display: grid;
-    gap: 0.55rem;
+    gap: 0.3rem;
 }
 
 .control-panel h1,
 .modal-card h2 {
-    margin: 0.2rem 0 0;
+    margin: 0.18rem 0 0;
     font-family: Georgia, "Times New Roman", serif;
 }
 
 .control-panel h1 {
-    font-size: clamp(1.04rem, 1.4vw, 1.34rem);
-    line-height: 1.14;
+    font-size: clamp(1.06rem, 1.45vw, 1.38rem);
+    line-height: 1.12;
+}
+
+.position-summary {
+    margin: 0.22rem 0 0;
+    color: rgba(236, 219, 190, 0.72);
+    font-size: 0.73rem;
+    line-height: 1.35;
+}
+
+.panel-top-tools {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    align-items: start;
 }
 
 .panel-status {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.6rem;
+    gap: 0.5rem;
     align-items: center;
     color: rgba(236, 219, 190, 0.76);
-    font-size: 0.74rem;
-    line-height: 1.35;
+    font-size: 0.72rem;
+    line-height: 1.28;
 }
 
 .status-orb {
@@ -294,22 +311,32 @@
 .sidebar-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
-    margin-top: 0.85rem;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
 }
 
-.footer-button {
-    height: 34px;
-    padding: 0 0.88rem;
+.footer-button,
+.modal-close,
+.sound-toggle {
+    min-height: 40px;
+    padding: 0.72rem 1rem;
     border: 1px solid rgba(140, 102, 48, 0.62);
-    border-radius: 7px;
+    border-radius: 8px;
     background: linear-gradient(180deg, rgba(35, 21, 14, 0.92) 0%, rgba(11, 7, 5, 0.96) 100%);
     color: var(--text-main);
     cursor: pointer;
-    transition: border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+    transition: border-color 0.16s ease, color 0.16s ease, transform 0.16s ease, background 0.16s ease;
 }
 
-.footer-button:hover {
+.footer-button {
+    flex: 1 1 140px;
+    font-weight: 600;
+}
+
+.footer-button:hover,
+.modal-close:hover,
+.sound-toggle:hover,
+.history-link:hover {
     transform: translateY(-1px);
     border-color: rgba(214, 162, 63, 0.82);
     color: var(--gold-soft);
@@ -319,9 +346,25 @@
     background: linear-gradient(180deg, rgba(58, 35, 22, 0.96) 0%, rgba(19, 11, 8, 0.98) 100%);
 }
 
+.sound-toggle-icon {
+    width: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0;
+    display: inline-grid;
+    place-items: center;
+    font-size: 0.95rem;
+    border-radius: 999px;
+}
+
+.sound-toggle-on {
+    border-color: rgba(214, 162, 63, 0.82);
+    color: var(--gold-soft);
+}
+
 .panel-block {
-    margin-top: 0.95rem;
-    padding-top: 0.95rem;
+    margin-top: 0.78rem;
+    padding-top: 0.78rem;
     border-top: 1px solid rgba(214, 162, 63, 0.1);
 }
 
@@ -336,34 +379,34 @@
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     gap: 0.45rem;
     align-items: center;
-    margin-top: 0.6rem;
+    margin-top: 0.48rem;
 }
 
 .sidebar-player {
     display: flex;
-    gap: 0.48rem;
+    gap: 0.5rem;
     align-items: center;
     min-width: 0;
-    padding: 0.42rem 0.46rem;
+    padding: 0.46rem 0.5rem;
     border-radius: 10px;
     color: rgba(236, 219, 190, 0.72);
 }
 
 .sidebar-player strong {
     display: block;
-    font-size: 0.84rem;
+    font-size: 0.85rem;
 }
 
 .sidebar-player span {
     display: block;
     margin-top: 0.08rem;
     color: rgba(236, 219, 190, 0.54);
-    font-size: 0.67rem;
+    font-size: 0.68rem;
 }
 
 .sidebar-player-piece {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     object-fit: contain;
 }
 
@@ -391,7 +434,7 @@
 
 .summary-lines {
     display: grid;
-    gap: 0.42rem;
+    gap: 0.36rem;
 }
 
 .summary-line {
@@ -414,33 +457,31 @@
 
 .captures-group {
     display: grid;
-    gap: 0.55rem;
-    margin-top: 0.55rem;
+    gap: 0.58rem;
+    margin-top: 0.5rem;
 }
 
-.capture-row {
+.capture-panel {
     display: grid;
-    grid-template-columns: 42px 1fr;
-    gap: 0.6rem;
-    align-items: center;
+    gap: 0.32rem;
 }
 
-.capture-side {
-    color: rgba(236, 219, 190, 0.6);
-    font-size: 0.7rem;
+.capture-heading {
+    color: rgba(236, 219, 190, 0.7);
+    font-size: 0.72rem;
 }
 
 .captured-strip {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.28rem;
-    min-height: 25px;
+    gap: 0.42rem;
+    min-height: 30px;
     align-items: center;
 }
 
 .captured-piece {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.38));
 }
@@ -451,13 +492,28 @@
     font-size: 0.72rem;
 }
 
-.history-list {
+.history-head,
+.history-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.history-link {
+    border: 1px solid transparent;
+    background: transparent;
+    color: rgba(236, 219, 190, 0.72);
+    padding: 0.15rem 0;
+    font-size: 0.72rem;
+    cursor: pointer;
+}
+
+.history-list,
+.history-modal-list {
     display: grid;
-    gap: 0.26rem;
-    margin-top: 0.55rem;
-    max-height: 176px;
-    overflow: auto;
-    padding-right: 0.1rem;
+    gap: 0.28rem;
+    margin-top: 0.42rem;
 }
 
 .history-item {
@@ -469,6 +525,21 @@
     color: rgba(236, 219, 190, 0.86);
     font-size: 0.75rem;
     line-height: 1.42;
+}
+
+.history-modal-card {
+    width: min(620px, 100%);
+}
+
+.history-list {
+    max-height: 112px;
+    overflow: hidden;
+}
+
+.history-modal-list {
+    max-height: min(60vh, 520px);
+    overflow: auto;
+    padding-right: 0.2rem;
 }
 
 .overlay {
@@ -561,7 +632,7 @@
     }
 
     .board-art {
-        width: min(92vw, calc(100vh - 210px), 920px);
+        width: min(95vw, calc(100vh - 188px), 1060px);
     }
 }
 
@@ -571,11 +642,11 @@
     }
 
     .brand-header {
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.6rem;
     }
 
     .board-art {
-        width: min(95vw, calc(100vh - 210px), 840px);
+        width: min(96vw, calc(100vh - 204px), 900px);
     }
 
     .board-chamber {
@@ -604,8 +675,13 @@
         grid-template-columns: 56px 1fr;
     }
 
-    .capture-row {
+    .history-head,
+    .history-modal-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .panel-top-tools {
         grid-template-columns: 1fr;
-        gap: 0.35rem;
     }
 }
