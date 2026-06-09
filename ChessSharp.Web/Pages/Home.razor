@@ -1,0 +1,990 @@
+@page "/"
+@using ChessSharp.AI
+@using ChessSharp.Board
+@using ChessSharp.Enums
+@using ChessSharp.Game
+@using ChessSharp.Pieces
+@inject IJSRuntime JS
+
+<PageTitle>ChessSharp no navegador</PageTitle>
+
+<div class="web-shell">
+    <header class="brand-header">
+        <img class="brand-logo" src="assets/images/logo-chesssharp.png" alt="ChessSharp" />
+        <p class="brand-subtitle">A mesma engine premium agora roda no navegador com Blazor WebAssembly.</p>
+    </header>
+
+    <div class="play-surface">
+        <section class="board-stage">
+            <div class="board-chamber">
+                <div class="board-art">
+                    <img class="board-image" src="assets/images/board-premium.png" alt="Tabuleiro premium" />
+
+                    <div class="board-grid">
+                        @foreach (var row in DisplayRows)
+                        {
+                            @foreach (var column in DisplayColumns)
+                            {
+                                var position = new BoardPosition(row, column);
+                                var piece = _game.Board.GetPieceAt(position);
+                                var squareNotation = GetBoardNotation(position);
+
+                                <button class="@GetSquareClass(position)"
+                                        data-square="@squareNotation"
+                                        @onclick="() => OnSquareClickedAsync(position)">
+                                    @if (IsLastMoveSquare(position))
+                                    {
+                                        <span class="last-move-highlight"></span>
+                                    }
+
+                                    @if (IsSelected(position))
+                                    {
+                                        <span class="selected-highlight"></span>
+                                    }
+
+                                    @if (IsCheckedKingSquare(position))
+                                    {
+                                        <span class="check-highlight"></span>
+                                    }
+
+                                    @if (IsLegalTarget(position))
+                                    {
+                                        <span class="@(IsCaptureTarget(position) ? "move-indicator move-indicator-capture" : "move-indicator")"></span>
+                                    }
+
+                                    @if (piece is not null)
+                                    {
+                                        <img class="piece-image @GetPieceFrameClass(piece, position)"
+                                             src="@GetPieceAssetPath(piece.PieceType, piece.PieceColor)"
+                                             alt="@GetPieceAltText(piece)"
+                                             draggable="false" />
+                                    }
+                                </button>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <aside class="info-panel">
+            <section class="card control-panel">
+                <div class="panel-top">
+                    <div>
+                        <p class="card-label">Painel da partida</p>
+                        <h1>@GetHeroPanelTitle()</h1>
+                        <p class="position-summary">@GetPositionSummary()</p>
+                    </div>
+
+                    <div class="panel-top-tools">
+                        <div class="panel-status">
+                            <span class="@GetStatusOrbClass()"></span>
+                            <span>@_statusMessage</span>
+                        </div>
+
+                        <button class="sound-toggle-icon @( _soundEnabled ? "sound-toggle-on" : string.Empty )"
+                                @onclick="ToggleSound"
+                                title="@GetSoundButtonLabel()"
+                                aria-label="@GetSoundButtonLabel()">
+                            @(_soundEnabled ? "🔊" : "🔇")
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-actions">
+                    <button class="footer-button footer-button-primary" @onclick="PromptForColorSelection">
+                        Novo jogo
+                    </button>
+                    <button class="footer-button" @onclick="PromptForColorSelection">
+                        Trocar cor
+                    </button>
+                </div>
+
+                <div class="panel-block">
+                    <div class="panel-inline-title">Voce vs Bot</div>
+
+                    <div class="sidebar-versus">
+                        <div class="@GetSidebarPlayerClass(_playerColor)">
+                            <img class="sidebar-player-piece" src="@GetPieceAssetPath(PieceType.King, _playerColor)" alt="Seu rei" />
+                            <div>
+                                <strong>Voce</strong>
+                                <span>@GetColorName(_playerColor)</span>
+                            </div>
+                        </div>
+
+                        <span class="sidebar-versus-mark">vs</span>
+
+                        <div class="@GetSidebarPlayerClass(_bot.BotColor)">
+                            <img class="sidebar-player-piece" src="@GetPieceAssetPath(PieceType.King, _bot.BotColor)" alt="Rei do bot" />
+                            <div>
+                                <strong>Bot</strong>
+                                <span>@GetColorName(_bot.BotColor)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-block">
+                    <div class="summary-lines">
+                        <div class="summary-line">
+                            <span>Fase</span>
+                            <strong>@GetPhaseLabel()</strong>
+                        </div>
+                        <div class="summary-line">
+                            <span>Turno</span>
+                            <strong>@GetTurnOwner()</strong>
+                        </div>
+                        <div class="summary-line">
+                            <span>Rei</span>
+                            <strong>@GetKingSafetyLabel()</strong>
+                        </div>
+                        <div class="summary-line">
+                            <span>Material</span>
+                            <strong>@GetMaterialSummary()</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-block">
+                    <p class="card-label">Capturadas</p>
+
+                    <div class="captures-group">
+                        <div class="capture-panel">
+                            <div class="capture-heading">
+                                <span>Brancas capturadas (@WhiteCapturedPieces.Count)</span>
+                            </div>
+                            <div class="captured-strip">
+                                @if (WhiteCapturedPieces.Count == 0)
+                                {
+                                    <span class="capture-empty">Nenhuma</span>
+                                }
+                                else
+                                {
+                                    @foreach (var capturedPiece in WhiteCapturedPieces)
+                                    {
+                                        <img class="captured-piece"
+                                             src="@GetPieceAssetPath(capturedPiece.PieceType, capturedPiece.PieceColor)"
+                                             alt="@GetPieceTypeName(capturedPiece.PieceType)" />
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <div class="capture-panel">
+                            <div class="capture-heading">
+                                <span>Pretas capturadas (@BlackCapturedPieces.Count)</span>
+                            </div>
+                            <div class="captured-strip">
+                                @if (BlackCapturedPieces.Count == 0)
+                                {
+                                    <span class="capture-empty">Nenhuma</span>
+                                }
+                                else
+                                {
+                                    @foreach (var capturedPiece in BlackCapturedPieces)
+                                    {
+                                        <img class="captured-piece"
+                                             src="@GetPieceAssetPath(capturedPiece.PieceType, capturedPiece.PieceColor)"
+                                             alt="@GetPieceTypeName(capturedPiece.PieceType)" />
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-block">
+                    <div class="history-head">
+                        <p class="card-label">Ultimos lances</p>
+                        @if (_moveHistory.Count > 0)
+                        {
+                            <button class="history-link" @onclick="OpenHistoryModal">
+                                Ver historico completo
+                            </button>
+                        }
+                    </div>
+
+                    @if (_moveHistory.Count == 0)
+                    {
+                        <p class="history-empty">Sem lances ainda.</p>
+                    }
+                    else
+                    {
+                        <div class="history-list">
+                            @foreach (var entry in RecentHistory)
+                            {
+                                <div class="history-item">
+                                    <span class="history-line">@entry.Number.ToString("00"). @entry.Notation</span>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    @if (_showHistoryModal)
+    {
+        <div class="overlay">
+            <div class="modal-card history-modal-card">
+                <div class="history-modal-head">
+                    <div>
+                        <p class="card-label">Historico completo</p>
+                        <h2>Todos os lances da partida</h2>
+                    </div>
+                    <button class="modal-close" @onclick="CloseHistoryModal">Fechar</button>
+                </div>
+
+                @if (_moveHistory.Count == 0)
+                {
+                    <p class="history-empty">Sem lances ainda.</p>
+                }
+                else
+                {
+                    <div class="history-modal-list">
+                        @foreach (var entry in FullHistory)
+                        {
+                            <div class="history-item">
+                                <span class="history-line">@entry.Number.ToString("00"). @entry.Notation</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (_showColorSelection)
+    {
+        <div class="overlay">
+            <div class="modal-card">
+                <p class="card-label">Escolha sua cor</p>
+                <h2>Quem faz a primeira jogada?</h2>
+
+                <div class="choice-grid">
+                    <button class="choice-button" @onclick="() => StartNewGameAsync(PieceColor.White)">
+                        <img class="choice-image"
+                             src="@GetPieceAssetPath(PieceType.King, PieceColor.White)"
+                             alt="Rei branco" />
+                        <span class="choice-title">Brancas</span>
+                        <span class="choice-copy">Voce comeca a partida.</span>
+                    </button>
+
+                    <button class="choice-button" @onclick="() => StartNewGameAsync(PieceColor.Black)">
+                        <img class="choice-image"
+                             src="@GetPieceAssetPath(PieceType.King, PieceColor.Black)"
+                             alt="Rei preto" />
+                        <span class="choice-title">Pretas</span>
+                        <span class="choice-copy">O bot abre a partida.</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (_showPromotionSelection)
+    {
+        <div class="overlay">
+            <div class="modal-card">
+                <p class="card-label">Promocao de peao</p>
+                <h2>Escolha a peca para concluir a jogada</h2>
+
+                <div class="choice-grid promotion-grid">
+                    @foreach (var pieceType in PromotionChoices)
+                    {
+                        <button class="choice-button"
+                                @onclick="() => CompletePromotionAsync(pieceType)">
+                            <img class="choice-image"
+                                 src="@GetPieceAssetPath(pieceType, _playerColor)"
+                                 alt="@GetPieceTypeName(pieceType)" />
+                            <span class="choice-title">@GetPieceTypeName(pieceType)</span>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private readonly PieceType[] PromotionChoices =
+    [
+        PieceType.Queen,
+        PieceType.Rook,
+        PieceType.Bishop,
+        PieceType.Knight
+    ];
+
+    private static readonly PieceType[] CapturablePieceOrder =
+    [
+        PieceType.Queen,
+        PieceType.Rook,
+        PieceType.Bishop,
+        PieceType.Knight,
+        PieceType.Pawn
+    ];
+
+    private ChessGame _game = new();
+    private ChessBot _bot = new(PieceColor.Black);
+    private PieceColor _playerColor = PieceColor.White;
+    private BoardPosition? _selectedPosition;
+    private List<BoardPosition> _legalTargetPositions = [];
+    private string _statusMessage = "Selecione uma cor para comecar.";
+    private bool _showColorSelection = true;
+    private bool _showPromotionSelection;
+    private bool _showHistoryModal;
+    private bool _isBotThinking;
+    private bool _soundEnabled;
+    private BoardPosition? _pendingPromotionOrigin;
+    private BoardPosition? _pendingPromotionTarget;
+    private PendingAnimation? _pendingAnimation;
+    private string? _pendingSound;
+    private readonly List<MoveHistoryEntry> _moveHistory = [];
+
+    private IEnumerable<int> DisplayRows =>
+        _playerColor == PieceColor.White
+            ? Enumerable.Range(0, 8)
+            : Enumerable.Range(0, 8).Reverse();
+
+    private IEnumerable<int> DisplayColumns =>
+        _playerColor == PieceColor.White
+            ? Enumerable.Range(0, 8)
+            : Enumerable.Range(0, 8).Reverse();
+
+    private IReadOnlyList<MoveHistoryEntry> RecentHistory =>
+        _moveHistory.TakeLast(6).Reverse().ToList();
+
+    private IReadOnlyList<MoveHistoryEntry> FullHistory =>
+        _moveHistory.AsEnumerable().Reverse().ToList();
+
+    private IReadOnlyList<CapturedPieceView> WhiteCapturedPieces =>
+        GetCapturedPieces(PieceColor.White);
+
+    private IReadOnlyList<CapturedPieceView> BlackCapturedPieces =>
+        GetCapturedPieces(PieceColor.Black);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            await JS.InvokeVoidAsync("chessSharpUi.init");
+
+        if (_pendingAnimation is not null)
+        {
+            var animation = _pendingAnimation;
+            _pendingAnimation = null;
+            await JS.InvokeVoidAsync("chessSharpUi.animateMove", animation.Origin, animation.Target);
+        }
+
+        if (_soundEnabled && !string.IsNullOrWhiteSpace(_pendingSound))
+        {
+            var sound = _pendingSound;
+            _pendingSound = null;
+            await JS.InvokeVoidAsync("chessSharpUi.playSound", sound);
+        }
+        else
+        {
+            _pendingSound = null;
+        }
+    }
+
+    private async Task OnSquareClickedAsync(BoardPosition clickedPosition)
+    {
+        if (_showColorSelection || _showPromotionSelection || _isBotThinking || _game.IsFinished)
+            return;
+
+        if (_game.CurrentTurn != _playerColor)
+            return;
+
+        if (_selectedPosition is null)
+        {
+            SelectPiece(clickedPosition);
+            return;
+        }
+
+        if (_selectedPosition.Value == clickedPosition)
+        {
+            ClearSelection();
+            _statusMessage = GetPlayerTurnMessage();
+            return;
+        }
+
+        var clickedPiece = _game.Board.GetPieceAt(clickedPosition);
+
+        if (clickedPiece is not null &&
+            clickedPiece.PieceColor == _playerColor &&
+            !_legalTargetPositions.Contains(clickedPosition))
+        {
+            SelectPiece(clickedPosition);
+            return;
+        }
+
+        if (!_legalTargetPositions.Contains(clickedPosition))
+        {
+            _statusMessage = GetInvalidTargetMessage();
+            return;
+        }
+
+        await TryMoveSelectedPieceAsync(clickedPosition);
+    }
+
+    private void SelectPiece(BoardPosition position)
+    {
+        var piece = _game.Board.GetPieceAt(position);
+
+        if (piece is null || piece.PieceColor != _playerColor)
+        {
+            ClearSelection();
+            _statusMessage = piece is null
+                ? "Selecione uma peca."
+                : "Selecione uma peca da sua cor.";
+            return;
+        }
+
+        _selectedPosition = position;
+        _legalTargetPositions = ChessRules
+            .GetLegalMoves(_game.Board, _playerColor)
+            .Where(move => move.Origin == position)
+            .Select(move => move.Target)
+            .Distinct()
+            .ToList();
+
+        if (_legalTargetPositions.Count == 0)
+        {
+            _statusMessage = ChessRules.IsKingInCheck(_game.Board, _playerColor)
+                ? "Seu rei precisa de defesa."
+                : "Essa peca nao tem lances validos.";
+            return;
+        }
+
+        _statusMessage = "Escolha o destino.";
+    }
+
+    private async Task TryMoveSelectedPieceAsync(BoardPosition targetPosition)
+    {
+        if (_selectedPosition is null)
+            return;
+
+        var origin = _selectedPosition.Value;
+        var movingPiece = _game.Board.GetPieceAt(origin);
+
+        if (movingPiece is null)
+            return;
+
+        if (ChessRules.IsPawnPromotionMove(movingPiece, targetPosition))
+        {
+            _pendingPromotionOrigin = origin;
+            _pendingPromotionTarget = targetPosition;
+            _showPromotionSelection = true;
+            _statusMessage = "Escolha a promocao.";
+            return;
+        }
+
+        await ExecutePlayerMoveAsync(new Move(origin, targetPosition));
+    }
+
+    private async Task CompletePromotionAsync(PieceType pieceType)
+    {
+        if (_pendingPromotionOrigin is null || _pendingPromotionTarget is null)
+            return;
+
+        _showPromotionSelection = false;
+
+        var move = new Move(
+            _pendingPromotionOrigin.Value,
+            _pendingPromotionTarget.Value,
+            pieceType);
+
+        _pendingPromotionOrigin = null;
+        _pendingPromotionTarget = null;
+
+        await ExecutePlayerMoveAsync(move);
+    }
+
+    private async Task ExecutePlayerMoveAsync(Move move)
+    {
+        var movingPiece = _game.Board.GetPieceAt(move.Origin);
+        var targetPiece = _game.Board.GetPieceAt(move.Target);
+        bool isCapture = movingPiece is not null &&
+            targetPiece is not null &&
+            targetPiece.PieceColor != movingPiece.PieceColor;
+
+        var result = _game.TryMove(move);
+        ClearSelection();
+
+        if (!result.Success)
+        {
+            _statusMessage = GetInvalidTargetMessage();
+            return;
+        }
+
+        RegisterMoveHistory(move);
+        QueueBoardFeedback(move, isCapture);
+
+        if (_game.IsFinished)
+        {
+            _statusMessage = GetFinalMessage();
+            return;
+        }
+
+        _statusMessage = "Bot pensando...";
+        await MakeBotMoveAsync();
+    }
+
+    private async Task MakeBotMoveAsync()
+    {
+        if (_game.CurrentTurn != _bot.BotColor)
+            return;
+
+        _isBotThinking = true;
+        _statusMessage = "Bot pensando...";
+
+        await Task.Delay(300);
+
+        try
+        {
+            var botMove = _bot.ChooseMove(_game.Board);
+
+            if (botMove is null)
+            {
+                _statusMessage = "Sem lances disponiveis.";
+                return;
+            }
+
+            var movingPiece = _game.Board.GetPieceAt(botMove.Value.Origin);
+            var targetPiece = _game.Board.GetPieceAt(botMove.Value.Target);
+            bool isCapture = movingPiece is not null &&
+                targetPiece is not null &&
+                targetPiece.PieceColor != movingPiece.PieceColor;
+
+            var botMoveResult = _game.TryMove(botMove.Value);
+
+            if (!botMoveResult.Success)
+            {
+                _statusMessage = "O bot tentou um lance invalido.";
+                return;
+            }
+
+            RegisterMoveHistory(botMove.Value);
+            QueueBoardFeedback(botMove.Value, isCapture);
+
+            _statusMessage = _game.IsFinished
+                ? GetFinalMessage()
+                : GetPlayerTurnMessage();
+        }
+        finally
+        {
+            _isBotThinking = false;
+        }
+    }
+
+    private void QueueBoardFeedback(Move move, bool isCapture)
+    {
+        _pendingAnimation = new PendingAnimation(
+            GetBoardNotation(move.Origin),
+            GetBoardNotation(move.Target));
+
+        bool isCheck = !_game.IsFinished && ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn);
+        _pendingSound = isCheck
+            ? "check"
+            : isCapture
+                ? "capture"
+                : "move";
+    }
+
+    private async Task StartNewGameAsync(PieceColor playerColor)
+    {
+        _showColorSelection = false;
+        _showPromotionSelection = false;
+        _showHistoryModal = false;
+        _pendingPromotionOrigin = null;
+        _pendingPromotionTarget = null;
+        _playerColor = playerColor;
+        _game = new ChessGame();
+        _bot = new ChessBot(ChessRules.GetOpponentColor(playerColor));
+        _moveHistory.Clear();
+        ClearSelection();
+
+        _statusMessage = GetPlayerTurnMessage();
+
+        if (_game.CurrentTurn != _playerColor)
+            await MakeBotMoveAsync();
+    }
+
+    private void PromptForColorSelection()
+    {
+        _showPromotionSelection = false;
+        _showHistoryModal = false;
+        _pendingPromotionOrigin = null;
+        _pendingPromotionTarget = null;
+        ClearSelection();
+        _showColorSelection = true;
+        _statusMessage = "Selecione uma cor para comecar.";
+    }
+
+    private void OpenHistoryModal() => _showHistoryModal = true;
+
+    private void CloseHistoryModal() => _showHistoryModal = false;
+
+    private void ToggleSound() => _soundEnabled = !_soundEnabled;
+
+    private string GetSoundButtonLabel() =>
+        _soundEnabled ? "Desativar som" : "Ativar som";
+
+    private void ClearSelection()
+    {
+        _selectedPosition = null;
+        _legalTargetPositions.Clear();
+    }
+
+    private string GetPlayerTurnMessage() =>
+        ChessRules.IsKingInCheck(_game.Board, _playerColor)
+            ? "Seu rei esta em xeque."
+            : "Selecione uma peca.";
+
+    private string GetInvalidTargetMessage() =>
+        ChessRules.IsKingInCheck(_game.Board, _playerColor)
+            ? "Voce precisa responder ao xeque."
+            : "Escolha uma casa valida.";
+
+    private string GetFinalMessage()
+    {
+        bool playerWon =
+            (_playerColor == PieceColor.White && _game.Status == GameStatus.WhiteWins) ||
+            (_playerColor == PieceColor.Black && _game.Status == GameStatus.BlackWins);
+
+        return _game.Status switch
+        {
+            GameStatus.WhiteWins or GameStatus.BlackWins => playerWon
+                ? "Vitoria."
+                : "Derrota.",
+            GameStatus.Draw => "Empate.",
+            GameStatus.PlayerQuit => "Partida encerrada.",
+            _ => "Jogo finalizado."
+        };
+    }
+
+    private string GetTurnOwner() =>
+        _game.CurrentTurn == _playerColor ? "Voce" : "Bot";
+
+    private string GetKingSafetyLabel() =>
+        ChessRules.IsKingInCheck(_game.Board, _playerColor) ? "Em xeque" : "Protegido";
+
+    private string GetHeroPanelTitle()
+    {
+        if (_showColorSelection)
+            return "Escolha o lado.";
+
+        if (_game.IsFinished)
+            return "Partida encerrada.";
+
+        return _game.CurrentTurn == _playerColor
+            ? "Sua vez."
+            : "Bot pensando.";
+    }
+
+    private string GetPositionSummary()
+    {
+        if (_showColorSelection)
+            return "Defina a cor para iniciar a partida.";
+
+        if (_game.IsFinished)
+            return "A sequencia final esta pronta para revisao.";
+
+        if (ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn))
+            return _game.CurrentTurn == PieceColor.White
+                ? "Rei branco sob pressao."
+                : "Rei preto sob pressao.";
+
+        string phase = GetPhaseLabel();
+        int whiteDelta = GetMaterialDelta(PieceColor.White);
+
+        if (phase == "Final")
+        {
+            if (whiteDelta > 1)
+                return "Final favoravel as brancas.";
+
+            if (whiteDelta < -1)
+                return "Final favoravel as pretas.";
+
+            return "Final equilibrado.";
+        }
+
+        if (whiteDelta == 0)
+            return "Posicao equilibrada.";
+
+        if (whiteDelta > 0)
+            return "Brancas pressionam o centro.";
+
+        return "Pretas pressionam o centro.";
+    }
+
+    private string GetSidebarPlayerClass(PieceColor color)
+    {
+        var classes = new List<string> { "sidebar-player" };
+
+        if (_game.CurrentTurn == color && !_game.IsFinished && !_showColorSelection)
+            classes.Add("sidebar-player-active");
+
+        return string.Join(" ", classes);
+    }
+
+    private bool IsSelected(BoardPosition position) =>
+        _selectedPosition is not null && _selectedPosition.Value == position;
+
+    private bool IsLegalTarget(BoardPosition position) =>
+        _legalTargetPositions.Contains(position);
+
+    private bool IsCaptureTarget(BoardPosition position)
+    {
+        var piece = _game.Board.GetPieceAt(position);
+        return piece is not null && piece.PieceColor != _playerColor;
+    }
+
+    private bool IsLastMoveSquare(BoardPosition position)
+    {
+        if (_game.Board.LastMove is null)
+            return false;
+
+        var move = _game.Board.LastMove.Value;
+        return move.Origin == position || move.Target == position;
+    }
+
+    private bool IsCheckedKingSquare(BoardPosition position)
+    {
+        if (!ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn))
+            return false;
+
+        var kingPosition = _game.Board.FindKingPosition(_game.CurrentTurn);
+        return kingPosition is not null && kingPosition.Value == position;
+    }
+
+    private string GetSquareClass(BoardPosition position)
+    {
+        var classes = new List<string> { "board-square" };
+
+        if (IsSelected(position))
+            classes.Add("board-square-selected");
+
+        return string.Join(" ", classes);
+    }
+
+    private string GetPieceFrameClass(ChessPiece piece, BoardPosition position)
+    {
+        var classes = new List<string>
+        {
+            piece.PieceType switch
+            {
+                PieceType.Pawn => "piece-pawn",
+                PieceType.Rook => "piece-rook",
+                PieceType.Knight => "piece-knight",
+                PieceType.Bishop => "piece-bishop",
+                PieceType.Queen => "piece-queen",
+                PieceType.King => "piece-king",
+                _ => string.Empty
+            }
+        };
+
+        if (IsBottomDisplayRow(position))
+            classes.Add("piece-edge-bottom");
+        else if (IsTopDisplayRow(position))
+            classes.Add("piece-edge-top");
+
+        return string.Join(" ", classes);
+    }
+
+    private bool IsTopDisplayRow(BoardPosition position) =>
+        _playerColor == PieceColor.White ? position.Row == 0 : position.Row == 7;
+
+    private bool IsBottomDisplayRow(BoardPosition position) =>
+        _playerColor == PieceColor.White ? position.Row == 7 : position.Row == 0;
+
+    private string GetStatusOrbClass()
+    {
+        var classes = new List<string> { "status-orb" };
+
+        if (_showColorSelection || _showPromotionSelection)
+            classes.Add("status-orb-attention");
+        else if (_isBotThinking)
+            classes.Add("status-orb-thinking");
+        else if (_game.IsFinished)
+            classes.Add("status-orb-finished");
+        else if (ChessRules.IsKingInCheck(_game.Board, _playerColor))
+            classes.Add("status-orb-alert");
+        else
+            classes.Add("status-orb-ready");
+
+        return string.Join(" ", classes);
+    }
+
+    private string GetPhaseLabel()
+    {
+        if (_moveHistory.Count < 8)
+            return "Abertura";
+
+        if (_moveHistory.Count < 24)
+            return "Meio-jogo";
+
+        return "Final";
+    }
+
+    private string GetMaterialSummary()
+    {
+        int whiteDelta = GetMaterialDelta(PieceColor.White);
+
+        if (whiteDelta == 0)
+            return "Material equilibrado";
+
+        if (whiteDelta == 1)
+            return "Vantagem das brancas";
+
+        if (whiteDelta == -1)
+            return "Vantagem das pretas";
+
+        if (whiteDelta > 1)
+            return $"Brancas +{whiteDelta}";
+
+        return $"Pretas +{Math.Abs(whiteDelta)}";
+    }
+
+    private int GetMaterialDelta(PieceColor perspective)
+    {
+        int own = GetMaterialScore(perspective);
+        int opponent = GetMaterialScore(ChessRules.GetOpponentColor(perspective));
+        return own - opponent;
+    }
+
+    private int GetMaterialScore(PieceColor color)
+    {
+        int total = 0;
+
+        for (int row = 0; row < 8; row++)
+        {
+            for (int column = 0; column < 8; column++)
+            {
+                var piece = _game.Board.GetPieceAt(new BoardPosition(row, column));
+
+                if (piece?.PieceColor != color)
+                    continue;
+
+                total += piece.PieceType switch
+                {
+                    PieceType.Pawn => 1,
+                    PieceType.Knight => 3,
+                    PieceType.Bishop => 3,
+                    PieceType.Rook => 5,
+                    PieceType.Queen => 9,
+                    _ => 0
+                };
+            }
+        }
+
+        return total;
+    }
+
+    private IReadOnlyList<CapturedPieceView> GetCapturedPieces(PieceColor capturedColor)
+    {
+        List<CapturedPieceView> pieces = [];
+
+        foreach (var pieceType in CapturablePieceOrder)
+        {
+            int missingCount = GetInitialPieceCount(pieceType) - GetRemainingPieceCount(capturedColor, pieceType);
+
+            for (int i = 0; i < missingCount; i++)
+                pieces.Add(new CapturedPieceView(pieceType, capturedColor));
+        }
+
+        return pieces;
+    }
+
+    private int GetRemainingPieceCount(PieceColor color, PieceType pieceType)
+    {
+        int total = 0;
+
+        for (int row = 0; row < 8; row++)
+        {
+            for (int column = 0; column < 8; column++)
+            {
+                var piece = _game.Board.GetPieceAt(new BoardPosition(row, column));
+
+                if (piece?.PieceColor == color && piece.PieceType == pieceType)
+                    total++;
+            }
+        }
+
+        return total;
+    }
+
+    private static int GetInitialPieceCount(PieceType pieceType) =>
+        pieceType switch
+        {
+            PieceType.Queen => 1,
+            PieceType.Rook => 2,
+            PieceType.Bishop => 2,
+            PieceType.Knight => 2,
+            PieceType.Pawn => 8,
+            _ => 0
+        };
+
+    private static string GetBoardNotation(BoardPosition position) =>
+        $"{(char)('a' + position.Column)}{8 - position.Row}";
+
+    private void RegisterMoveHistory(Move move)
+    {
+        _moveHistory.Add(new MoveHistoryEntry(
+            _moveHistory.Count + 1,
+            BuildMoveNotation(move)));
+    }
+
+    private string BuildMoveNotation(Move move)
+    {
+        string notation = $"{GetBoardNotation(move.Origin)} -> {GetBoardNotation(move.Target)}";
+
+        if (move.PromotionPieceType is not null)
+            notation += $" = {GetPieceTypeName(move.PromotionPieceType.Value)}";
+
+        return notation;
+    }
+
+    private static string GetColorName(PieceColor color) =>
+        color == PieceColor.White ? "Brancas" : "Pretas";
+
+    private static string GetPieceAssetPath(PieceType pieceType, PieceColor color)
+    {
+        string colorName = color == PieceColor.White ? "white" : "black";
+
+        string pieceName = pieceType switch
+        {
+            PieceType.King => "king",
+            PieceType.Queen => "queen",
+            PieceType.Rook => "rook",
+            PieceType.Bishop => "bishop",
+            PieceType.Knight => "knight",
+            PieceType.Pawn => "pawn",
+            _ => throw new InvalidOperationException("Tipo de peca invalido.")
+        };
+
+        return $"assets/images/pieces/{colorName}-{pieceName}.png";
+    }
+
+    private static string GetPieceAltText(ChessPiece piece) =>
+        $"{GetPieceTypeName(piece.PieceType)} {(piece.PieceColor == PieceColor.White ? "branco" : "preto")}";
+
+    private static string GetPieceTypeName(PieceType pieceType) =>
+        pieceType switch
+        {
+            PieceType.Queen => "Rainha",
+            PieceType.Rook => "Torre",
+            PieceType.Bishop => "Bispo",
+            PieceType.Knight => "Cavalo",
+            PieceType.King => "Rei",
+            PieceType.Pawn => "Peao",
+            _ => pieceType.ToString()
+        };
+
+    private sealed record MoveHistoryEntry(int Number, string Notation);
+
+    private sealed record CapturedPieceView(PieceType PieceType, PieceColor PieceColor);
+
+    private sealed record PendingAnimation(string Origin, string Target);
+}

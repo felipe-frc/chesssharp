@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChessSharp no navegador</title>
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link href="ChessSharp.Web.styles.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="app">
+        <svg class="loading-progress">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    </div>
+
+    <div id="blazor-error-ui">
+        Ocorreu um erro inesperado.
+        <a href="." class="reload">Recarregar</a>
+        <span class="dismiss">x</span>
+    </div>
+    <script>
+        function showBootError(message) {
+            const host = document.getElementById('app');
+            const errorUi = document.getElementById('blazor-error-ui');
+
+            if (host) {
+                host.innerHTML =
+                    '<main style="min-height:100vh;padding:2rem;background:#120906;color:#f3e7d5;">' +
+                    '<h1 style="margin-top:0;">Erro ao iniciar o ChessSharp</h1>' +
+                    '<pre style="white-space:pre-wrap;line-height:1.45;">' + message + '</pre>' +
+                    '</main>';
+            }
+
+            if (errorUi) {
+                errorUi.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('error', function (event) {
+            if (event?.message) {
+                showBootError(event.message);
+            }
+        });
+
+        window.addEventListener('unhandledrejection', function (event) {
+            const reason = event?.reason;
+            const message = reason?.stack || reason?.message || String(reason);
+            showBootError(message);
+        });
+    </script>
+    <script src="js/chesssharp-ui.js"></script>
+    <script src="_framework/blazor.webassembly.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+<ErrorBoundary>
+    <ChildContent>
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </ChildContent>
+    <ErrorContent Context="ex">
+        <main style="min-height:100vh;padding:2rem;background:#120906;color:#f3e7d5;">
+            <h1 style="margin-top:0;">Erro na inicialização do Blazor</h1>
+            <p>@ex.Message</p>
+            <pre style="white-space:pre-wrap;line-height:1.45;">@ex.ToString()</pre>
+        </main>
+    </ErrorContent>
+</ErrorBoundary>

@@ -1,0 +1,122 @@
+:root {
+    --bg-900: #080504;
+    --bg-850: #100906;
+    --bg-800: #140d09;
+    --gold-strong: #d6a23f;
+    --gold-soft: #e0b85c;
+    --gold-muted: #c89b48;
+    --text-main: #f3e7d5;
+    --text-soft: #dbc7a7;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-main);
+    background:
+        linear-gradient(rgba(5, 4, 3, 0.72), rgba(5, 4, 3, 0.82)),
+        radial-gradient(circle at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.48) 100%),
+        url("/assets/images/background-marble.png") center / cover no-repeat,
+        linear-gradient(180deg, var(--bg-800) 0%, var(--bg-900) 100%);
+}
+
+body {
+    min-height: 100vh;
+}
+
+a,
+button {
+    font: inherit;
+}
+
+button {
+    border: 0;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+#app {
+    min-height: 100vh;
+}
+
+.loading-progress {
+    width: 88px;
+    height: 88px;
+    margin: 38vh auto 1rem;
+    display: block;
+}
+
+.loading-progress circle {
+    fill: none;
+    stroke-width: 0.38rem;
+    transform-origin: center;
+}
+
+.loading-progress circle:first-child {
+    stroke: rgba(214, 162, 63, 0.16);
+}
+
+.loading-progress circle:last-child {
+    stroke: var(--gold-strong);
+    stroke-linecap: round;
+    stroke-dasharray: 180%;
+    stroke-dashoffset: 155%;
+    animation: chesssharp-spin 1.2s ease-in-out infinite;
+}
+
+.loading-progress-text {
+    color: var(--text-soft);
+    text-align: center;
+    letter-spacing: 0.12rem;
+    text-transform: uppercase;
+    font-size: 0.82rem;
+}
+
+.loading-progress-text::after {
+    content: "Carregando tabuleiro";
+}
+
+@keyframes chesssharp-spin {
+    0% {
+        transform: rotate(0deg);
+        stroke-dashoffset: 155%;
+    }
+
+    50% {
+        transform: rotate(180deg);
+        stroke-dashoffset: 45%;
+    }
+
+    100% {
+        transform: rotate(360deg);
+        stroke-dashoffset: 155%;
+    }
+}
+
+#blazor-error-ui {
+    color-scheme: dark;
+    background: #2f120f;
+    color: #f8efe3;
+    border-top: 1px solid rgba(214, 162, 63, 0.4);
+    bottom: 0;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+    display: none;
+    left: 0;
+    padding: 0.85rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 0.7rem;
+}
