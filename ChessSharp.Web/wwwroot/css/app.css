@@ -16,8 +16,9 @@ body {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-main);
     background:
-        radial-gradient(circle at top, rgba(214, 162, 63, 0.16), transparent 28%),
-        radial-gradient(circle at 85% 20%, rgba(123, 78, 40, 0.14), transparent 24%),
+        linear-gradient(rgba(5, 4, 3, 0.72), rgba(5, 4, 3, 0.82)),
+        radial-gradient(circle at center, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.48) 100%),
+        url("/assets/images/background-marble.png") center / cover no-repeat,
         linear-gradient(180deg, var(--bg-800) 0%, var(--bg-900) 100%);
 }
 
