@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\ChessSharp\AI\**\*.cs" Link="AI\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\ChessSharp\Board\**\*.cs" Link="Board\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\ChessSharp\Enums\**\*.cs" Link="Enums\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\ChessSharp\Game\**\*.cs" Link="Game\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\ChessSharp\Pieces\**\*.cs" Link="Pieces\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

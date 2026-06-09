@@ -7,4 +7,16 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="AI\**\*.cs" />
+    <Compile Remove="Board\**\*.cs" />
+    <Compile Remove="Enums\**\*.cs" />
+    <Compile Remove="Game\**\*.cs" />
+    <Compile Remove="Pieces\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ChessSharp.Core\ChessSharp.Core.csproj" />
+  </ItemGroup>
+
 </Project>
