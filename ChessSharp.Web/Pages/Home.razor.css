@@ -167,12 +167,12 @@
     --piece-bottom: 4%;
 }
 
-.piece-light {
-    --piece-bottom-adjust: -3%;
+.piece-edge-top {
+    --piece-bottom-adjust: -1%;
 }
 
-.piece-dark {
-    --piece-bottom-adjust: 0%;
+.piece-edge-bottom {
+    --piece-bottom-adjust: 5%;
 }
 
 .status-strip {

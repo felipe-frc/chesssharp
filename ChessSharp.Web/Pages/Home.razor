@@ -41,7 +41,7 @@
 
                                     @if (piece is not null)
                                     {
-                                        <img class="piece-image @GetPieceCssClass(piece) @(piece.PieceColor == PieceColor.White ? "piece-light" : "piece-dark")"
+                                        <img class="piece-image @GetPieceFrameClass(piece, position)"
                                              src="@GetPieceAssetPath(piece.PieceType, piece.PieceColor)"
                                              alt="@GetPieceAltText(piece)"
                                              draggable="false" />
@@ -524,17 +524,35 @@
         return string.Join(" ", classes);
     }
 
-    private string GetPieceCssClass(ChessPiece piece) =>
-        piece.PieceType switch
+    private string GetPieceFrameClass(ChessPiece piece, BoardPosition position)
+    {
+        var classes = new List<string>
         {
-            PieceType.Pawn => "piece-pawn",
-            PieceType.Rook => "piece-rook",
-            PieceType.Knight => "piece-knight",
-            PieceType.Bishop => "piece-bishop",
-            PieceType.Queen => "piece-queen",
-            PieceType.King => "piece-king",
-            _ => string.Empty
+            piece.PieceType switch
+            {
+                PieceType.Pawn => "piece-pawn",
+                PieceType.Rook => "piece-rook",
+                PieceType.Knight => "piece-knight",
+                PieceType.Bishop => "piece-bishop",
+                PieceType.Queen => "piece-queen",
+                PieceType.King => "piece-king",
+                _ => string.Empty
+            }
         };
+
+        if (IsBottomDisplayRow(position))
+            classes.Add("piece-edge-bottom");
+        else if (IsTopDisplayRow(position))
+            classes.Add("piece-edge-top");
+
+        return string.Join(" ", classes);
+    }
+
+    private bool IsTopDisplayRow(BoardPosition position) =>
+        _playerColor == PieceColor.White ? position.Row == 0 : position.Row == 7;
+
+    private bool IsBottomDisplayRow(BoardPosition position) =>
+        _playerColor == PieceColor.White ? position.Row == 7 : position.Row == 0;
 
     private string GetStatusOrbClass()
     {
