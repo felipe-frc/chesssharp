@@ -6,7 +6,8 @@
       "/css/*",
       "/js/*",
       "/_framework/*",
-      "/favicon.png"
+      "/favicon.png",
+      "/icon-192.png"
     ]
   },
   "mimeTypes": {
