@@ -62,7 +62,7 @@ public partial class Home : ComponentBase
             : Enumerable.Range(0, 8).Reverse();
 
     private IReadOnlyList<MoveHistoryEntry> RecentHistory =>
-        _moveHistory.TakeLast(5).Reverse().ToList();
+        _moveHistory.TakeLast(4).Reverse().ToList();
 
     private IReadOnlyList<MoveHistoryEntry> FullHistory =>
         _moveHistory.AsEnumerable().Reverse().ToList();

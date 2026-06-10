@@ -126,14 +126,14 @@ button {
 .web-shell {
     position: relative;
     min-height: 100vh;
-    padding: 0.9rem 0.95rem 1.1rem;
+    padding: 1rem 1rem 1.15rem;
 }
 
 .brand-header {
     display: grid;
     justify-items: center;
-    gap: 0.3rem;
-    margin-bottom: 0.9rem;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .brand-logo {
@@ -147,12 +147,13 @@ button {
     text-align: center;
     font-size: 0.76rem;
     letter-spacing: 0.04rem;
+    line-height: 1.35;
 }
 
 .play-surface {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(280px, 25.5%);
-    gap: 0.65rem;
+    gap: 0.72rem;
     align-items: start;
     max-width: 1680px;
     margin: 0 auto;
@@ -177,7 +178,7 @@ button {
 
 .board-art {
     position: relative;
-    width: min(92vw, calc(100vh - 104px), 1170px);
+    width: min(86vw, calc(100vh - 136px), 1080px);
     aspect-ratio: 1;
     margin: 0 auto;
 }
@@ -352,7 +353,7 @@ button {
 }
 
 .card {
-    padding: 0.84rem 0.88rem 0.88rem;
+    padding: 0.72rem 0.76rem 0.76rem;
     border-radius: 16px;
     background: rgba(13, 9, 7, 0.84);
 }
@@ -373,7 +374,7 @@ button {
 
 .panel-top {
     display: grid;
-    gap: 0.28rem;
+    gap: 0.22rem;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: start;
 }
@@ -385,43 +386,43 @@ button {
 }
 
 .control-panel h1 {
-    font-size: clamp(0.94rem, 1.1vw, 1.06rem);
+    font-size: clamp(0.88rem, 1vw, 0.98rem);
     line-height: 1.08;
     color: rgba(243, 231, 213, 0.94);
 }
 
 .position-summary {
-    margin: 0.16rem 0 0;
+    margin: 0.12rem 0 0;
     color: rgba(236, 219, 190, 0.68);
-    font-size: 0.7rem;
-    line-height: 1.3;
+    font-size: 0.68rem;
+    line-height: 1.26;
 }
 
 .panel-top-tools {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.28rem;
 }
 
 .panel-status-meta {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
+    gap: 0.36rem;
     flex-wrap: wrap;
-    margin-top: 0.52rem;
+    margin-top: 0.42rem;
 }
 
 .status-badge,
 .panel-counter {
     display: inline-flex;
     align-items: center;
-    min-height: 26px;
-    padding: 0.16rem 0.56rem;
+    min-height: 22px;
+    padding: 0.12rem 0.46rem;
     border-radius: 999px;
-    font-size: 0.64rem;
+    font-size: 0.58rem;
     font-weight: 700;
-    letter-spacing: 0.08rem;
+    letter-spacing: 0.07rem;
     text-transform: uppercase;
 }
 
@@ -445,13 +446,13 @@ button {
 }
 
 .panel-status {
-    margin-top: 0.45rem;
+    margin-top: 0.36rem;
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.42rem;
+    gap: 0.36rem;
     align-items: center;
     color: rgba(236, 219, 190, 0.72);
-    font-size: 0.69rem;
+    font-size: 0.66rem;
     line-height: 1.2;
 }
 
@@ -499,16 +500,16 @@ button {
 .sidebar-actions {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
-    margin-top: 0.64rem;
+    gap: 0.45rem;
+    margin-top: 0.54rem;
 }
 
 .footer-button,
 .modal-close,
 .sound-toggle,
 .panel-collapse-button {
-    min-height: 40px;
-    padding: 0.72rem 1rem;
+    min-height: 34px;
+    padding: 0.48rem 0.78rem;
     border: 1px solid rgba(140, 102, 48, 0.62);
     border-radius: 8px;
     background: linear-gradient(180deg, rgba(35, 21, 14, 0.92) 0%, rgba(11, 7, 5, 0.96) 100%);
@@ -520,6 +521,7 @@ button {
 .footer-button {
     flex: 1 1 140px;
     font-weight: 600;
+    font-size: 0.72rem;
 }
 
 .footer-button:hover,
@@ -538,76 +540,72 @@ button {
 }
 
 .sound-toggle-chip {
-    min-height: 34px;
-    padding: 0.42rem 0.62rem;
+    min-height: 28px;
+    min-width: 28px;
+    padding: 0.18rem;
     display: inline-flex;
     align-items: center;
-    gap: 0.38rem;
-    border: 1px solid rgba(140, 102, 48, 0.4);
+    justify-content: center;
+    gap: 0;
+    border: 1px solid rgba(140, 102, 48, 0.18);
     border-radius: 999px;
-    background: rgba(17, 11, 8, 0.8);
-    color: rgba(236, 219, 190, 0.74);
+    background: rgba(17, 11, 8, 0.28);
+    color: rgba(236, 219, 190, 0.66);
     cursor: pointer;
     transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
 }
 
 .sound-toggle-glyph {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     line-height: 1;
-}
-
-.sound-toggle-label {
-    font-size: 0.66rem;
-    line-height: 1;
-    white-space: nowrap;
 }
 
 .sound-toggle-on {
-    border-color: rgba(214, 162, 63, 0.82);
+    border-color: rgba(214, 162, 63, 0.34);
     color: var(--gold-soft);
 }
 
 .panel-collapse-button {
-    min-width: 36px;
-    min-height: 36px;
-    padding: 0.38rem 0.55rem;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0.26rem 0.42rem;
     border-radius: 999px;
     background: rgba(17, 11, 8, 0.86);
 }
 
 .panel-block {
-    margin-top: 0.58rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(214, 162, 63, 0.035);
+    margin-top: 0.46rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid rgba(214, 162, 63, 0.022);
 }
 
 .panel-inline-title {
     color: rgba(236, 219, 190, 0.76);
-    font-size: 0.68rem;
+    font-size: 0.64rem;
     letter-spacing: 0.03rem;
 }
 
 .sidebar-versus {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    gap: 0.35rem;
+    gap: 0.3rem;
     align-items: center;
-    margin-top: 0.34rem;
+    margin-top: 0.28rem;
 }
 
 .sidebar-player {
     display: flex;
-    gap: 0.42rem;
+    gap: 0.34rem;
     align-items: center;
     min-width: 0;
-    padding: 0.32rem 0.36rem;
+    padding: 0.26rem 0.3rem;
     border-radius: 9px;
     color: rgba(236, 219, 190, 0.72);
 }
 
 .sidebar-player strong {
     display: block;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 600;
 }
 
@@ -617,8 +615,8 @@ button {
 }
 
 .sidebar-player-piece {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     object-fit: contain;
 }
 
@@ -646,54 +644,54 @@ button {
 
 .summary-lines {
     display: grid;
-    gap: 0.26rem;
+    gap: 0.2rem;
 }
 
 .summary-line {
     display: grid;
-    grid-template-columns: 70px 1fr;
-    gap: 0.55rem;
+    grid-template-columns: 64px 1fr;
+    gap: 0.44rem;
     align-items: baseline;
 }
 
 .summary-line span {
     color: rgba(236, 219, 190, 0.6);
-    font-size: 0.69rem;
+    font-size: 0.64rem;
 }
 
 .summary-line strong {
     color: var(--text-main);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
 }
 
 .captures-group {
     display: grid;
-    gap: 0.34rem;
-    margin-top: 0.34rem;
+    gap: 0.24rem;
+    margin-top: 0.26rem;
 }
 
 .capture-panel-inline {
     grid-template-columns: 1fr;
     align-items: start;
-    gap: 0.24rem;
+    gap: 0.16rem;
 }
 
 .capture-heading {
     color: rgba(236, 219, 190, 0.7);
-    font-size: 0.69rem;
+    font-size: 0.64rem;
 }
 
 .captured-strip {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.38rem;
+    gap: 0.26rem;
     align-items: center;
 }
 
 .captured-piece {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.38));
 }
@@ -716,22 +714,22 @@ button {
     background: transparent;
     color: rgba(236, 219, 190, 0.72);
     padding: 0.15rem 0;
-    font-size: 0.68rem;
+    font-size: 0.64rem;
     cursor: pointer;
 }
 
 .history-list,
 .history-modal-list {
     display: grid;
-    gap: 0.22rem;
-    margin-top: 0.38rem;
+    gap: 0.18rem;
+    margin-top: 0.3rem;
 }
 
 .history-line {
     display: block;
     color: rgba(236, 219, 190, 0.86);
-    font-size: 0.67rem;
-    line-height: 1.24;
+    font-size: 0.62rem;
+    line-height: 1.18;
 }
 
 .history-modal-card {
@@ -739,7 +737,7 @@ button {
 }
 
 .history-list {
-    max-height: 78px;
+    max-height: 58px;
     overflow: hidden;
 }
 
@@ -890,7 +888,7 @@ button {
     }
 
     .board-art {
-        width: min(98vw, calc(100vh - 170px), 1110px);
+        width: min(92vw, calc(100vh - 182px), 1010px);
     }
 
     .info-panel-collapsed {
@@ -904,11 +902,11 @@ button {
     }
 
     .brand-header {
-        margin-bottom: 0.7rem;
+        margin-bottom: 0.95rem;
     }
 
     .board-art {
-        width: min(98vw, calc(100vh - 210px), 980px);
+        width: min(92vw, calc(100vh - 234px), 900px);
     }
 
     .board-chamber {
