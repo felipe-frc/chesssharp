@@ -26,12 +26,14 @@ public partial class Home : ComponentBase
     private PieceColor _playerColor = PieceColor.White;
     private BoardPosition? _selectedPosition;
     private List<BoardPosition> _legalTargetPositions = [];
-    private string _statusMessage = "Selecione uma cor para começar.";
+    private string _statusMessage = "Escolha sua cor para começar.";
     private bool _showColorSelection = true;
     private bool _showPromotionSelection;
     private bool _showHistoryModal;
+    private bool _showGameOverModal;
     private bool _isBotThinking;
     private bool _soundEnabled;
+    private bool _isSidebarCollapsed;
     private BoardPosition? _pendingPromotionOrigin;
     private BoardPosition? _pendingPromotionTarget;
     private PendingAnimation? _pendingAnimation;
@@ -230,7 +232,7 @@ public partial class Home : ComponentBase
 
         if (_game.IsFinished)
         {
-            _statusMessage = GetFinalMessage();
+            HandleFinishedGame();
             return;
         }
 
@@ -275,9 +277,13 @@ public partial class Home : ComponentBase
             RegisterMoveHistory(botMove.Value);
             QueueBoardFeedback(botMove.Value, isCapture);
 
-            _statusMessage = _game.IsFinished
-                ? GetFinalMessage()
-                : GetPlayerTurnMessage();
+            if (_game.IsFinished)
+            {
+                HandleFinishedGame();
+                return;
+            }
+
+            _statusMessage = GetPlayerTurnMessage();
         }
         finally
         {
@@ -292,11 +298,13 @@ public partial class Home : ComponentBase
             GetBoardNotation(move.Target));
 
         bool isCheck = !_game.IsFinished && ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn);
-        _pendingSound = isCheck
-            ? "check"
-            : isCapture
-                ? "capture"
-                : "move";
+        _pendingSound = _game.IsFinished
+            ? "end"
+            : isCheck
+                ? "check"
+                : isCapture
+                    ? "capture"
+                    : "move";
     }
 
     private async Task StartNewGameAsync(PieceColor playerColor)
@@ -304,6 +312,7 @@ public partial class Home : ComponentBase
         _showColorSelection = false;
         _showPromotionSelection = false;
         _showHistoryModal = false;
+        _showGameOverModal = false;
         _pendingPromotionOrigin = null;
         _pendingPromotionTarget = null;
         _playerColor = playerColor;
@@ -322,18 +331,23 @@ public partial class Home : ComponentBase
     {
         _showPromotionSelection = false;
         _showHistoryModal = false;
+        _showGameOverModal = false;
         _pendingPromotionOrigin = null;
         _pendingPromotionTarget = null;
         ClearSelection();
         _showColorSelection = true;
-        _statusMessage = "Selecione uma cor para começar.";
+        _statusMessage = "Escolha sua cor para começar.";
     }
 
     private void OpenHistoryModal() => _showHistoryModal = true;
 
     private void CloseHistoryModal() => _showHistoryModal = false;
 
+    private void CloseGameOverModal() => _showGameOverModal = false;
+
     private void ToggleSound() => _soundEnabled = !_soundEnabled;
+
+    private void ToggleSidebar() => _isSidebarCollapsed = !_isSidebarCollapsed;
 
     private string GetSoundButtonLabel() =>
         _soundEnabled ? "🔊 Som ligado" : "🔇 Som desligado";
@@ -342,6 +356,12 @@ public partial class Home : ComponentBase
     {
         _selectedPosition = null;
         _legalTargetPositions.Clear();
+    }
+
+    private void HandleFinishedGame()
+    {
+        _showGameOverModal = true;
+        _statusMessage = GetFinalMessage();
     }
 
     private string GetPlayerTurnMessage() =>
@@ -354,22 +374,38 @@ public partial class Home : ComponentBase
             ? "Você precisa responder ao xeque."
             : "Escolha uma casa válida.";
 
-    private string GetFinalMessage()
-    {
-        bool playerWon =
-            (_playerColor == PieceColor.White && _game.Status == GameStatus.WhiteWins) ||
-            (_playerColor == PieceColor.Black && _game.Status == GameStatus.BlackWins);
-
-        return _game.Status switch
+    private string GetFinalMessage() =>
+        _game.Status switch
         {
-            GameStatus.WhiteWins or GameStatus.BlackWins => playerWon
-                ? "Vitória."
-                : "Derrota.",
+            GameStatus.WhiteWins => _playerColor == PieceColor.White
+                ? "Vitória das Brancas."
+                : "Vitória das Pretas.",
+            GameStatus.BlackWins => _playerColor == PieceColor.Black
+                ? "Vitória das Pretas."
+                : "Vitória das Brancas.",
             GameStatus.Draw => "Empate.",
             GameStatus.PlayerQuit => "Partida encerrada.",
             _ => "Jogo finalizado."
         };
-    }
+
+    private string GetGameOverTitle() =>
+        _game.Status switch
+        {
+            GameStatus.WhiteWins => "Vitória das Brancas",
+            GameStatus.BlackWins => "Vitória das Pretas",
+            GameStatus.Draw => "Empate",
+            GameStatus.PlayerQuit => "Partida encerrada",
+            _ => "Fim da partida"
+        };
+
+    private string GetGameOverReason() =>
+        _game.Status switch
+        {
+            GameStatus.WhiteWins or GameStatus.BlackWins => "Xeque-mate.",
+            GameStatus.Draw => "Empate por afogamento.",
+            GameStatus.PlayerQuit => "Partida encerrada pelo jogador.",
+            _ => "Partida concluída."
+        };
 
     private string GetTurnOwner() =>
         _game.CurrentTurn == _playerColor ? "Você" : "Bot";
@@ -393,16 +429,21 @@ public partial class Home : ComponentBase
     private string GetPositionSummary()
     {
         if (_showColorSelection)
-            return "Defina a cor para iniciar a partida.";
+            return "Escolha sua cor para iniciar a partida.";
 
         if (_game.IsFinished)
-            return "A sequência final está pronta para revisão.";
+            return "A partida terminou. Revise os últimos lances ou comece uma nova rodada.";
 
         if (ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn))
             return _game.CurrentTurn == PieceColor.White
-                ? "Rei branco sob pressão."
-                : "Rei preto sob pressão.";
+                ? "O rei branco está sob pressão."
+                : "O rei preto está sob pressão.";
 
+        return GetPositionEvaluation();
+    }
+
+    private string GetPositionEvaluation()
+    {
         string phase = GetPhaseLabel();
         int whiteDelta = GetMaterialDelta(PieceColor.White);
 
@@ -420,10 +461,9 @@ public partial class Home : ComponentBase
         if (whiteDelta == 0)
             return "Posição equilibrada.";
 
-        if (whiteDelta > 0)
-            return "Brancas pressionam o centro.";
-
-        return "Pretas pressionam o centro.";
+        return whiteDelta > 0
+            ? "Brancas têm vantagem."
+            : "Pretas têm vantagem.";
     }
 
     private string GetSidebarPlayerClass(PieceColor color)
@@ -520,13 +560,38 @@ public partial class Home : ComponentBase
             classes.Add("status-orb-thinking");
         else if (_game.IsFinished)
             classes.Add("status-orb-finished");
-        else if (ChessRules.IsKingInCheck(_game.Board, _playerColor))
+        else if (ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn))
             classes.Add("status-orb-alert");
         else
             classes.Add("status-orb-ready");
 
         return string.Join(" ", classes);
     }
+
+    private string? GetAlertBadgeText()
+    {
+        if (_game.Status is GameStatus.WhiteWins or GameStatus.BlackWins)
+            return "XEQUE-MATE";
+
+        if (!_showColorSelection && ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn))
+            return "XEQUE";
+
+        return null;
+    }
+
+    private string GetAlertBadgeClass()
+    {
+        var classes = new List<string> { "status-badge" };
+
+        if (_game.Status is GameStatus.WhiteWins or GameStatus.BlackWins)
+            classes.Add("status-badge-mate");
+        else
+            classes.Add("status-badge-check");
+
+        return string.Join(" ", classes);
+    }
+
+    private string GetMoveCounterLabel() => $"Lance {_moveHistory.Count}";
 
     private string GetPhaseLabel()
     {

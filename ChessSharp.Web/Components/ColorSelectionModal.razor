@@ -1,26 +1,27 @@
 @using ChessSharp.Enums
 
 <div class="overlay">
-    <div class="modal-card">
-        <p class="card-label">Escolha sua cor</p>
-        <h2>Quem faz a primeira jogada?</h2>
+    <div class="modal-card modal-card-compact start-modal-card">
+        <p class="card-label">ChessSharp</p>
+        <h2>Escolha sua cor</h2>
+        <p class="choice-copy modal-copy">Defina o lado e comece a partida com a mesma engine premium em C# no navegador.</p>
 
         <div class="choice-grid">
-            <button class="choice-button" @onclick="() => OnColorSelected.InvokeAsync(PieceColor.White)">
+            <button class="choice-button" type="button" @onclick="() => OnColorSelected.InvokeAsync(PieceColor.White)">
                 <ChessPiece PieceType="PieceType.King"
                             PieceColor="PieceColor.White"
                             CssClass="choice-image"
                             AltText="Rei branco" />
-                <span class="choice-title">Brancas</span>
-                <span class="choice-copy">Você começa a partida.</span>
+                <span class="choice-title">Jogar com Brancas</span>
+                <span class="choice-copy">Você faz a primeira jogada.</span>
             </button>
 
-            <button class="choice-button" @onclick="() => OnColorSelected.InvokeAsync(PieceColor.Black)">
+            <button class="choice-button" type="button" @onclick="() => OnColorSelected.InvokeAsync(PieceColor.Black)">
                 <ChessPiece PieceType="PieceType.King"
                             PieceColor="PieceColor.Black"
                             CssClass="choice-image"
                             AltText="Rei preto" />
-                <span class="choice-title">Pretas</span>
+                <span class="choice-title">Jogar com Pretas</span>
                 <span class="choice-copy">O bot abre a partida.</span>
             </button>
         </div>

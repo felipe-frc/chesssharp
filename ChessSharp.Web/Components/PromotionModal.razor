@@ -9,6 +9,8 @@
             @foreach (var pieceType in PromotionChoices)
             {
                 <button class="choice-button"
+                        type="button"
+                        aria-label="@ChessPresentationService.GetPieceTypeName(pieceType)"
                         @onclick="() => OnPromotionSelected.InvokeAsync(pieceType)">
                     <ChessPiece PieceType="pieceType"
                                 PieceColor="PlayerColor"

@@ -8,7 +8,7 @@
         <p class="brand-subtitle">A mesma engine premium agora roda no navegador com Blazor WebAssembly.</p>
     </header>
 
-    <div class="play-surface">
+    <div class="play-surface @(_isSidebarCollapsed ? "play-surface-panel-collapsed" : string.Empty)">
         <ChessBoard Board="_game.Board"
                     PlayerColor="_playerColor"
                     DisplayRows="DisplayRows"
@@ -27,6 +27,9 @@
                    PositionSummary="@GetPositionSummary()"
                    StatusMessage="@_statusMessage"
                    StatusOrbClass="@GetStatusOrbClass()"
+                   AlertBadgeText="@GetAlertBadgeText()"
+                   AlertBadgeClass="@GetAlertBadgeClass()"
+                   MoveCounterLabel="@GetMoveCounterLabel()"
                    SoundEnabled="_soundEnabled"
                    SoundButtonLabel="@GetSoundButtonLabel()"
                    PlayerColor="_playerColor"
@@ -37,14 +40,17 @@
                    TurnOwner="@GetTurnOwner()"
                    KingSafetyLabel="@GetKingSafetyLabel()"
                    MaterialSummary="@GetMaterialSummary()"
-                   WhiteCapturedPieces="WhiteCapturedPieces"
-                   BlackCapturedPieces="BlackCapturedPieces"
+                   PositionEvaluation="@GetPositionEvaluation()"
+                   CapturedByWhitePieces="BlackCapturedPieces"
+                   CapturedByBlackPieces="WhiteCapturedPieces"
                    RecentHistory="RecentHistory"
                    HasHistory="@(_moveHistory.Count > 0)"
+                   IsCollapsed="_isSidebarCollapsed"
                    OnNewGame="PromptForColorSelection"
                    OnChangeColor="PromptForColorSelection"
                    OnToggleSound="ToggleSound"
-                   OnOpenHistoryModal="OpenHistoryModal" />
+                   OnOpenHistoryModal="OpenHistoryModal"
+                   OnToggleCollapse="ToggleSidebar" />
     </div>
 
     @if (_showHistoryModal)
@@ -76,5 +82,14 @@
         <PromotionModal PlayerColor="_playerColor"
                         PromotionChoices="PromotionChoices"
                         OnPromotionSelected="CompletePromotionAsync" />
+    }
+
+    @if (_showGameOverModal)
+    {
+        <GameOverModal Title="@GetGameOverTitle()"
+                       Subtitle="@GetGameOverReason()"
+                       MoveCount="@_moveHistory.Count"
+                       OnNewGame="PromptForColorSelection"
+                       OnClose="CloseGameOverModal" />
     }
 </div>

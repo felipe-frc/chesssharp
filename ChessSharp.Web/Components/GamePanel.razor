@@ -1,95 +1,133 @@
 @using ChessSharp.Enums
 
-<aside class="info-panel">
-    <section class="card control-panel">
-        <div class="panel-top">
-            <div class="panel-heading">
-                <p class="card-label">Painel da partida</p>
-                <h1>@HeroTitle</h1>
-                <p class="position-summary">@PositionSummary</p>
-            </div>
-
-            <div class="panel-top-tools">
-                <SoundToggle Enabled="SoundEnabled"
-                             Label="@SoundButtonLabel"
-                             OnToggle="OnToggleSound" />
-            </div>
-        </div>
-
-        @if (!string.IsNullOrWhiteSpace(StatusMessage))
-        {
-            <div class="panel-status">
-                <span class="@StatusOrbClass"></span>
-                <span>@StatusMessage</span>
-            </div>
-        }
-
-        <div class="sidebar-actions">
-            <button class="footer-button footer-button-primary" @onclick="OnNewGame">
-                Novo jogo
-            </button>
-            <button class="footer-button" @onclick="OnChangeColor">
-                Trocar cor
+<aside class="info-panel @(IsCollapsed ? "info-panel-collapsed" : string.Empty)">
+    @if (IsCollapsed)
+    {
+        <div class="panel-collapse-rail">
+            <button class="panel-collapse-button"
+                    type="button"
+                    @onclick="OnToggleCollapse"
+                    aria-label="Expandir painel lateral"
+                    title="Expandir painel lateral">
+                <span>❯</span>
             </button>
         </div>
-
-        <div class="panel-block panel-block-soft">
-            <div class="panel-inline-title">Você vs Bot</div>
-
-            <div class="sidebar-versus sidebar-versus-compact">
-                <div class="@PlayerSidebarClass">
-                    <ChessPiece PieceType="PieceType.King"
-                                PieceColor="PlayerColor"
-                                CssClass="sidebar-player-piece"
-                                AltText="Seu rei" />
-                    <strong>Você <span>(@ChessPresentationService.GetColorName(PlayerColor))</span></strong>
+    }
+    else
+    {
+        <section class="card control-panel">
+            <div class="panel-top">
+                <div class="panel-heading">
+                    <p class="card-label">Painel da partida</p>
+                    <h1>@HeroTitle</h1>
+                    <p class="position-summary">@PositionSummary</p>
                 </div>
 
-                <span class="sidebar-versus-mark">vs</span>
-
-                <div class="@BotSidebarClass">
-                    <ChessPiece PieceType="PieceType.King"
-                                PieceColor="BotColor"
-                                CssClass="sidebar-player-piece"
-                                AltText="Rei do bot" />
-                    <strong>Bot <span>(@ChessPresentationService.GetColorName(BotColor))</span></strong>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel-block panel-block-soft">
-            <div class="summary-lines">
-                <div class="summary-line">
-                    <span>Fase</span>
-                    <strong>@PhaseLabel</strong>
-                </div>
-                <div class="summary-line">
-                    <span>Turno</span>
-                    <strong>@TurnOwner</strong>
-                </div>
-                <div class="summary-line">
-                    <span>Rei</span>
-                    <strong>@KingSafetyLabel</strong>
-                </div>
-                <div class="summary-line">
-                    <span>Material</span>
-                    <strong>@MaterialSummary</strong>
+                <div class="panel-top-tools">
+                    <SoundToggle Enabled="SoundEnabled"
+                                 Label="@SoundButtonLabel"
+                                 OnToggle="OnToggleSound" />
+                    <button class="panel-collapse-button"
+                            type="button"
+                            @onclick="OnToggleCollapse"
+                            aria-label="Recolher painel lateral"
+                            title="Recolher painel lateral">
+                        <span>❮</span>
+                    </button>
                 </div>
             </div>
-        </div>
 
-        <div class="panel-block panel-block-soft">
-            <p class="card-label">Capturadas</p>
-            <CapturedPieces WhiteCapturedPieces="WhiteCapturedPieces"
-                            BlackCapturedPieces="BlackCapturedPieces" />
-        </div>
+            <div class="panel-status-meta">
+                @if (!string.IsNullOrWhiteSpace(AlertBadgeText))
+                {
+                    <span class="@AlertBadgeClass">@AlertBadgeText</span>
+                }
 
-        <div class="panel-block panel-block-soft">
-            <MoveHistory Entries="RecentHistory"
-                         ShowOpenButton="@HasHistory"
-                         OnOpenFullHistory="OnOpenHistoryModal" />
-        </div>
-    </section>
+                @if (!string.IsNullOrWhiteSpace(MoveCounterLabel))
+                {
+                    <span class="panel-counter">@MoveCounterLabel</span>
+                }
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(StatusMessage))
+            {
+                <div class="panel-status">
+                    <span class="@StatusOrbClass"></span>
+                    <span>@StatusMessage</span>
+                </div>
+            }
+
+            <div class="sidebar-actions">
+                <button class="footer-button footer-button-primary" @onclick="OnNewGame">
+                    Novo jogo
+                </button>
+                <button class="footer-button" @onclick="OnChangeColor">
+                    Trocar cor
+                </button>
+            </div>
+
+            <div class="panel-block panel-block-soft">
+                <div class="panel-inline-title">Você vs Bot</div>
+
+                <div class="sidebar-versus sidebar-versus-compact">
+                    <div class="@PlayerSidebarClass">
+                        <ChessPiece PieceType="PieceType.King"
+                                    PieceColor="PlayerColor"
+                                    CssClass="sidebar-player-piece"
+                                    AltText="Seu rei" />
+                        <strong>Você <span>(@ChessPresentationService.GetColorName(PlayerColor))</span></strong>
+                    </div>
+
+                    <span class="sidebar-versus-mark">vs</span>
+
+                    <div class="@BotSidebarClass">
+                        <ChessPiece PieceType="PieceType.King"
+                                    PieceColor="BotColor"
+                                    CssClass="sidebar-player-piece"
+                                    AltText="Rei do bot" />
+                        <strong>Bot <span>(@ChessPresentationService.GetColorName(BotColor))</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-block panel-block-soft">
+                <div class="summary-lines">
+                    <div class="summary-line">
+                        <span>Fase</span>
+                        <strong>@PhaseLabel</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Turno</span>
+                        <strong>@TurnOwner</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Rei</span>
+                        <strong>@KingSafetyLabel</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Material</span>
+                        <strong>@MaterialSummary</strong>
+                    </div>
+                    <div class="summary-line">
+                        <span>Avaliação</span>
+                        <strong>@PositionEvaluation</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-block panel-block-soft">
+                <p class="card-label">Material capturado</p>
+                <CapturedPieces CapturedByWhitePieces="CapturedByWhitePieces"
+                                CapturedByBlackPieces="CapturedByBlackPieces" />
+            </div>
+
+            <div class="panel-block panel-block-soft">
+                <MoveHistory Entries="RecentHistory"
+                             ShowOpenButton="@HasHistory"
+                             OnOpenFullHistory="OnOpenHistoryModal" />
+            </div>
+        </section>
+    }
 </aside>
 
 @code {
@@ -104,6 +142,15 @@
 
     [Parameter]
     public string StatusOrbClass { get; set; } = "status-orb";
+
+    [Parameter]
+    public string? AlertBadgeText { get; set; }
+
+    [Parameter]
+    public string AlertBadgeClass { get; set; } = "status-badge";
+
+    [Parameter]
+    public string MoveCounterLabel { get; set; } = string.Empty;
 
     [Parameter]
     public bool SoundEnabled { get; set; }
@@ -135,17 +182,23 @@
     [Parameter]
     public string MaterialSummary { get; set; } = string.Empty;
 
-    [Parameter, EditorRequired]
-    public IReadOnlyList<CapturedPieceView> WhiteCapturedPieces { get; set; } = Array.Empty<CapturedPieceView>();
+    [Parameter]
+    public string PositionEvaluation { get; set; } = string.Empty;
 
     [Parameter, EditorRequired]
-    public IReadOnlyList<CapturedPieceView> BlackCapturedPieces { get; set; } = Array.Empty<CapturedPieceView>();
+    public IReadOnlyList<CapturedPieceView> CapturedByWhitePieces { get; set; } = Array.Empty<CapturedPieceView>();
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CapturedPieceView> CapturedByBlackPieces { get; set; } = Array.Empty<CapturedPieceView>();
 
     [Parameter, EditorRequired]
     public IReadOnlyList<MoveHistoryEntry> RecentHistory { get; set; } = Array.Empty<MoveHistoryEntry>();
 
     [Parameter]
     public bool HasHistory { get; set; }
+
+    [Parameter]
+    public bool IsCollapsed { get; set; }
 
     [Parameter]
     public EventCallback OnNewGame { get; set; }
@@ -158,4 +211,7 @@
 
     [Parameter]
     public EventCallback OnOpenHistoryModal { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggleCollapse { get; set; }
 }

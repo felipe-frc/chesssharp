@@ -69,7 +69,9 @@ window.chessSharpUi = {
       ? { frequency: 610, peak: 0.038, duration: 0.22 }
       : type === "capture"
         ? { frequency: 420, peak: 0.032, duration: 0.18 }
-        : { frequency: 520, peak: 0.024, duration: 0.16 };
+        : type === "end"
+          ? { frequency: 340, peak: 0.034, duration: 0.3 }
+          : { frequency: 520, peak: 0.024, duration: 0.16 };
 
     oscillator.frequency.setValueAtTime(profile.frequency, now);
     gain.gain.exponentialRampToValueAtTime(profile.peak, now + 0.01);

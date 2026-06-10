@@ -1,0 +1,40 @@
+<div class="overlay">
+    <div class="modal-card modal-card-compact">
+        <p class="card-label">Fim da partida</p>
+        <h2>@Title</h2>
+        <p class="choice-copy modal-copy">@Subtitle</p>
+
+        <div class="game-over-meta">
+            <div class="game-over-stat">
+                <span>Lances</span>
+                <strong>@MoveCount</strong>
+            </div>
+            <div class="game-over-stat">
+                <span>Motivo</span>
+                <strong>@Subtitle</strong>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="footer-button footer-button-primary" @onclick="OnNewGame">Novo jogo</button>
+            <button class="footer-button" @onclick="OnClose">Fechar</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Subtitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public int MoveCount { get; set; }
+
+    [Parameter]
+    public EventCallback OnNewGame { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+}

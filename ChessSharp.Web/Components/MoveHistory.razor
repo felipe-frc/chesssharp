@@ -18,7 +18,7 @@ else
         @foreach (var entry in Entries)
         {
             <div class="history-item">
-                <span class="history-line">@entry.Number.ToString("00"). @entry.Notation</span>
+                <span class="history-line">#@entry.Number @entry.Notation</span>
             </div>
         }
     </div>
