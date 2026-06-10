@@ -37,9 +37,6 @@
     public global::ChessSharp.Board.ChessBoard Board { get; set; } = default!;
 
     [Parameter, EditorRequired]
-    public PieceColor PlayerColor { get; set; }
-
-    [Parameter, EditorRequired]
     public IEnumerable<int> DisplayRows { get; set; } = Array.Empty<int>();
 
     [Parameter, EditorRequired]

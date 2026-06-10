@@ -57,7 +57,7 @@ public static class ConsoleRenderer
                 }
                 else
                 {
-                    Console.ForegroundColor = GetPieceColor(piece.PieceColor, isLightSquare, isLastMoveSquare);
+                    Console.ForegroundColor = GetPieceColor(piece.PieceColor);
                     Console.Write($"  {GetPieceSymbol(piece.PieceType, piece.PieceColor)}  ");
                 }
 
@@ -102,7 +102,7 @@ public static class ConsoleRenderer
             : ConsoleColor.DarkGray;
     }
 
-    private static ConsoleColor GetPieceColor(PieceColor pieceColor, bool isLightSquare, bool isLastMoveSquare)
+    private static ConsoleColor GetPieceColor(PieceColor pieceColor)
     {
         return pieceColor == PieceColor.White
             ? ConsoleColor.White
