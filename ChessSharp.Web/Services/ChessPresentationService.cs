@@ -20,7 +20,7 @@ public static class ChessPresentationService
             PieceType.Bishop => "bishop",
             PieceType.Knight => "knight",
             PieceType.Pawn => "pawn",
-            _ => throw new InvalidOperationException("Tipo de peca invalido.")
+            _ => throw new InvalidOperationException("Tipo de peça inválido.")
         };
 
         return $"assets/images/pieces/{colorName}-{pieceName}.png";
@@ -37,7 +37,7 @@ public static class ChessPresentationService
             PieceType.Bishop => "Bispo",
             PieceType.Knight => "Cavalo",
             PieceType.King => "Rei",
-            PieceType.Pawn => "Peao",
+            PieceType.Pawn => "Peão",
             _ => pieceType.ToString()
         };
 }

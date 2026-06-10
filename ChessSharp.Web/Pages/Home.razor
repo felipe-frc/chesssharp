@@ -25,7 +25,7 @@
 
         <GamePanel HeroTitle="@GetHeroPanelTitle()"
                    PositionSummary="@GetPositionSummary()"
-                   StatusMessage="_statusMessage"
+                   StatusMessage="@_statusMessage"
                    StatusOrbClass="@GetStatusOrbClass()"
                    SoundEnabled="_soundEnabled"
                    SoundButtonLabel="@GetSoundButtonLabel()"
@@ -53,13 +53,13 @@
             <div class="modal-card history-modal-card">
                 <div class="history-modal-head">
                     <div>
-                        <p class="card-label">Historico completo</p>
+                        <p class="card-label">Histórico completo</p>
                         <h2>Todos os lances da partida</h2>
                     </div>
                     <button class="modal-close" @onclick="CloseHistoryModal">Fechar</button>
                 </div>
 
-                <MoveHistory Title="Historico completo"
+                <MoveHistory Title="Histórico completo"
                              Entries="FullHistory"
                              ListCssClass="history-modal-list" />
             </div>

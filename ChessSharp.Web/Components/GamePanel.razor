@@ -3,23 +3,26 @@
 <aside class="info-panel">
     <section class="card control-panel">
         <div class="panel-top">
-            <div>
+            <div class="panel-heading">
                 <p class="card-label">Painel da partida</p>
                 <h1>@HeroTitle</h1>
                 <p class="position-summary">@PositionSummary</p>
             </div>
 
             <div class="panel-top-tools">
-                <div class="panel-status">
-                    <span class="@StatusOrbClass"></span>
-                    <span>@StatusMessage</span>
-                </div>
-
                 <SoundToggle Enabled="SoundEnabled"
                              Label="@SoundButtonLabel"
                              OnToggle="OnToggleSound" />
             </div>
         </div>
+
+        @if (!string.IsNullOrWhiteSpace(StatusMessage))
+        {
+            <div class="panel-status">
+                <span class="@StatusOrbClass"></span>
+                <span>@StatusMessage</span>
+            </div>
+        }
 
         <div class="sidebar-actions">
             <button class="footer-button footer-button-primary" @onclick="OnNewGame">
@@ -30,19 +33,16 @@
             </button>
         </div>
 
-        <div class="panel-block">
-            <div class="panel-inline-title">Voce vs Bot</div>
+        <div class="panel-block panel-block-soft">
+            <div class="panel-inline-title">Você vs Bot</div>
 
-            <div class="sidebar-versus">
+            <div class="sidebar-versus sidebar-versus-compact">
                 <div class="@PlayerSidebarClass">
                     <ChessPiece PieceType="PieceType.King"
                                 PieceColor="PlayerColor"
                                 CssClass="sidebar-player-piece"
                                 AltText="Seu rei" />
-                    <div>
-                        <strong>Voce</strong>
-                        <span>@ChessPresentationService.GetColorName(PlayerColor)</span>
-                    </div>
+                    <strong>Você <span>(@ChessPresentationService.GetColorName(PlayerColor))</span></strong>
                 </div>
 
                 <span class="sidebar-versus-mark">vs</span>
@@ -52,15 +52,12 @@
                                 PieceColor="BotColor"
                                 CssClass="sidebar-player-piece"
                                 AltText="Rei do bot" />
-                    <div>
-                        <strong>Bot</strong>
-                        <span>@ChessPresentationService.GetColorName(BotColor)</span>
-                    </div>
+                    <strong>Bot <span>(@ChessPresentationService.GetColorName(BotColor))</span></strong>
                 </div>
             </div>
         </div>
 
-        <div class="panel-block">
+        <div class="panel-block panel-block-soft">
             <div class="summary-lines">
                 <div class="summary-line">
                     <span>Fase</span>
@@ -81,13 +78,13 @@
             </div>
         </div>
 
-        <div class="panel-block">
+        <div class="panel-block panel-block-soft">
             <p class="card-label">Capturadas</p>
             <CapturedPieces WhiteCapturedPieces="WhiteCapturedPieces"
                             BlackCapturedPieces="BlackCapturedPieces" />
         </div>
 
-        <div class="panel-block">
+        <div class="panel-block panel-block-soft">
             <MoveHistory Entries="RecentHistory"
                          ShowOpenButton="@HasHistory"
                          OnOpenFullHistory="OnOpenHistoryModal" />

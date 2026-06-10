@@ -1,17 +1,13 @@
 @using ChessSharp.Enums
 
-<div class="captures-group">
-    <div class="capture-panel">
+<div class="captures-group captures-group-compact">
+    <div class="capture-panel capture-panel-inline">
         <div class="capture-heading">
-            <span>Brancas capturadas (@WhiteCapturedPieces.Count)</span>
+            <span>Brancas (@WhiteCapturedPieces.Count)</span>
         </div>
-        <div class="captured-strip">
-            @if (WhiteCapturedPieces.Count == 0)
-            {
-                <span class="capture-empty">Nenhuma</span>
-            }
-            else
-            {
+        @if (WhiteCapturedPieces.Count > 0)
+        {
+            <div class="captured-strip">
                 @foreach (var capturedPiece in WhiteCapturedPieces)
                 {
                     <ChessPiece PieceType="capturedPiece.PieceType"
@@ -19,21 +15,17 @@
                                 CssClass="captured-piece"
                                 AltText="@ChessPresentationService.GetPieceTypeName(capturedPiece.PieceType)" />
                 }
-            }
-        </div>
+            </div>
+        }
     </div>
 
-    <div class="capture-panel">
+    <div class="capture-panel capture-panel-inline">
         <div class="capture-heading">
-            <span>Pretas capturadas (@BlackCapturedPieces.Count)</span>
+            <span>Pretas (@BlackCapturedPieces.Count)</span>
         </div>
-        <div class="captured-strip">
-            @if (BlackCapturedPieces.Count == 0)
-            {
-                <span class="capture-empty">Nenhuma</span>
-            }
-            else
-            {
+        @if (BlackCapturedPieces.Count > 0)
+        {
+            <div class="captured-strip">
                 @foreach (var capturedPiece in BlackCapturedPieces)
                 {
                     <ChessPiece PieceType="capturedPiece.PieceType"
@@ -41,8 +33,8 @@
                                 CssClass="captured-piece"
                                 AltText="@ChessPresentationService.GetPieceTypeName(capturedPiece.PieceType)" />
                 }
-            }
-        </div>
+            </div>
+        }
     </div>
 </div>
 

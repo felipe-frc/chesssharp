@@ -26,7 +26,7 @@ public partial class Home : ComponentBase
     private PieceColor _playerColor = PieceColor.White;
     private BoardPosition? _selectedPosition;
     private List<BoardPosition> _legalTargetPositions = [];
-    private string _statusMessage = "Selecione uma cor para comecar.";
+    private string _statusMessage = "Selecione uma cor para começar.";
     private bool _showColorSelection = true;
     private bool _showPromotionSelection;
     private bool _showHistoryModal;
@@ -60,7 +60,7 @@ public partial class Home : ComponentBase
             : Enumerable.Range(0, 8).Reverse();
 
     private IReadOnlyList<MoveHistoryEntry> RecentHistory =>
-        _moveHistory.TakeLast(6).Reverse().ToList();
+        _moveHistory.TakeLast(5).Reverse().ToList();
 
     private IReadOnlyList<MoveHistoryEntry> FullHistory =>
         _moveHistory.AsEnumerable().Reverse().ToList();
@@ -143,8 +143,8 @@ public partial class Home : ComponentBase
         {
             ClearSelection();
             _statusMessage = piece is null
-                ? "Selecione uma peca."
-                : "Selecione uma peca da sua cor.";
+                ? "Selecione uma peça."
+                : "Selecione uma peça da sua cor.";
             return;
         }
 
@@ -160,7 +160,7 @@ public partial class Home : ComponentBase
         {
             _statusMessage = ChessRules.IsKingInCheck(_game.Board, _playerColor)
                 ? "Seu rei precisa de defesa."
-                : "Essa peca nao tem lances validos.";
+                : "Essa peça não tem lances válidos.";
             return;
         }
 
@@ -183,7 +183,7 @@ public partial class Home : ComponentBase
             _pendingPromotionOrigin = origin;
             _pendingPromotionTarget = targetPosition;
             _showPromotionSelection = true;
-            _statusMessage = "Escolha a promocao.";
+            _statusMessage = "Escolha a promoção.";
             return;
         }
 
@@ -254,7 +254,7 @@ public partial class Home : ComponentBase
 
             if (botMove is null)
             {
-                _statusMessage = "Sem lances disponiveis.";
+                _statusMessage = "Sem lances disponíveis.";
                 return;
             }
 
@@ -268,7 +268,7 @@ public partial class Home : ComponentBase
 
             if (!botMoveResult.Success)
             {
-                _statusMessage = "O bot tentou um lance invalido.";
+                _statusMessage = "O bot tentou um lance inválido.";
                 return;
             }
 
@@ -326,7 +326,7 @@ public partial class Home : ComponentBase
         _pendingPromotionTarget = null;
         ClearSelection();
         _showColorSelection = true;
-        _statusMessage = "Selecione uma cor para comecar.";
+        _statusMessage = "Selecione uma cor para começar.";
     }
 
     private void OpenHistoryModal() => _showHistoryModal = true;
@@ -336,7 +336,7 @@ public partial class Home : ComponentBase
     private void ToggleSound() => _soundEnabled = !_soundEnabled;
 
     private string GetSoundButtonLabel() =>
-        _soundEnabled ? "Desativar som" : "Ativar som";
+        _soundEnabled ? "🔊 Som ligado" : "🔇 Som desligado";
 
     private void ClearSelection()
     {
@@ -346,13 +346,13 @@ public partial class Home : ComponentBase
 
     private string GetPlayerTurnMessage() =>
         ChessRules.IsKingInCheck(_game.Board, _playerColor)
-            ? "Seu rei esta em xeque."
-            : "Selecione uma peca.";
+            ? "Seu rei está em xeque."
+            : "Selecione uma peça.";
 
     private string GetInvalidTargetMessage() =>
         ChessRules.IsKingInCheck(_game.Board, _playerColor)
-            ? "Voce precisa responder ao xeque."
-            : "Escolha uma casa valida.";
+            ? "Você precisa responder ao xeque."
+            : "Escolha uma casa válida.";
 
     private string GetFinalMessage()
     {
@@ -363,7 +363,7 @@ public partial class Home : ComponentBase
         return _game.Status switch
         {
             GameStatus.WhiteWins or GameStatus.BlackWins => playerWon
-                ? "Vitoria."
+                ? "Vitória."
                 : "Derrota.",
             GameStatus.Draw => "Empate.",
             GameStatus.PlayerQuit => "Partida encerrada.",
@@ -372,7 +372,7 @@ public partial class Home : ComponentBase
     }
 
     private string GetTurnOwner() =>
-        _game.CurrentTurn == _playerColor ? "Voce" : "Bot";
+        _game.CurrentTurn == _playerColor ? "Você" : "Bot";
 
     private string GetKingSafetyLabel() =>
         ChessRules.IsKingInCheck(_game.Board, _playerColor) ? "Em xeque" : "Protegido";
@@ -396,12 +396,12 @@ public partial class Home : ComponentBase
             return "Defina a cor para iniciar a partida.";
 
         if (_game.IsFinished)
-            return "A sequencia final esta pronta para revisao.";
+            return "A sequência final está pronta para revisão.";
 
         if (ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn))
             return _game.CurrentTurn == PieceColor.White
-                ? "Rei branco sob pressao."
-                : "Rei preto sob pressao.";
+                ? "Rei branco sob pressão."
+                : "Rei preto sob pressão.";
 
         string phase = GetPhaseLabel();
         int whiteDelta = GetMaterialDelta(PieceColor.White);
@@ -409,16 +409,16 @@ public partial class Home : ComponentBase
         if (phase == "Final")
         {
             if (whiteDelta > 1)
-                return "Final favoravel as brancas.";
+                return "Final favorável às brancas.";
 
             if (whiteDelta < -1)
-                return "Final favoravel as pretas.";
+                return "Final favorável às pretas.";
 
             return "Final equilibrado.";
         }
 
         if (whiteDelta == 0)
-            return "Posicao equilibrada.";
+            return "Posição equilibrada.";
 
         if (whiteDelta > 0)
             return "Brancas pressionam o centro.";
@@ -649,7 +649,7 @@ public partial class Home : ComponentBase
 
     private static string BuildMoveNotation(Move move)
     {
-        string notation = $"{GetBoardNotation(move.Origin)} -> {GetBoardNotation(move.Target)}";
+        string notation = $"{GetBoardNotation(move.Origin)} → {GetBoardNotation(move.Target)}";
 
         if (move.PromotionPieceType is not null)
             notation += $" = {ChessPresentationService.GetPieceTypeName(move.PromotionPieceType.Value)}";

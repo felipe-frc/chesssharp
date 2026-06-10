@@ -1,8 +1,9 @@
-<button class="sound-toggle-icon @(Enabled ? "sound-toggle-on" : string.Empty)"
+<button class="sound-toggle-chip @(Enabled ? "sound-toggle-on" : string.Empty)"
         @onclick="OnToggle"
         title="@Label"
         aria-label="@Label">
-    @(Enabled ? "🔊" : "🔇")
+    <span class="sound-toggle-glyph">@(Enabled ? "🔊" : "🔇")</span>
+    <span class="sound-toggle-label">@Label</span>
 </button>
 
 @code {
