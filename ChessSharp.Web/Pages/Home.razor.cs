@@ -12,15 +12,6 @@ namespace ChessSharp.Web.Pages;
 
 public partial class Home : ComponentBase
 {
-    private static readonly PieceType[] CapturablePieceOrder =
-    [
-        PieceType.Queen,
-        PieceType.Rook,
-        PieceType.Bishop,
-        PieceType.Knight,
-        PieceType.Pawn
-    ];
-
     private ChessGame _game = new();
     private ChessBot _bot = new(PieceColor.Black);
     private PieceColor _playerColor = PieceColor.White;
@@ -68,10 +59,10 @@ public partial class Home : ComponentBase
         _moveHistory.AsEnumerable().Reverse().ToList();
 
     private IReadOnlyList<CapturedPieceView> WhiteCapturedPieces =>
-        GetCapturedPieces(PieceColor.White);
+        ChessPresentationService.GetCapturedPieces(_game.Board, PieceColor.White);
 
     private IReadOnlyList<CapturedPieceView> BlackCapturedPieces =>
-        GetCapturedPieces(PieceColor.Black);
+        ChessPresentationService.GetCapturedPieces(_game.Board, PieceColor.Black);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -447,7 +438,7 @@ public partial class Home : ComponentBase
     private string GetPositionEvaluation()
     {
         string phase = GetPhaseLabel();
-        int whiteDelta = GetMaterialDelta(PieceColor.White);
+        int whiteDelta = ChessPresentationService.GetMaterialDelta(_game.Board, PieceColor.White);
 
         if (phase == "Final")
         {
@@ -612,7 +603,7 @@ public partial class Home : ComponentBase
 
     private string GetMaterialSummary()
     {
-        int whiteDelta = GetMaterialDelta(PieceColor.White);
+        int whiteDelta = ChessPresentationService.GetMaterialDelta(_game.Board, PieceColor.White);
 
         if (whiteDelta == 0)
             return "Material equilibrado";
@@ -628,85 +619,6 @@ public partial class Home : ComponentBase
 
         return $"Pretas +{Math.Abs(whiteDelta)}";
     }
-
-    private int GetMaterialDelta(PieceColor perspective)
-    {
-        int own = GetMaterialScore(perspective);
-        int opponent = GetMaterialScore(ChessRules.GetOpponentColor(perspective));
-        return own - opponent;
-    }
-
-    private int GetMaterialScore(PieceColor color)
-    {
-        int total = 0;
-
-        for (int row = 0; row < 8; row++)
-        {
-            for (int column = 0; column < 8; column++)
-            {
-                var piece = _game.Board.GetPieceAt(new BoardPosition(row, column));
-
-                if (piece?.PieceColor != color)
-                    continue;
-
-                total += piece.PieceType switch
-                {
-                    PieceType.Pawn => 1,
-                    PieceType.Knight => 3,
-                    PieceType.Bishop => 3,
-                    PieceType.Rook => 5,
-                    PieceType.Queen => 9,
-                    _ => 0
-                };
-            }
-        }
-
-        return total;
-    }
-
-    private IReadOnlyList<CapturedPieceView> GetCapturedPieces(PieceColor capturedColor)
-    {
-        List<CapturedPieceView> pieces = [];
-
-        foreach (var pieceType in CapturablePieceOrder)
-        {
-            int missingCount = GetInitialPieceCount(pieceType) - GetRemainingPieceCount(capturedColor, pieceType);
-
-            for (int i = 0; i < missingCount; i++)
-                pieces.Add(new CapturedPieceView(pieceType, capturedColor));
-        }
-
-        return pieces;
-    }
-
-    private int GetRemainingPieceCount(PieceColor color, PieceType pieceType)
-    {
-        int total = 0;
-
-        for (int row = 0; row < 8; row++)
-        {
-            for (int column = 0; column < 8; column++)
-            {
-                var piece = _game.Board.GetPieceAt(new BoardPosition(row, column));
-
-                if (piece?.PieceColor == color && piece.PieceType == pieceType)
-                    total++;
-            }
-        }
-
-        return total;
-    }
-
-    private static int GetInitialPieceCount(PieceType pieceType) =>
-        pieceType switch
-        {
-            PieceType.Queen => 1,
-            PieceType.Rook => 2,
-            PieceType.Bishop => 2,
-            PieceType.Knight => 2,
-            PieceType.Pawn => 8,
-            _ => 0
-        };
 
     private static string GetBoardNotation(BoardPosition position) =>
         $"{(char)('a' + position.Column)}{8 - position.Row}";
