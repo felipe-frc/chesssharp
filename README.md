@@ -6,143 +6,75 @@
 
 # ChessSharp
 
-ChessSharp e um jogo de xadrez desenvolvido em **C# com .NET**, com tres formas de jogar:
+ChessSharp e um jogo de xadrez desenvolvido em **C# com .NET**, estruturado para compartilhar a mesma engine entre tres experiencias:
 
-- **Console** para experimentar o motor de regras no terminal
-- **Desktop WPF** para uma experiencia 2D nativa no Windows
-- **Web com Blazor WebAssembly** para jogar no navegador com a mesma engine em C#
+- **Console** para jogar no terminal
+- **Desktop WPF** para uma interface grafica nativa no Windows
+- **Web com Blazor WebAssembly** para jogar no navegador usando a mesma base em C#
 
-O projeto foi evoluido por releases incrementais e hoje entrega uma base jogavel e estavel com:
+O projeto foi evoluido em releases incrementais e hoje combina:
 
 - regras reais de xadrez
-- bot com minimax simples e poda alpha-beta
-- cobertura de testes com CI no GitHub Actions
-- interface desktop premium
-- interface web estavel, responsiva e jogavel no navegador
+- bot com minimax e poda alpha-beta
+- engine centralizada e reutilizavel
+- testes automatizados
+- integracao continua no GitHub Actions
+- interfaces Desktop e Web com identidade visual premium
 
 ---
 
 ## Visao Geral
 
-O ChessSharp compartilha o mesmo motor de jogo entre as interfaces. Isso permite evoluir a experiencia visual sem duplicar regras, validacoes ou comportamento do bot.
+O ChessSharp foi refatorado para que toda a logica de jogo fique em `ChessSharp.Core`, enquanto as interfaces ficam responsaveis apenas por apresentacao e interacao.
+
+Isso permite:
+
+- evoluir a experiencia visual sem duplicar regra de negocio
+- manter Console, Desktop e Web sincronizados
+- testar a engine separadamente da UI
+- escalar o projeto com mais seguranca e organizacao
 
 ### O que ja esta pronto
 
-- xeque e xeque-mate
+- xeque
+- xeque-mate
 - afogamento
 - roque pequeno e grande
 - promocao de peao
 - en passant
 - validacao de movimentos legais
-- protecao contra jogadas que deixam o proprio rei em xeque
+- bloqueio de jogadas que deixam o proprio rei em xeque
 - bot com avaliacao material e busca minimax
 
-### Plataformas disponiveis
-
-- **Console**: partida via terminal com entrada por coordenadas
-- **Desktop WPF**: experiencia 2D premium para Windows
-- **Blazor WebAssembly**: versao web jogavel com layout premium, capturas, historico, selecao de cor, animacao curta e feedback visual refinado
-
 ---
 
-## Objetivo do Projeto
+## Arquitetura Atual
 
-O projeto foi construido para praticar e demonstrar:
+### Nucleo compartilhado
 
-- desenvolvimento com C# e .NET
-- programacao orientada a objetos
-- modelagem de dominio
-- implementacao de regras completas de xadrez
-- IA simples para jogos
-- testes automatizados com xUnit
-- cobertura de testes com Coverlet
-- integracao continua com GitHub Actions
-- evolucao incremental guiada por releases
+`ChessSharp.Core` centraliza:
 
----
+- tabuleiro
+- pecas
+- enums
+- regras do jogo
+- regras especiais
+- validacoes de movimento
+- estrutura de jogadas
+- IA / bot
 
-## Funcionalidades
+### Interfaces
 
-### Motor do jogo
+- `ChessSharp`:
+  camada Console, focada em entrada e saida textual
+- `ChessSharp.Desktop`:
+  camada WPF, focada em renderizacao, eventos e interacao visual
+- `ChessSharp.Web`:
+  camada Blazor WebAssembly, focada em componentes, layout, feedback visual e experiencia no navegador
 
-- tabuleiro 8x8
-- representacao por coordenadas como `e2`, `e4`, `h8`
-- controle de turno entre brancas e pretas
-- validacao de movimentos legais
-- validacao de caminho livre
-- captura de pecas adversarias
-- bloqueio de captura de peca da mesma cor
-- bloqueio de jogadas que deixam o proprio rei em xeque
-- encerramento correto por vitoria, empate ou partida encerrada
+### Testes
 
-### Regras especiais
-
-- roque pequeno
-- roque grande
-- promocao de peao
-- promocao com escolha de peca
-- en passant
-- afogamento
-
-### Bot
-
-- busca de movimentos legais
-- avaliacao material
-- minimax simples
-- poda alpha-beta
-- respeito integral ao motor de regras
-
-### Console
-
-- jogavel no terminal
-- pecas em Unicode
-- entrada no formato `origem destino`
-- escolha da cor do jogador
-- promocao informando a peca desejada
-
-Exemplo:
-
-```txt
-e2 e4
-e7 e8 q
-```
-
-### Desktop WPF
-
-- tabuleiro visual 2D
-- pecas em PNG
-- selecao por clique
-- destaque de movimentos validos
-- nova partida
-- feedback visual premium
-
-### Web com Blazor WebAssembly
-
-- roda no navegador com a mesma engine em C#
-- selecao de cor no inicio da partida
-- tabuleiro premium com foco visual dominante
-- lateral compacta com resumo da partida
-- capturas separadas por cor
-- historico recente com acesso ao historico completo
-- animacao curta de movimento
-- feedback sonoro opcional
-- layout responsivo e pronto para demonstracao publica
-
----
-
-## Tecnologias Utilizadas
-
-| Camada | Tecnologia |
-| --- | --- |
-| Linguagem | C# |
-| Plataforma | .NET |
-| Console | .NET 9 |
-| Desktop | WPF em .NET 9 para Windows |
-| Web | Blazor WebAssembly em .NET 9 |
-| Testes | xUnit |
-| Cobertura | Coverlet |
-| CI/CD | GitHub Actions |
-| Versionamento | Git / GitHub |
+`ChessSharp.Tests` cobre a engine compartilhada sem depender de UI.
 
 ---
 
@@ -153,6 +85,7 @@ ChessSharp/
 |
 |-- ChessSharp/
 |   |-- UI/
+|   |-- ChessSharp.csproj
 |   `-- Program.cs
 |
 |-- ChessSharp.Core/
@@ -165,17 +98,37 @@ ChessSharp/
 |
 |-- ChessSharp.Desktop/
 |   |-- Assets/
+|   |   `-- Images/
 |   |-- App.xaml
 |   |-- MainWindow.xaml
+|   |-- MainWindow.xaml.cs
 |   `-- ChessSharp.Desktop.csproj
 |
 |-- ChessSharp.Web/
 |   |-- Components/
+|   |   |-- CapturedPieces.razor
+|   |   |-- ChessBoard.razor
+|   |   |-- ChessPiece.razor
+|   |   |-- ChessSquare.razor
+|   |   |-- ColorSelectionModal.razor
+|   |   |-- GamePanel.razor
+|   |   |-- MoveHistory.razor
+|   |   |-- PromotionModal.razor
+|   |   `-- SoundToggle.razor
 |   |-- Layout/
 |   |-- Pages/
+|   |   |-- Home.razor
+|   |   `-- Home.razor.cs
 |   |-- Services/
+|   |   `-- ChessPresentationService.cs
 |   |-- ViewModels/
+|   |   |-- CapturedPieceView.cs
+|   |   |-- MoveHistoryEntry.cs
+|   |   `-- PendingAnimation.cs
 |   |-- wwwroot/
+|   |   |-- assets/
+|   |   |-- css/
+|   |   `-- js/
 |   |-- App.razor
 |   |-- Program.cs
 |   `-- ChessSharp.Web.csproj
@@ -184,21 +137,98 @@ ChessSharp/
 |   |-- AI/
 |   |-- Board/
 |   |-- Game/
-|   `-- Pieces/
+|   |-- Pieces/
+|   `-- ChessSharp.Tests.csproj
 |
 |-- .github/
+|   `-- workflows/
 |-- badges/
 |-- ChessSharp.sln
 `-- README.md
 ```
 
-### Arquitetura
+---
 
-- `ChessSharp.Core` centraliza toda a engine compartilhada: tabuleiro, regras, movimentos, pecas, enums e bot.
-- `ChessSharp` ficou focado apenas na experiencia de terminal e usa o Core por referencia de projeto.
-- `ChessSharp.Desktop` usa a mesma engine em uma camada WPF dedicada a eventos, renderizacao e interacao visual.
-- `ChessSharp.Web` usa a mesma engine em Blazor WebAssembly, com `Home.razor` atuando como orquestrador e a interface separada em componentes como `ChessBoard`, `ChessSquare`, `GamePanel`, `MoveHistory` e modais.
-- `ChessSharp.Tests` valida a engine compartilhada sem depender de UI.
+## Funcionalidades
+
+### Motor do jogo
+
+- tabuleiro 8x8
+- coordenadas como `e2`, `e4`, `h8`
+- controle de turno entre brancas e pretas
+- validacao completa de movimentos
+- validacao de caminho livre
+- capturas
+- protecao contra captura de peca da mesma cor
+- bloqueio de jogadas que deixam o proprio rei em xeque
+- encerramento correto da partida
+
+### Regras especiais
+
+- roque pequeno
+- roque grande
+- promocao de peao
+- promocao com escolha de peca
+- en passant
+- afogamento
+
+### Bot
+
+- avaliacao material
+- busca de movimentos legais
+- minimax
+- poda alpha-beta
+
+### Versao Console
+
+- jogavel no terminal
+- pecas em Unicode
+- escolha da cor do jogador
+- entrada por coordenadas
+
+Exemplo:
+
+```txt
+e2 e4
+e7 e8 q
+```
+
+### Versao Desktop WPF
+
+- tabuleiro 2D
+- pecas em PNG
+- selecao por clique
+- destaque de movimentos legais
+- feedback visual premium
+
+### Versao Web com Blazor WebAssembly
+
+- roda diretamente no navegador
+- usa a mesma engine em C#
+- selecao de cor no inicio
+- tabuleiro premium
+- painel lateral compacto
+- capturas separadas por cor
+- historico recente e completo
+- promocao em modal
+- animacao curta de movimento
+- feedback sonoro opcional
+
+---
+
+## Tecnologias Utilizadas
+
+| Camada | Tecnologia |
+| --- | --- |
+| Linguagem | C# |
+| Plataforma | .NET 9 |
+| Console | .NET 9 |
+| Desktop | WPF em .NET 9 para Windows |
+| Web | Blazor WebAssembly em .NET 9 |
+| Testes | xUnit |
+| Cobertura | Coverlet |
+| CI/CD | GitHub Actions |
+| Versionamento | Git / GitHub |
 
 ---
 
@@ -207,10 +237,10 @@ ChessSharp/
 ### Pre-requisitos
 
 - .NET SDK 9
-- Windows para executar a versao desktop
+- Windows para executar a versao Desktop
 - Git
 
-> A solution foi padronizada em `.NET 9`, mantendo apenas a variacao `net9.0-windows` no projeto WPF por necessidade da plataforma.
+> O projeto foi padronizado em `.NET 9`, com o Desktop usando `net9.0-windows`.
 
 ### 1. Clone o repositorio
 
@@ -225,19 +255,19 @@ cd chesssharp
 dotnet restore
 ```
 
-### 3. Execute a versao console
+### 3. Execute a versao Console
 
 ```bash
 dotnet run --project ChessSharp/ChessSharp.csproj
 ```
 
-### 4. Execute a versao desktop
+### 4. Execute a versao Desktop
 
 ```bash
 dotnet run --project ChessSharp.Desktop/ChessSharp.Desktop.csproj
 ```
 
-### 5. Execute a versao web
+### 5. Execute a versao Web
 
 ```bash
 dotnet run --project ChessSharp.Web/ChessSharp.Web.csproj
@@ -260,20 +290,12 @@ http://localhost:5290/
 - para promocao, informe a peca como terceiro argumento
 - use `sair` para encerrar a partida
 
-Exemplos:
-
-```txt
-e2 e4
-e7 e8 q
-sair
-```
-
 ### Desktop
 
 - clique em uma peca da sua cor
-- as casas legais serao destacadas
+- as casas validas serao destacadas
 - clique na casa de destino
-- a maquina responde automaticamente
+- o bot responde automaticamente
 
 ### Web
 
@@ -281,21 +303,21 @@ sair
 - clique em uma peca para ver os movimentos
 - clique na casa destacada para concluir a jogada
 - use `Novo jogo` para recomecar
-- use `Trocar cor` para abrir uma nova escolha de lado
-- use `Ver historico completo` para revisar todos os lances
+- use `Trocar cor` para abrir uma nova selecao
+- use `Ver historico completo` para revisar a partida
 
 ---
 
-## Testes Automatizados
+## Testes
 
-O projeto possui testes cobrindo:
+Os testes cobrem:
 
 - conversao de coordenadas
 - movimentos das pecas
 - regras gerais do jogo
 - xeque e xeque-mate
-- promocao de peao
 - roque
+- promocao
 - en passant
 - comportamento do bot
 
@@ -311,40 +333,17 @@ Para compilar a solution completa:
 dotnet build ChessSharp.sln
 ```
 
-Para compilar manualmente por interface:
-
-```bash
-dotnet build ChessSharp/ChessSharp.csproj
-dotnet build ChessSharp.Desktop/ChessSharp.Desktop.csproj
-dotnet build ChessSharp.Web/ChessSharp.Web.csproj
-```
-
 ---
 
 ## Integracao Continua
 
 O GitHub Actions executa automaticamente:
 
-- restauracao de dependencias
-- compilacao da solucao
+- restauracao da solution
+- compilacao
 - execucao dos testes
 - coleta de cobertura
 - atualizacao do badge de cobertura
-
----
-
-## Melhorias e Proximos Passos
-
-Proximas evolucoes recomendadas:
-
-- refinamentos visuais finais na interface web
-- configuracao de profundidade do bot
-- regras adicionais de empate:
-  - repeticao de posicao
-  - regra dos 50 lances
-  - material insuficiente
-- reducao de responsabilidades visuais concentradas nas telas
-- avaliacao de deploy publico da versao web
 
 ---
 
@@ -402,26 +401,37 @@ Proximas evolucoes recomendadas:
 
 ### v2.4.0
 
-- otimização visual e cache de assets do jogo
+- otimizacao visual e cache de assets
 
 ### v2.5.0
 
-- versao web estavel com Blazor WebAssembly
+- versao Web estavel com Blazor WebAssembly
 - selecao de cor no navegador
-- historico recente e historico completo em modal
+- historico recente e historico completo
 - capturas separadas por cor
-- resumo de posicao e material em linguagem amigavel
 - animacao curta de movimento
 - feedback sonoro opcional
-- layout premium responsivo para browser
+
+### v2.6.0
+
+- refatoracao arquitetural da solution
+- consolidacao definitiva da engine em `ChessSharp.Core`
+- componentizacao da versao Web
+- separacao entre UI e regra de negocio
+- reorganizacao da estrutura do projeto
+- reforco de testes e compatibilidade da pipeline
 
 ---
 
 ## Releases
 
+### v2.6.0 - Refatoracao arquitetural e consolidacao multiplataforma
+
+Versao focada em reorganizar a base do ChessSharp para deixar a engine compartilhada entre Console, Desktop WPF e Web Blazor WebAssembly mais limpa, reutilizavel e profissional. Esta release consolida `ChessSharp.Core` como centro da logica do jogo, componentiza a interface Web e melhora a manutencao geral da solution.
+
 ### v2.5.0 - ChessSharp Web estavel no navegador
 
-Versao focada em consolidar a experiencia web do ChessSharp com Blazor WebAssembly, transformando o projeto em uma experiencia jogavel no navegador sem abrir mao da mesma engine em C#, da identidade premium do tabuleiro e da evolucao incremental que marcou as releases anteriores.
+Versao focada em consolidar a experiencia Web do ChessSharp com Blazor WebAssembly, transformando o projeto em uma experiencia jogavel no navegador sem abrir mao da mesma engine em C# e da identidade premium do tabuleiro.
 
 ### v2.4.0 - Otimizacao visual e cache de assets
 
@@ -429,55 +439,67 @@ Versao focada em melhorar o carregamento e o reaproveitamento dos assets visuais
 
 ### v2.3.0 - Refinamento do footer e feedback visual
 
-Versao focada no polimento visual da interface desktop, refinando o footer, os botoes de acao, o painel de status e o feedback de selecao e movimentos legais para uma experiencia mais consistente com a identidade premium do projeto.
+Versao focada no polimento visual da interface desktop, refinando o footer, os botoes de acao, o painel de status e o feedback de selecao e movimentos legais.
 
 ### v2.2.0 - Fundo premium e refinamento da interface desktop
 
-Versao focada na atmosfera visual da interface desktop, adicionando fundo premium em marmore escuro, consolidando o tabuleiro premium e refinando o layout geral da tela para um acabamento mais forte de portfolio.
+Versao focada na atmosfera visual da interface desktop, adicionando fundo premium em marmore escuro e refinando o layout geral da tela.
 
 ### v2.1.0 - Tabuleiro premium e refinamento visual do jogo
 
-Versao focada na substituicao do tabuleiro renderizado por codigo por um tabuleiro premium em imagem, com melhor integracao visual entre pecas, fundo, coordenadas e layout da interface.
+Versao focada na substituicao do tabuleiro renderizado por codigo por um tabuleiro premium em imagem.
 
 ### v2.0.1 - Refinamento visual da interface desktop
 
-Versao focada em melhorar a apresentacao da primeira interface grafica do ChessSharp, com ajustes de paleta, logo, harmonia visual, acabamento do layout e preservacao do fluxo funcional ja existente.
+Versao focada em melhorar a apresentacao da primeira interface grafica do ChessSharp, com ajustes de paleta, logo e acabamento visual.
 
 ### v2.0.0 - Interface grafica 2D com WPF
 
-Versao focada na evolucao visual do ChessSharp, adicionando uma interface grafica desktop em WPF, tabuleiro 2D, movimentacao por mouse, integracao com o bot e marcadores visuais para movimentos legais.
+Versao focada na evolucao visual do ChessSharp, adicionando uma interface grafica desktop em WPF com movimentacao por mouse e integracao com o bot.
 
 ### v1.7.0 - En passant
 
-Versao focada na implementacao da regra especial en passant, completando as principais regras especiais do xadrez junto com roque e promocao de peao.
+Versao focada na implementacao da regra especial en passant.
 
 ### v1.6.0 - Cobertura de testes com badge
 
-Versao focada na validacao de qualidade do projeto, adicionando coleta de cobertura com Coverlet e badge de cobertura no README.
+Versao focada na validacao de qualidade do projeto, adicionando coleta de cobertura com Coverlet e badge no README.
 
 ### v1.5.0 - Bot com minimax simples
 
-Versao focada na evolucao da inteligencia da maquina, adicionando avaliacao de tabuleiro, simulacao de jogadas futuras, busca minimax simples e poda alpha-beta.
+Versao focada na evolucao da inteligencia da maquina, adicionando avaliacao de tabuleiro, minimax e poda alpha-beta.
 
 ### v1.4.0 - Roque e promocao de peao
 
-Versao focada na implementacao de regras especiais do xadrez, adicionando promocao de peao, roque pequeno, roque grande e validacoes especificas para impedir roques ilegais.
+Versao focada na implementacao de regras especiais do xadrez.
 
 ### v1.3.0 - Xeque e xeque-mate real
 
-Versao focada na evolucao do motor de regras do ChessSharp, substituindo a logica simplificada de captura do rei por deteccao real de xeque e xeque-mate.
+Versao focada na substituicao da logica simplificada de captura do rei por deteccao real de xeque e xeque-mate.
 
 ### v1.2.0 - Escolha de cor do jogador
 
-Versao que permite ao jogador escolher se deseja jogar com as pecas brancas ou pretas antes do inicio da partida.
+Versao que permite ao jogador escolher jogar com as pecas brancas ou pretas.
 
 ### v1.1.0 - Melhorias visuais no tabuleiro
 
-Versao focada na melhoria visual do ChessSharp no console, com casas coloridas, pecas Unicode e melhor apresentacao do tabuleiro.
+Versao focada na melhoria visual do ChessSharp no console, com casas coloridas e pecas Unicode.
 
 ### v1.0.0 - Versao inicial jogavel no console
 
 Primeira versao jogavel do ChessSharp, com tabuleiro, pecas, movimentacao, jogador contra maquina, bot simples, testes automatizados e integracao continua.
+
+---
+
+## Proximos Passos
+
+Melhorias naturais para as proximas iteracoes:
+
+- refinamentos visuais finais na interface Web
+- configuracao de profundidade do bot
+- regras adicionais de empate
+- mais testes para cenarios estrategicos
+- deploy publico da versao Web
 
 ---
 
