@@ -25,6 +25,7 @@
         <a href="." class="reload">Recarregar</a>
         <span class="dismiss">x</span>
     </div>
+
     <script>
         function showBootError(message) {
             const host = document.getElementById('app');
@@ -42,21 +43,22 @@
                 errorUi.style.display = 'block';
             }
         }
-
-        window.addEventListener('error', function (event) {
-            if (event?.message) {
-                showBootError(event.message);
-            }
-        });
+    </script>
+    <script src="js/chesssharp-ui.js"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
+    <script>
+        Blazor.start()
+            .catch(function (error) {
+                const message = error && (error.stack || error.message) ? (error.stack || error.message) : String(error);
+                showBootError(message);
+            });
 
         window.addEventListener('unhandledrejection', function (event) {
-            const reason = event?.reason;
-            const message = reason?.stack || reason?.message || String(reason);
+            const reason = event && event.reason;
+            const message = reason && (reason.stack || reason.message) ? (reason.stack || reason.message) : String(reason);
             showBootError(message);
         });
     </script>
-    <script src="js/chesssharp-ui.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
 </html>

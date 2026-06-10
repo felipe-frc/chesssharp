@@ -891,13 +891,6 @@ public partial class MainWindow : Window
         return color == PieceColor.White ? "CLARAS" : "ESCURAS";
     }
 
-    private static string ToChessNotation(BoardPosition position)
-    {
-        char file = (char)('a' + position.Column);
-        int rank = 8 - position.Row;
-        return $"{file}{rank}";
-    }
-
     private readonly record struct PieceRenderProfile(
         double Height,
         double MaxWidth,

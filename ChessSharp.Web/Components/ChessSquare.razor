@@ -1,0 +1,69 @@
+@using ChessSharp.Board
+<button class="@CssClass"
+        data-square="@SquareNotation"
+        @onclick="HandleClick">
+    @if (IsLastMoveSquare)
+    {
+        <span class="last-move-highlight"></span>
+    }
+
+    @if (IsSelected)
+    {
+        <span class="selected-highlight"></span>
+    }
+
+    @if (IsCheckedKingSquare)
+    {
+        <span class="check-highlight"></span>
+    }
+
+    @if (IsLegalTarget)
+    {
+        <span class="@(IsCaptureTarget ? "move-indicator move-indicator-capture" : "move-indicator")"></span>
+    }
+
+    @if (Piece is not null)
+    {
+        <ChessPiece PieceType="Piece.PieceType"
+                    PieceColor="Piece.PieceColor"
+                    CssClass="@PieceCssClass"
+                    AltText="@ChessPresentationService.GetPieceAltText(Piece)" />
+    }
+</button>
+
+@code {
+    [Parameter, EditorRequired]
+    public BoardPosition Position { get; set; }
+
+    [Parameter]
+    public global::ChessSharp.Pieces.ChessPiece? Piece { get; set; }
+
+    [Parameter, EditorRequired]
+    public string SquareNotation { get; set; } = string.Empty;
+
+    [Parameter]
+    public string CssClass { get; set; } = "board-square";
+
+    [Parameter]
+    public string PieceCssClass { get; set; } = "piece-image";
+
+    [Parameter]
+    public bool IsLastMoveSquare { get; set; }
+
+    [Parameter]
+    public bool IsSelected { get; set; }
+
+    [Parameter]
+    public bool IsCheckedKingSquare { get; set; }
+
+    [Parameter]
+    public bool IsLegalTarget { get; set; }
+
+    [Parameter]
+    public bool IsCaptureTarget { get; set; }
+
+    [Parameter]
+    public EventCallback<BoardPosition> OnClick { get; set; }
+
+    private Task HandleClick() => OnClick.InvokeAsync(Position);
+}

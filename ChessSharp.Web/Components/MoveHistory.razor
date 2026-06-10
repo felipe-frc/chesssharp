@@ -1,0 +1,42 @@
+<div class="history-head">
+    <p class="card-label">@Title</p>
+    @if (ShowOpenButton)
+    {
+        <button class="history-link" @onclick="OnOpenFullHistory">
+            Ver historico completo
+        </button>
+    }
+</div>
+
+@if (Entries.Count == 0)
+{
+    <p class="history-empty">Sem lances ainda.</p>
+}
+else
+{
+    <div class="@ListCssClass">
+        @foreach (var entry in Entries)
+        {
+            <div class="history-item">
+                <span class="history-line">@entry.Number.ToString("00"). @entry.Notation</span>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Title { get; set; } = "Ultimos lances";
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<MoveHistoryEntry> Entries { get; set; } = Array.Empty<MoveHistoryEntry>();
+
+    [Parameter]
+    public bool ShowOpenButton { get; set; }
+
+    [Parameter]
+    public string ListCssClass { get; set; } = "history-list";
+
+    [Parameter]
+    public EventCallback OnOpenFullHistory { get; set; }
+}

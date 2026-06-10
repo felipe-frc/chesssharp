@@ -1,0 +1,55 @@
+@using ChessSharp.Enums
+
+<div class="captures-group">
+    <div class="capture-panel">
+        <div class="capture-heading">
+            <span>Brancas capturadas (@WhiteCapturedPieces.Count)</span>
+        </div>
+        <div class="captured-strip">
+            @if (WhiteCapturedPieces.Count == 0)
+            {
+                <span class="capture-empty">Nenhuma</span>
+            }
+            else
+            {
+                @foreach (var capturedPiece in WhiteCapturedPieces)
+                {
+                    <ChessPiece PieceType="capturedPiece.PieceType"
+                                PieceColor="capturedPiece.PieceColor"
+                                CssClass="captured-piece"
+                                AltText="@ChessPresentationService.GetPieceTypeName(capturedPiece.PieceType)" />
+                }
+            }
+        </div>
+    </div>
+
+    <div class="capture-panel">
+        <div class="capture-heading">
+            <span>Pretas capturadas (@BlackCapturedPieces.Count)</span>
+        </div>
+        <div class="captured-strip">
+            @if (BlackCapturedPieces.Count == 0)
+            {
+                <span class="capture-empty">Nenhuma</span>
+            }
+            else
+            {
+                @foreach (var capturedPiece in BlackCapturedPieces)
+                {
+                    <ChessPiece PieceType="capturedPiece.PieceType"
+                                PieceColor="capturedPiece.PieceColor"
+                                CssClass="captured-piece"
+                                AltText="@ChessPresentationService.GetPieceTypeName(capturedPiece.PieceType)" />
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CapturedPieceView> WhiteCapturedPieces { get; set; } = Array.Empty<CapturedPieceView>();
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CapturedPieceView> BlackCapturedPieces { get; set; } = Array.Empty<CapturedPieceView>();
+}

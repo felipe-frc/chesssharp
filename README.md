@@ -136,7 +136,7 @@ e7 e8 q
 | --- | --- |
 | Linguagem | C# |
 | Plataforma | .NET |
-| Console | .NET 8 |
+| Console | .NET 9 |
 | Desktop | WPF em .NET 9 para Windows |
 | Web | Blazor WebAssembly em .NET 9 |
 | Testes | xUnit |
@@ -152,15 +152,15 @@ e7 e8 q
 ChessSharp/
 |
 |-- ChessSharp/
+|   |-- UI/
+|   `-- Program.cs
+|
+|-- ChessSharp.Core/
 |   |-- AI/
 |   |-- Board/
 |   |-- Enums/
 |   |-- Game/
 |   |-- Pieces/
-|   |-- UI/
-|   `-- Program.cs
-|
-|-- ChessSharp.Core/
 |   `-- ChessSharp.Core.csproj
 |
 |-- ChessSharp.Desktop/
@@ -170,8 +170,11 @@ ChessSharp/
 |   `-- ChessSharp.Desktop.csproj
 |
 |-- ChessSharp.Web/
+|   |-- Components/
 |   |-- Layout/
 |   |-- Pages/
+|   |-- Services/
+|   |-- ViewModels/
 |   |-- wwwroot/
 |   |-- App.razor
 |   |-- Program.cs
@@ -189,6 +192,14 @@ ChessSharp/
 `-- README.md
 ```
 
+### Arquitetura
+
+- `ChessSharp.Core` centraliza toda a engine compartilhada: tabuleiro, regras, movimentos, pecas, enums e bot.
+- `ChessSharp` ficou focado apenas na experiencia de terminal e usa o Core por referencia de projeto.
+- `ChessSharp.Desktop` usa a mesma engine em uma camada WPF dedicada a eventos, renderizacao e interacao visual.
+- `ChessSharp.Web` usa a mesma engine em Blazor WebAssembly, com `Home.razor` atuando como orquestrador e a interface separada em componentes como `ChessBoard`, `ChessSquare`, `GamePanel`, `MoveHistory` e modais.
+- `ChessSharp.Tests` valida a engine compartilhada sem depender de UI.
+
 ---
 
 ## Como Executar
@@ -199,7 +210,7 @@ ChessSharp/
 - Windows para executar a versao desktop
 - Git
 
-> O SDK 9 permite trabalhar com a solucao completa, incluindo projetos `net8.0`, `net9.0` e `net9.0-windows`.
+> A solution foi padronizada em `.NET 9`, mantendo apenas a variacao `net9.0-windows` no projeto WPF por necessidade da plataforma.
 
 ### 1. Clone o repositorio
 
@@ -294,7 +305,13 @@ Para executar:
 dotnet test ChessSharp.Tests/ChessSharp.Tests.csproj
 ```
 
-Para compilar manualmente:
+Para compilar a solution completa:
+
+```bash
+dotnet build ChessSharp.sln
+```
+
+Para compilar manualmente por interface:
 
 ```bash
 dotnet build ChessSharp/ChessSharp.csproj

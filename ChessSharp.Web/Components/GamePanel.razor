@@ -1,0 +1,164 @@
+@using ChessSharp.Enums
+
+<aside class="info-panel">
+    <section class="card control-panel">
+        <div class="panel-top">
+            <div>
+                <p class="card-label">Painel da partida</p>
+                <h1>@HeroTitle</h1>
+                <p class="position-summary">@PositionSummary</p>
+            </div>
+
+            <div class="panel-top-tools">
+                <div class="panel-status">
+                    <span class="@StatusOrbClass"></span>
+                    <span>@StatusMessage</span>
+                </div>
+
+                <SoundToggle Enabled="SoundEnabled"
+                             Label="@SoundButtonLabel"
+                             OnToggle="OnToggleSound" />
+            </div>
+        </div>
+
+        <div class="sidebar-actions">
+            <button class="footer-button footer-button-primary" @onclick="OnNewGame">
+                Novo jogo
+            </button>
+            <button class="footer-button" @onclick="OnChangeColor">
+                Trocar cor
+            </button>
+        </div>
+
+        <div class="panel-block">
+            <div class="panel-inline-title">Voce vs Bot</div>
+
+            <div class="sidebar-versus">
+                <div class="@PlayerSidebarClass">
+                    <ChessPiece PieceType="PieceType.King"
+                                PieceColor="PlayerColor"
+                                CssClass="sidebar-player-piece"
+                                AltText="Seu rei" />
+                    <div>
+                        <strong>Voce</strong>
+                        <span>@ChessPresentationService.GetColorName(PlayerColor)</span>
+                    </div>
+                </div>
+
+                <span class="sidebar-versus-mark">vs</span>
+
+                <div class="@BotSidebarClass">
+                    <ChessPiece PieceType="PieceType.King"
+                                PieceColor="BotColor"
+                                CssClass="sidebar-player-piece"
+                                AltText="Rei do bot" />
+                    <div>
+                        <strong>Bot</strong>
+                        <span>@ChessPresentationService.GetColorName(BotColor)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-block">
+            <div class="summary-lines">
+                <div class="summary-line">
+                    <span>Fase</span>
+                    <strong>@PhaseLabel</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Turno</span>
+                    <strong>@TurnOwner</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Rei</span>
+                    <strong>@KingSafetyLabel</strong>
+                </div>
+                <div class="summary-line">
+                    <span>Material</span>
+                    <strong>@MaterialSummary</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-block">
+            <p class="card-label">Capturadas</p>
+            <CapturedPieces WhiteCapturedPieces="WhiteCapturedPieces"
+                            BlackCapturedPieces="BlackCapturedPieces" />
+        </div>
+
+        <div class="panel-block">
+            <MoveHistory Entries="RecentHistory"
+                         ShowOpenButton="@HasHistory"
+                         OnOpenFullHistory="OnOpenHistoryModal" />
+        </div>
+    </section>
+</aside>
+
+@code {
+    [Parameter]
+    public string HeroTitle { get; set; } = string.Empty;
+
+    [Parameter]
+    public string PositionSummary { get; set; } = string.Empty;
+
+    [Parameter]
+    public string StatusMessage { get; set; } = string.Empty;
+
+    [Parameter]
+    public string StatusOrbClass { get; set; } = "status-orb";
+
+    [Parameter]
+    public bool SoundEnabled { get; set; }
+
+    [Parameter]
+    public string SoundButtonLabel { get; set; } = "Som";
+
+    [Parameter]
+    public PieceColor PlayerColor { get; set; }
+
+    [Parameter]
+    public PieceColor BotColor { get; set; }
+
+    [Parameter]
+    public string PlayerSidebarClass { get; set; } = "sidebar-player";
+
+    [Parameter]
+    public string BotSidebarClass { get; set; } = "sidebar-player";
+
+    [Parameter]
+    public string PhaseLabel { get; set; } = string.Empty;
+
+    [Parameter]
+    public string TurnOwner { get; set; } = string.Empty;
+
+    [Parameter]
+    public string KingSafetyLabel { get; set; } = string.Empty;
+
+    [Parameter]
+    public string MaterialSummary { get; set; } = string.Empty;
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CapturedPieceView> WhiteCapturedPieces { get; set; } = Array.Empty<CapturedPieceView>();
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<CapturedPieceView> BlackCapturedPieces { get; set; } = Array.Empty<CapturedPieceView>();
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<MoveHistoryEntry> RecentHistory { get; set; } = Array.Empty<MoveHistoryEntry>();
+
+    [Parameter]
+    public bool HasHistory { get; set; }
+
+    [Parameter]
+    public EventCallback OnNewGame { get; set; }
+
+    [Parameter]
+    public EventCallback OnChangeColor { get; set; }
+
+    [Parameter]
+    public EventCallback OnToggleSound { get; set; }
+
+    [Parameter]
+    public EventCallback OnOpenHistoryModal { get; set; }
+}

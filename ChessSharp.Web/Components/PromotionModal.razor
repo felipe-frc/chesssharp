@@ -1,0 +1,33 @@
+@using ChessSharp.Enums
+
+<div class="overlay">
+    <div class="modal-card">
+        <p class="card-label">Promocao de peao</p>
+        <h2>Escolha a peca para concluir a jogada</h2>
+
+        <div class="choice-grid promotion-grid">
+            @foreach (var pieceType in PromotionChoices)
+            {
+                <button class="choice-button"
+                        @onclick="() => OnPromotionSelected.InvokeAsync(pieceType)">
+                    <ChessPiece PieceType="pieceType"
+                                PieceColor="PlayerColor"
+                                CssClass="choice-image"
+                                AltText="@ChessPresentationService.GetPieceTypeName(pieceType)" />
+                    <span class="choice-title">@ChessPresentationService.GetPieceTypeName(pieceType)</span>
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public PieceColor PlayerColor { get; set; }
+
+    [Parameter, EditorRequired]
+    public IReadOnlyList<PieceType> PromotionChoices { get; set; } = Array.Empty<PieceType>();
+
+    [Parameter, EditorRequired]
+    public EventCallback<PieceType> OnPromotionSelected { get; set; }
+}

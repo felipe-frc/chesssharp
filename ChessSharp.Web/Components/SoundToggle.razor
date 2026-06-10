@@ -1,0 +1,17 @@
+<button class="sound-toggle-icon @(Enabled ? "sound-toggle-on" : string.Empty)"
+        @onclick="OnToggle"
+        title="@Label"
+        aria-label="@Label">
+    @(Enabled ? "🔊" : "🔇")
+</button>
+
+@code {
+    [Parameter]
+    public bool Enabled { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = "Som";
+
+    [Parameter]
+    public EventCallback OnToggle { get; set; }
+}

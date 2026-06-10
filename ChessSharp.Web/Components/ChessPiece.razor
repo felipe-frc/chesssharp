@@ -1,0 +1,20 @@
+@using ChessSharp.Enums
+
+<img class="@CssClass"
+     src="@ChessPresentationService.GetPieceAssetPath(PieceType, PieceColor)"
+     alt="@AltText"
+     draggable="false" />
+
+@code {
+    [Parameter, EditorRequired]
+    public PieceType PieceType { get; set; }
+
+    [Parameter, EditorRequired]
+    public PieceColor PieceColor { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; } = "piece-image";
+
+    [Parameter]
+    public string? AltText { get; set; }
+}

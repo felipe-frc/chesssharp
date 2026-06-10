@@ -1,0 +1,74 @@
+@using ChessSharp.Board
+@using ChessSharp.Enums
+@using ChessSharp.Game
+<section class="board-stage">
+    <div class="board-chamber">
+        <div class="board-art">
+            <img class="board-image" src="assets/images/board-premium.png" alt="Tabuleiro premium" />
+
+            <div class="board-grid">
+                @foreach (var row in DisplayRows)
+                {
+                    @foreach (var column in DisplayColumns)
+                    {
+                        var position = new BoardPosition(row, column);
+                        var piece = Board.GetPieceAt(position);
+
+                        <ChessSquare Position="position"
+                                     Piece="piece"
+                                     SquareNotation="@GetBoardNotation(position)"
+                                     CssClass="@GetSquareClass(position)"
+                                     PieceCssClass="@GetPieceFrameClass(piece, position)"
+                                     IsLastMoveSquare="@IsLastMoveSquare(position)"
+                                     IsSelected="@IsSelected(position)"
+                                     IsCheckedKingSquare="@IsCheckedKingSquare(position)"
+                                     IsLegalTarget="@IsLegalTarget(position)"
+                                     IsCaptureTarget="@IsCaptureTarget(position)"
+                                     OnClick="OnSquareClicked" />
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired]
+    public global::ChessSharp.Board.ChessBoard Board { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public PieceColor PlayerColor { get; set; }
+
+    [Parameter, EditorRequired]
+    public IEnumerable<int> DisplayRows { get; set; } = Array.Empty<int>();
+
+    [Parameter, EditorRequired]
+    public IEnumerable<int> DisplayColumns { get; set; } = Array.Empty<int>();
+
+    [Parameter, EditorRequired]
+    public Func<BoardPosition, bool> IsLastMoveSquare { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Func<BoardPosition, bool> IsSelected { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Func<BoardPosition, bool> IsCheckedKingSquare { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Func<BoardPosition, bool> IsLegalTarget { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Func<BoardPosition, bool> IsCaptureTarget { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Func<BoardPosition, string> GetSquareClass { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Func<global::ChessSharp.Pieces.ChessPiece?, BoardPosition, string> GetPieceFrameClass { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Func<BoardPosition, string> GetBoardNotation { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EventCallback<BoardPosition> OnSquareClicked { get; set; }
+}
