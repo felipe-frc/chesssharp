@@ -19,7 +19,7 @@ string lastMessage = playerColor == PieceColor.White
 
 while (!game.IsFinished)
 {
-    ConsoleRenderer.RenderBoard(game.Board);
+    ConsoleRenderer.RenderBoard(game.Board, game.CurrentTurn);
 
     Console.WriteLine();
     Console.WriteLine(lastMessage);
@@ -57,7 +57,7 @@ while (!game.IsFinished)
 
     if (game.CurrentTurn == botColor)
     {
-        ConsoleRenderer.RenderBoard(game.Board);
+        ConsoleRenderer.RenderBoard(game.Board, game.CurrentTurn);
 
         Console.WriteLine();
         Console.WriteLine(lastMessage);
@@ -90,7 +90,7 @@ while (!game.IsFinished)
     }
 }
 
-ConsoleRenderer.RenderBoard(game.Board);
+ConsoleRenderer.RenderBoard(game.Board, game.CurrentTurn);
 
 Console.WriteLine();
 Console.WriteLine(lastMessage);
