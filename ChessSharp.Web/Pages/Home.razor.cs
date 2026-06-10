@@ -62,7 +62,7 @@ public partial class Home : ComponentBase
             : Enumerable.Range(0, 8).Reverse();
 
     private IReadOnlyList<MoveHistoryEntry> RecentHistory =>
-        _moveHistory.TakeLast(4).Reverse().ToList();
+        _moveHistory.TakeLast(6).Reverse().ToList();
 
     private IReadOnlyList<MoveHistoryEntry> FullHistory =>
         _moveHistory.AsEnumerable().Reverse().ToList();
@@ -562,6 +562,10 @@ public partial class Home : ComponentBase
             classes.Add("status-orb-finished");
         else if (ChessRules.IsKingInCheck(_game.Board, _game.CurrentTurn))
             classes.Add("status-orb-alert");
+        else if (!_showColorSelection)
+            classes.Add(_game.CurrentTurn == PieceColor.White
+                ? "status-orb-white-turn"
+                : "status-orb-black-turn");
         else
             classes.Add("status-orb-ready");
 

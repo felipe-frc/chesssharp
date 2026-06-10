@@ -150,11 +150,12 @@ button {
     line-height: 1.35;
 }
 
+/* ChessSharp Layout Improvements */
 .play-surface {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 25.5%);
-    gap: 0.72rem;
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 1.5rem;
+    align-items: stretch;
     max-width: 1680px;
     margin: 0 auto;
     transition: grid-template-columns 180ms ease;
@@ -178,7 +179,7 @@ button {
 
 .board-art {
     position: relative;
-    width: min(86vw, calc(100vh - 136px), 1080px);
+    width: min(100%, calc(100vh - 136px), 1040px);
     aspect-ratio: 1;
     margin: 0 auto;
 }
@@ -336,6 +337,8 @@ button {
 
 .info-panel {
     min-width: 0;
+    align-self: stretch;
+    height: 100%;
 }
 
 .info-panel-collapsed {
@@ -359,8 +362,11 @@ button {
 }
 
 .control-panel {
+    height: 100%;
+    max-height: calc(100vh - 150px);
     border: 1px solid rgba(214, 162, 63, 0.18);
     box-shadow: 0 16px 38px rgba(0, 0, 0, 0.16);
+    overflow: hidden;
 }
 
 .card-label {
@@ -463,6 +469,7 @@ button {
     background: rgba(22, 14, 10, 0.92);
     border: 1px solid rgba(140, 102, 48, 0.5);
     position: relative;
+    transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .status-orb::after {
@@ -478,6 +485,20 @@ button {
 
 .status-orb-ready {
     color: #e0b85c;
+}
+
+.status-orb-white-turn {
+    color: #f5e8c8;
+    background: linear-gradient(145deg, #f5e8c8 0%, #c8a040 100%);
+    border-color: rgba(245, 217, 143, 0.78);
+    box-shadow: 0 0 8px rgba(245, 217, 143, 0.7);
+}
+
+.status-orb-black-turn {
+    color: #3a3a3a;
+    background: linear-gradient(145deg, #3a3a3a 0%, #1a1a1a 100%);
+    border: 1px solid #9a6a2e;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
 .status-orb-thinking {
@@ -533,10 +554,19 @@ button {
     transform: translateY(-1px);
     border-color: rgba(214, 162, 63, 0.82);
     color: var(--gold-soft);
+    filter: brightness(1.15);
 }
 
 .footer-button-primary {
-    background: linear-gradient(180deg, rgba(58, 35, 22, 0.96) 0%, rgba(19, 11, 8, 0.98) 100%);
+    background: linear-gradient(to bottom, #e8c45a 0%, #c49030 100%);
+    border-color: rgba(232, 196, 90, 0.8);
+    color: #1a0e08;
+}
+
+.footer-button:not(.footer-button-primary) {
+    background: #1a0e08;
+    border-color: #9a6a2e;
+    color: #e3be68;
 }
 
 .sound-toggle-chip {
@@ -737,8 +767,11 @@ button {
 }
 
 .history-list {
-    max-height: 58px;
-    overflow: hidden;
+    max-height: 5.9rem;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(214, 162, 63, 0.46) rgba(26, 14, 8, 0.5);
 }
 
 .history-modal-list {
@@ -881,14 +914,19 @@ button {
     }
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 1024px) {
     .play-surface,
     .play-surface-panel-collapsed {
         grid-template-columns: 1fr;
+        gap: 1.25rem;
     }
 
     .board-art {
         width: min(92vw, calc(100vh - 182px), 1010px);
+    }
+
+    .control-panel {
+        max-height: none;
     }
 
     .info-panel-collapsed {
