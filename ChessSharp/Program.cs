@@ -69,15 +69,10 @@ while (!game.IsFinished)
 
         if (botMove is null)
         {
-            if (playerColor == PieceColor.White)
-            {
-                game.FinishWithWhiteWin();
-                lastMessage = "A máquina não possui movimentos válidos. Você venceu.";
-            }
-            else
-            {
-                lastMessage = "A máquina não possui movimentos válidos. Fim de jogo.";
-            }
+            game.FinishByNoLegalMoves(botColor);
+            lastMessage = game.Status == GameStatus.Draw
+                ? "A máquina não possui movimentos válidos. Empate por afogamento."
+                : "A máquina não possui movimentos válidos. Você venceu.";
 
             break;
         }

@@ -168,9 +168,17 @@ public class ChessGame
         Status = GameStatus.PlayerQuit;
     }
 
-    public void FinishWithWhiteWin()
+    public void FinishByNoLegalMoves(PieceColor colorWithoutLegalMoves)
     {
-        Status = GameStatus.WhiteWins;
+        if (!ChessRules.IsKingInCheck(Board, colorWithoutLegalMoves))
+        {
+            Status = GameStatus.Draw;
+            return;
+        }
+
+        Status = colorWithoutLegalMoves == PieceColor.White
+            ? GameStatus.BlackWins
+            : GameStatus.WhiteWins;
     }
 
     private void ExecuteCastlingMove(Move move)

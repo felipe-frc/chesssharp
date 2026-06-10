@@ -125,13 +125,29 @@ public class ChessGameTests
     }
 
     [Fact]
-    public void FinishWithWhiteWin_ShouldSetStatusToWhiteWins()
+    public void FinishByNoLegalMoves_ShouldSetStatusToDraw_WhenKingIsNotInCheck()
     {
         var game = new ChessGame();
 
-        game.FinishWithWhiteWin();
+        game.FinishByNoLegalMoves(PieceColor.White);
 
-        Assert.Equal(GameStatus.WhiteWins, game.Status);
+        Assert.Equal(GameStatus.Draw, game.Status);
+        Assert.True(game.IsFinished);
+    }
+
+    [Fact]
+    public void FinishByNoLegalMoves_ShouldSetOpponentAsWinner_WhenKingIsInCheck()
+    {
+        var game = new ChessGame();
+        game.Board.Clear();
+
+        game.Board.SetPieceAt(BoardPosition.FromChessNotation("e1"), new King(PieceColor.White));
+        game.Board.SetPieceAt(BoardPosition.FromChessNotation("e8"), new King(PieceColor.Black));
+        game.Board.SetPieceAt(BoardPosition.FromChessNotation("e7"), new Queen(PieceColor.Black));
+
+        game.FinishByNoLegalMoves(PieceColor.White);
+
+        Assert.Equal(GameStatus.BlackWins, game.Status);
         Assert.True(game.IsFinished);
     }
 

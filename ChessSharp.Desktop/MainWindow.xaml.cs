@@ -610,7 +610,8 @@ public partial class MainWindow : Window
 
         if (botMove is null)
         {
-            UpdateStatusMessage("OPONENTE SEM MOVIMENTOS.");
+            _game.FinishByNoLegalMoves(_bot.BotColor);
+            UpdateStatusMessage(GetFinalMessage());
             return;
         }
 

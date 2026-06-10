@@ -256,7 +256,9 @@ public partial class Home : ComponentBase
 
             if (botMove is null)
             {
-                _statusMessage = "Sem lances disponíveis.";
+                _game.FinishByNoLegalMoves(_bot.BotColor);
+                _pendingSound = "end";
+                HandleFinishedGame();
                 return;
             }
 
