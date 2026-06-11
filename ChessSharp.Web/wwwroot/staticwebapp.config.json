@@ -5,6 +5,8 @@
       "/assets/*",
       "/css/*",
       "/js/*",
+      "/lib/*",
+      "/sample-data/*",
       "/_framework/*",
       "/favicon.png",
       "/icon-192.png"
