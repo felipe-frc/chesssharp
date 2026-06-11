@@ -27,7 +27,7 @@
     </div>
 
     <script>
-        function showBootError(message) {
+        function showBootError() {
             const host = document.getElementById('app');
             const errorUi = document.getElementById('blazor-error-ui');
 
@@ -35,7 +35,7 @@
                 host.innerHTML =
                     '<main style="min-height:100vh;padding:2rem;background:#120906;color:#f3e7d5;">' +
                     '<h1 style="margin-top:0;">Erro ao iniciar o ChessSharp</h1>' +
-                    '<pre style="white-space:pre-wrap;line-height:1.45;">' + message + '</pre>' +
+                    '<p style="line-height:1.6;max-width:40rem;">Não foi possível carregar a aplicação neste momento. Tente recarregar a página em alguns instantes.</p>' +
                     '</main>';
             }
 
@@ -49,14 +49,13 @@
     <script>
         Blazor.start()
             .catch(function (error) {
-                const message = error && (error.stack || error.message) ? (error.stack || error.message) : String(error);
-                showBootError(message);
+                console.error('ChessSharp Web failed to start.', error);
+                showBootError();
             });
 
         window.addEventListener('unhandledrejection', function (event) {
-            const reason = event && event.reason;
-            const message = reason && (reason.stack || reason.message) ? (reason.stack || reason.message) : String(reason);
-            showBootError(message);
+            console.error('Unhandled promise rejection during ChessSharp Web startup.', event && event.reason);
+            showBootError();
         });
     </script>
 </body>
