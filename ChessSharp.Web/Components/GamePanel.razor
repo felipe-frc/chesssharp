@@ -17,23 +17,26 @@
     {
         <section class="card control-panel">
             <div class="panel-top">
-                <div class="panel-heading">
+                <div class="panel-header-bar">
                     <p class="card-label">Painel da partida</p>
-                    <h1>@HeroTitle</h1>
-                    <p class="position-summary">@PositionSummary</p>
+
+                    <div class="panel-top-tools">
+                        <SoundToggle Enabled="SoundEnabled"
+                                     Label="@SoundButtonLabel"
+                                     OnToggle="OnToggleSound" />
+                        <button class="panel-collapse-button"
+                                type="button"
+                                @onclick="OnToggleCollapse"
+                                aria-label="Recolher painel lateral"
+                                title="Recolher painel lateral">
+                            <span>❮</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="panel-top-tools">
-                    <SoundToggle Enabled="SoundEnabled"
-                                 Label="@SoundButtonLabel"
-                                 OnToggle="OnToggleSound" />
-                    <button class="panel-collapse-button"
-                            type="button"
-                            @onclick="OnToggleCollapse"
-                            aria-label="Recolher painel lateral"
-                            title="Recolher painel lateral">
-                        <span>❮</span>
-                    </button>
+                <div class="panel-heading">
+                    <h1>@HeroTitle</h1>
+                    <p class="position-summary">@PositionSummary</p>
                 </div>
             </div>
 
@@ -211,6 +214,9 @@
 
     [Parameter]
     public EventCallback OnToggleSound { get; set; }
+
+    [Parameter]
+    public EventCallback OnOpenFullHistory { get; set; }
 
     [Parameter]
     public EventCallback OnOpenHistoryModal { get; set; }

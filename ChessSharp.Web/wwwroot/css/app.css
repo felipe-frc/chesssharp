@@ -15,6 +15,7 @@ html,
 body {
     margin: 0;
     min-height: 100%;
+    overflow-x: hidden;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text-main);
     background:
@@ -167,9 +168,12 @@ button {
 
 .board-stage {
     min-width: 0;
+    width: 100%;
 }
 
 .board-chamber {
+    width: 100%;
+    max-width: 100%;
     padding: 0.48rem;
     border: 1px solid rgba(214, 162, 63, 0.24);
     border-radius: 16px;
@@ -180,6 +184,7 @@ button {
 .board-art {
     position: relative;
     width: min(100%, calc(100vh - 136px), 1040px);
+    max-width: 100%;
     aspect-ratio: 1;
     margin: 0 auto;
 }
@@ -381,8 +386,15 @@ button {
 .panel-top {
     display: grid;
     gap: 0.22rem;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     align-items: start;
+}
+
+.panel-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
 }
 
 .control-panel h1,
@@ -409,6 +421,7 @@ button {
     justify-content: flex-end;
     align-items: center;
     gap: 0.28rem;
+    flex: 0 0 auto;
 }
 
 .panel-status-meta {
@@ -934,7 +947,7 @@ button {
     }
 
     .board-art {
-        width: min(92vw, calc(100vh - 182px), 1010px);
+        width: min(100%, calc(100vw - 2.2rem), calc(100vh - 182px), 1010px);
     }
 
     .control-panel {
@@ -965,8 +978,19 @@ button {
         line-height: 1.22;
     }
 
+    .board-stage {
+        overflow: visible;
+    }
+
+    .board-chamber {
+        width: min(100%, calc(100vw - 1.4rem));
+        max-width: calc(100vw - 1.4rem);
+        margin-inline: auto;
+    }
+
     .board-art {
-        width: min(96vw, calc(100vh - 246px), 900px);
+        width: 100%;
+        max-width: 100%;
     }
 
     .board-chamber {
@@ -980,15 +1004,10 @@ button {
         align-items: stretch;
     }
 
-    .sidebar-versus,
     .choice-grid,
     .promotion-grid,
     .game-over-meta {
         grid-template-columns: 1fr;
-    }
-
-    .sidebar-versus-mark {
-        justify-self: center;
     }
 
     .summary-line {
@@ -996,159 +1015,167 @@ button {
     }
 
     .history-head,
-    .history-modal-head,
-    .panel-top {
+    .history-modal-head {
         align-items: flex-start;
-        grid-template-columns: 1fr;
-    }
-
-    .panel-top-tools {
-        justify-content: flex-start;
     }
 
     .card.control-panel {
-        padding: 0.86rem 0.78rem 0.82rem;
+        padding: 0.82rem 0.74rem 0.76rem;
         border-radius: 18px;
     }
 
     .panel-top {
-        gap: 0.16rem;
+        gap: 0.14rem;
+    }
+
+    .panel-header-bar {
+        gap: 0.55rem;
     }
 
     .control-panel h1 {
-        font-size: 0.82rem;
+        font-size: 0.8rem;
+        margin-top: 0.1rem;
     }
 
     .position-summary {
-        font-size: 0.63rem;
-        line-height: 1.18;
+        font-size: 0.61rem;
+        line-height: 1.14;
     }
 
     .panel-status-meta {
-        margin-top: 0.32rem;
-        gap: 0.28rem;
+        margin-top: 0.26rem;
+        gap: 0.24rem;
     }
 
     .panel-status {
-        margin-top: 0.28rem;
-        gap: 0.3rem;
-        font-size: 0.62rem;
+        margin-top: 0.2rem;
+        gap: 0.28rem;
+        font-size: 0.6rem;
     }
 
     .status-orb {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
     }
 
     .sidebar-actions {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.48rem;
-        margin-top: 0.48rem;
+        gap: 0.42rem;
+        margin-top: 0.42rem;
     }
 
     .footer-button {
         flex: 0 0 auto;
-        min-height: 54px;
-        padding: 0.62rem 0.72rem;
-        font-size: 0.74rem;
+        min-height: 44px;
+        padding: 0.5rem 0.62rem;
+        font-size: 0.68rem;
         border-radius: 10px;
     }
 
     .panel-inline-title {
-        font-size: 0.6rem;
-    }
-
-    .panel-block {
-        margin-top: 0.32rem;
-        padding-top: 0.3rem;
-    }
-
-    .sidebar-versus {
-        gap: 0.18rem;
-        margin-top: 0.2rem;
-    }
-
-    .sidebar-player {
-        gap: 0.24rem;
-        padding: 0.2rem 0.24rem;
-    }
-
-    .sidebar-player strong {
-        font-size: 0.62rem;
-        line-height: 1.1;
-    }
-
-    .sidebar-player-piece {
-        width: 18px;
-        height: 18px;
-    }
-
-    .sidebar-versus-mark {
-        font-size: 0.56rem;
-    }
-
-    .summary-lines {
-        gap: 0.12rem;
-    }
-
-    .summary-line {
-        grid-template-columns: 58px 1fr;
-        gap: 0.34rem;
-    }
-
-    .summary-line span {
         font-size: 0.58rem;
     }
 
+    .panel-block {
+        margin-top: 0.28rem;
+        padding-top: 0.24rem;
+    }
+
+    .sidebar-versus {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 0.14rem;
+        margin-top: 0.14rem;
+    }
+
+    .sidebar-player {
+        gap: 0.18rem;
+        padding: 0.16rem 0.18rem;
+    }
+
+    .sidebar-player strong {
+        font-size: 0.58rem;
+        line-height: 1.1;
+    }
+
+    .sidebar-player strong span {
+        display: inline;
+    }
+
+    .sidebar-player-piece {
+        width: 16px;
+        height: 16px;
+    }
+
+    .sidebar-versus-mark {
+        font-size: 0.52rem;
+        justify-self: center;
+    }
+
+    .summary-lines {
+        gap: 0.08rem;
+    }
+
+    .summary-line {
+        grid-template-columns: 54px 1fr;
+        gap: 0.28rem;
+    }
+
+    .summary-line span {
+        font-size: 0.54rem;
+    }
+
     .summary-line strong {
-        font-size: 0.64rem;
+        font-size: 0.6rem;
+        line-height: 1.16;
     }
 
     .captures-group {
-        margin-top: 0.16rem;
-        gap: 0.18rem;
+        margin-top: 0.12rem;
+        gap: 0.16rem;
     }
 
     .captures-group-empty {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.22rem 0.42rem;
+        gap: 0.16rem 0.28rem;
     }
 
     .capture-heading {
+        font-size: 0.54rem;
+        line-height: 1.14;
+    }
+
+    .captured-strip {
+        gap: 0.16rem;
+    }
+
+    .captured-piece {
+        width: 18px;
+        height: 18px;
+    }
+
+    .history-head {
+        gap: 0.2rem;
+    }
+
+    .history-link {
+        font-size: 0.54rem;
+    }
+
+    .history-empty {
+        margin: 0.06rem 0 0;
         font-size: 0.58rem;
         line-height: 1.18;
     }
 
-    .captured-strip {
-        gap: 0.2rem;
-    }
-
-    .captured-piece {
-        width: 20px;
-        height: 20px;
-    }
-
-    .history-head {
-        gap: 0.28rem;
-    }
-
-    .history-link {
-        font-size: 0.58rem;
-    }
-
-    .history-empty {
-        margin: 0.1rem 0 0;
-        font-size: 0.64rem;
-    }
-
     .history-list {
-        max-height: 4.75rem;
-        margin-top: 0.2rem;
+        max-height: 4.2rem;
+        margin-top: 0.16rem;
     }
 
     .history-line {
-        font-size: 0.58rem;
+        font-size: 0.54rem;
+        line-height: 1.12;
     }
 }
 
@@ -1159,46 +1186,148 @@ button {
     }
 
     .board-art {
-        width: min(97vw, calc(100vh - 272px), 720px);
+        width: 100%;
     }
 
     .card.control-panel {
-        padding: 0.78rem 0.68rem 0.74rem;
+        padding: 0.72rem 0.62rem 0.68rem;
+    }
+
+    .board-chamber {
+        width: min(100%, calc(100vw - 1rem));
+        max-width: calc(100vw - 1rem);
     }
 
     .panel-top-tools {
-        gap: 0.22rem;
+        gap: 0.18rem;
     }
 
     .sound-toggle-chip,
     .panel-collapse-button {
-        min-width: 34px;
-        min-height: 34px;
+        min-width: 36px;
+        min-height: 36px;
+        width: 36px;
+        height: 36px;
+        padding: 0;
     }
 
     .sidebar-actions {
         grid-template-columns: 1fr 1fr;
-        gap: 0.42rem;
+        gap: 0.36rem;
     }
 
     .footer-button {
-        min-height: 46px;
-        padding: 0.54rem 0.62rem;
-        font-size: 0.7rem;
+        min-height: 40px;
+        padding: 0.44rem 0.54rem;
+        font-size: 0.64rem;
     }
 
     .panel-status-meta .panel-counter,
     .panel-status-meta .status-badge {
-        min-height: 20px;
-        padding: 0.1rem 0.4rem;
-        font-size: 0.54rem;
+        min-height: 18px;
+        padding: 0.08rem 0.34rem;
+        font-size: 0.5rem;
     }
 
     .panel-block-empty-mobile .card-label {
-        margin-bottom: 0.08rem;
+        margin-bottom: 0.04rem;
     }
 
     .captures-group-empty .capture-heading {
-        font-size: 0.55rem;
+        font-size: 0.52rem;
+    }
+
+    .brand-logo {
+        width: min(228px, 62vw);
+    }
+
+    .brand-subtitle {
+        font-size: 0.66rem;
+    }
+
+    .move-indicator::before {
+        width: 15px;
+        height: 15px;
+    }
+
+    .move-indicator-capture::before {
+        width: 48px;
+        height: 48px;
+    }
+
+    .last-move-highlight {
+        inset: 8px;
+    }
+
+    .check-highlight {
+        inset: 5px;
+    }
+
+    .selected-highlight {
+        inset: 3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .web-shell {
+        padding: 0.62rem 0.5rem 0.92rem;
+    }
+
+    .play-surface,
+    .play-surface-panel-collapsed {
+        gap: 0.78rem;
+    }
+
+    .board-chamber {
+        width: min(100%, calc(100vw - 0.78rem));
+        max-width: calc(100vw - 0.78rem);
+        padding: 0.24rem;
+        border-radius: 12px;
+    }
+
+    .card.control-panel {
+        padding: 0.68rem 0.56rem 0.64rem;
+    }
+
+    .panel-header-bar {
+        gap: 0.42rem;
+    }
+
+    .card-label {
+        font-size: 0.58rem;
+        letter-spacing: 0.1rem;
+    }
+
+    .control-panel h1 {
+        font-size: 0.76rem;
+    }
+
+    .position-summary {
+        font-size: 0.58rem;
+    }
+
+    .sidebar-actions {
+        gap: 0.32rem;
+    }
+
+    .footer-button {
+        min-height: 38px;
+        font-size: 0.62rem;
+    }
+
+    .sidebar-player strong {
+        font-size: 0.54rem;
+    }
+
+    .summary-line {
+        grid-template-columns: 50px 1fr;
+    }
+
+    .summary-line span {
+        font-size: 0.51rem;
+    }
+
+    .summary-line strong {
+        font-size: 0.57rem;
     }
 }
