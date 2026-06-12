@@ -1,28 +1,30 @@
-<div class="history-head">
-    <p class="card-label">@Title</p>
-    @if (ShowOpenButton)
-    {
-        <button class="history-link" @onclick="OnOpenFullHistory">
-            Ver histórico completo
-        </button>
-    }
-</div>
-
-@if (Entries.Count == 0)
-{
-    <p class="history-empty">Sem lances ainda.</p>
-}
-else
-{
-    <div class="@ListCssClass">
-        @foreach (var entry in Entries)
+<div class="move-history-root @(Entries.Count == 0 ? "move-history-root-empty" : string.Empty)">
+    <div class="history-head">
+        <p class="card-label">@Title</p>
+        @if (ShowOpenButton)
         {
-            <div class="history-item">
-                <span class="history-line">#@entry.Number @entry.Notation</span>
-            </div>
+            <button class="history-link" @onclick="OnOpenFullHistory">
+                Ver histórico completo
+            </button>
         }
     </div>
-}
+
+    @if (Entries.Count == 0)
+    {
+        <p class="history-empty">Sem lances ainda.</p>
+    }
+    else
+    {
+        <div class="@ListCssClass">
+            @foreach (var entry in Entries)
+            {
+                <div class="history-item">
+                    <span class="history-line">#@entry.Number @entry.Notation</span>
+                </div>
+            }
+        </div>
+    }
+</div>
 
 @code {
     [Parameter]

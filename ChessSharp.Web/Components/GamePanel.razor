@@ -115,13 +115,13 @@
                 </div>
             </div>
 
-            <div class="panel-block panel-block-soft">
+            <div class="panel-block panel-block-soft @(HasCapturedPieces ? string.Empty : "panel-block-empty-mobile")">
                 <p class="card-label">Material capturado</p>
                 <CapturedPieces CapturedByWhitePieces="CapturedByWhitePieces"
                                 CapturedByBlackPieces="CapturedByBlackPieces" />
             </div>
 
-            <div class="panel-block panel-block-soft">
+            <div class="panel-block panel-block-soft @(HasHistory ? string.Empty : "panel-block-empty-mobile")">
                 <MoveHistory Entries="RecentHistory"
                              ShowOpenButton="@HasHistory"
                              OnOpenFullHistory="OnOpenHistoryModal" />
@@ -196,6 +196,9 @@
 
     [Parameter]
     public bool HasHistory { get; set; }
+
+    private bool HasCapturedPieces =>
+        CapturedByWhitePieces.Count > 0 || CapturedByBlackPieces.Count > 0;
 
     [Parameter]
     public bool IsCollapsed { get; set; }
