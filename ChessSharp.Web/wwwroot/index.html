@@ -26,38 +26,9 @@
         <span class="dismiss">x</span>
     </div>
 
-    <script>
-        function showBootError() {
-            const host = document.getElementById('app');
-            const errorUi = document.getElementById('blazor-error-ui');
-
-            if (host) {
-                host.innerHTML =
-                    '<main style="min-height:100vh;padding:2rem;background:#120906;color:#f3e7d5;">' +
-                    '<h1 style="margin-top:0;">Erro ao iniciar o ChessSharp</h1>' +
-                    '<p style="line-height:1.6;max-width:40rem;">Não foi possível carregar a aplicação neste momento. Tente recarregar a página em alguns instantes.</p>' +
-                    '</main>';
-            }
-
-            if (errorUi) {
-                errorUi.style.display = 'block';
-            }
-        }
-    </script>
     <script src="js/chesssharp-ui.js"></script>
     <script src="_framework/blazor.webassembly.js" autostart="false"></script>
-    <script>
-        Blazor.start()
-            .catch(function (error) {
-                console.error('ChessSharp Web failed to start.', error);
-                showBootError();
-            });
-
-        window.addEventListener('unhandledrejection', function (event) {
-            console.error('Unhandled promise rejection during ChessSharp Web startup.', event && event.reason);
-            showBootError();
-        });
-    </script>
+    <script src="js/chesssharp-boot.js"></script>
 </body>
 
 </html>
