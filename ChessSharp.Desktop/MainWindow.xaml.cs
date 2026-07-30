@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Globalization;
 using ChessSharp.AI;
 using ChessSharp.Board;
 using ChessSharp.Enums;
@@ -183,7 +184,7 @@ public partial class MainWindow : Window
 
     private void UpdateStatusMessage(string message)
     {
-        StatusText.Text = message.ToUpper();
+        StatusText.Text = message.ToUpper(CultureInfo.CurrentCulture);
     }
 
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)

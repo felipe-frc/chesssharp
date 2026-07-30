@@ -149,9 +149,9 @@ public static class ConsoleRenderer
 
                 if (piece?.PieceColor == capturedColor &&
                     piece.PieceType != PieceType.King &&
-                    currentCounts.ContainsKey(piece.PieceType))
+                    currentCounts.TryGetValue(piece.PieceType, out var currentCount))
                 {
-                    currentCounts[piece.PieceType]++;
+                    currentCounts[piece.PieceType] = currentCount + 1;
                 }
             }
         }
