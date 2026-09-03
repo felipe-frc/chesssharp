@@ -12,6 +12,22 @@ O projeto conta com uma **engine central em C#** compartilhada entre três vers�
 
 ---
 
+## 🎮 Demonstração do Jogo
+
+Veja uma partida em andamento na versão Web, com movimentação de peças, resposta automática do bot, destaques de jogadas legais e painel lateral da partida.
+
+**Caminho do GIF:** `docs/images/chesssharp-gameplay.gif`
+
+<p align="center">
+  <a href="https://lively-smoke-05fc65310.7.azurestaticapps.net/">
+    <img src="docs/images/chesssharp-gameplay.gif" alt="ChessSharp Web - Gameplay contra o bot" width="750">
+  </a>
+</p>
+
+> Clique no GIF para abrir a versão Web publicada no Azure e jogar diretamente no navegador.
+
+---
+
 ## 🌐 Acesse o Projeto
 
 🔗 **Deploy:** [ChessSharp Web no Azure](https://lively-smoke-05fc65310.7.azurestaticapps.net/)
@@ -211,6 +227,7 @@ ChessSharp/
 │   ├── chesssharp-checkmate.png
 │   ├── chesssharp-color-selection.png
 │   ├── chesssharp-console.png
+│   ├── chesssharp-gameplay.gif
 │   └── chesssharp-web-gameplay.png
 │
 ├── badges/                      # Badge local de cobertura
