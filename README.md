@@ -1,5 +1,5 @@
 [![CI (.NET)](https://github.com/felipe-frc/chesssharp/actions/workflows/dotnet-ci.yml/badge.svg)](https://github.com/felipe-frc/chesssharp/actions/workflows/dotnet-ci.yml)
-![Coverage](badges/coverage.svg)
+[![Coverage](badges/coverage.svg)](https://github.com/felipe-frc/chesssharp/actions/workflows/dotnet-ci.yml)
 ![GitHub release](https://img.shields.io/github/v/release/felipe-frc/chesssharp)
 ![GitHub repo size](https://img.shields.io/github/repo-size/felipe-frc/chesssharp)
 ![GitHub license](https://img.shields.io/github/license/felipe-frc/chesssharp)
